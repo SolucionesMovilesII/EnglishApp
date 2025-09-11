@@ -93,7 +93,7 @@ class _ChapterEpisodesScreenState extends State<ChapterEpisodesScreen>
             AppBanner(
               title: widget.chapterTitle,
               subtitle: AppLocalizations.of(context)!.chapterProgress,
-              livesText: AppLocalizations.of(context)!.livesRemaining,
+              livesText: AppLocalizations.of(context)!.livesRemaining(5),
             ),
             
             Expanded(

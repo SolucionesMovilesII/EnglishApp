@@ -150,7 +150,9 @@ class AppLocalizationsQu extends AppLocalizations {
   String get user => 'Usuario';
 
   @override
-  String get livesRemaining => '5/5';
+  String livesRemaining(int lives) {
+    return '5/5';
+  }
 
   @override
   String get chapterProgress => 'Cap 4/5';
@@ -375,4 +377,22 @@ class AppLocalizationsQu extends AppLocalizations {
 
   @override
   String get folders => 'Carpetas';
+
+  @override
+  String get errorLoadingLives => 'Error loading lives';
+
+  @override
+  String get retry => 'Retry';
+
+  @override
+  String get noLivesRemaining => 'No lives remaining!';
+
+  @override
+  String get livesResetTomorrow => 'Lives reset tomorrow';
+
+  @override
+  String get nextResetTomorrow => 'Next reset tomorrow';
+
+  @override
+  String get refresh => 'Refresh';
 }

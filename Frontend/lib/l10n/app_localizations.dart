@@ -383,8 +383,8 @@ abstract class AppLocalizations {
   /// No description provided for @livesRemaining.
   ///
   /// In en, this message translates to:
-  /// **'5/5'**
-  String get livesRemaining;
+  /// **'{lives} lives remaining'**
+  String livesRemaining(int lives);
 
   /// No description provided for @chapterProgress.
   ///
@@ -799,6 +799,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Folders'**
   String get folders;
+
+  /// No description provided for @errorLoadingLives.
+  ///
+  /// In en, this message translates to:
+  /// **'Error loading lives'**
+  String get errorLoadingLives;
+
+  /// No description provided for @retry.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get retry;
+
+  /// No description provided for @noLivesRemaining.
+  ///
+  /// In en, this message translates to:
+  /// **'No lives remaining!'**
+  String get noLivesRemaining;
+
+  /// No description provided for @livesResetTomorrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Lives reset tomorrow'**
+  String get livesResetTomorrow;
+
+  /// No description provided for @nextResetTomorrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Next reset tomorrow'**
+  String get nextResetTomorrow;
+
+  /// No description provided for @refresh.
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh'**
+  String get refresh;
 }
 
 class _AppLocalizationsDelegate

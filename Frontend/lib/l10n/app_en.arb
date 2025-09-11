@@ -146,5 +146,20 @@
   "book": "Book",
   "@book": {
     "description": "Book section title"
-  }
+  },
+  "errorLoadingLives": "Error loading lives",
+  "retry": "Retry",
+  "noLivesRemaining": "No lives remaining!",
+  "livesRemaining": "{lives} lives remaining",
+  "@livesRemaining": {
+    "placeholders": {
+      "lives": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "livesResetTomorrow": "Lives reset tomorrow",
+  "nextResetTomorrow": "Next reset tomorrow",
+  "refresh": "Refresh"
 }
