@@ -1,20 +1,28 @@
 import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { ScheduleModule } from '@nestjs/schedule';
-import { DailyLivesModule } from './daily-lives.module';
+import { DailyLives } from '../../domain/entities/daily-lives.entity';
+import { DailyLivesRepository } from '../../infrastructure/repositories/daily-lives.repository';
 import { DailyLivesResetService } from '../services/cron/daily-lives-reset.service';
 
 @Module({
   imports: [
     // Schedule module for cron jobs
     ScheduleModule.forRoot(),
-    
-    // Import DailyLives module to get repository
-    DailyLivesModule,
+
+    // TypeORM entities
+    TypeOrmModule.forFeature([DailyLives]),
   ],
   providers: [
+    // Repositories
+    {
+      provide: 'IDailyLivesRepository',
+      useClass: DailyLivesRepository,
+    },
+
     // Cron services
     DailyLivesResetService,
   ],
-  exports: [DailyLivesResetService],
+  exports: [DailyLivesResetService, 'IDailyLivesRepository'],
 })
 export class CronModule {}
