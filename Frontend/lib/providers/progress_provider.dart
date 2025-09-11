@@ -10,6 +10,7 @@ enum ProgressState {
   saving,
   saved,
   error,
+  retrying,
 }
 
 class ProgressProvider with ChangeNotifier {
@@ -19,11 +20,14 @@ class ProgressProvider with ChangeNotifier {
   String? _errorMessage;
   Timer? _debounceTimer;
   final List<Map<String, dynamic>> _pendingSaves = [];
+  bool _isOfflineMode = false;
+  bool _simulateNetworkError = false;
   
   // Getters
   ProgressState get progressState => _progressState;
   String? get errorMessage => _errorMessage;
   bool get isSaving => _progressState == ProgressState.saving;
+  bool get hasPendingProgress => _pendingSaves.isNotEmpty;
   
   // Auto-save configuration
   static const Duration _debounceDuration = Duration(milliseconds: 500);
@@ -57,10 +61,20 @@ class ProgressProvider with ChangeNotifier {
     try {
       _setProgressState(ProgressState.saving);
       
-      // Get auth token
-      final token = await _getAuthToken();
-      if (token == null) {
-        throw Exception('User not authenticated');
+      // Check for simulated network error or offline mode
+      if (_simulateNetworkError || _isOfflineMode) {
+        throw Exception('Network error simulated or offline mode');
+      }
+      
+      // Get auth token (skip in test mode)
+      String? token;
+      if (!_testMode) {
+        token = await _getAuthToken();
+        if (token == null) {
+          throw Exception('User not authenticated');
+        }
+      } else {
+        token = 'test_token'; // Use dummy token in test mode
       }
       
       // Prepare API request
@@ -71,25 +85,43 @@ class ProgressProvider with ChangeNotifier {
         'extra_data': progressData['extra_data'],
       };
       
-      // Make API call
-      final response = await _apiService.post(
-        endpoint,
-        body: requestBody,
-        token: token,
-      );
-      
-      if (response.success) {
-        _setProgressState(ProgressState.saved);
-        _removePendingSave(progressData);
+      // Make API call (simulate success in test mode unless network error is simulated)
+      if (_testMode) {
+        // Simulate network delay
+        await Future.delayed(Duration(milliseconds: 100));
         
-        // Store successful save locally for backup
-        await _storeProgressLocally(progressData);
-        
-        if (kDebugMode) {
-          print('✅ Progress saved successfully for chapter: ${progressData['chapter_id']}');
+        if (_simulateNetworkError) {
+          // Simulate network error in test mode
+          throw Exception('Simulated network error (TEST MODE)');
+        } else {
+          // Simulate successful API call in test mode
+          _setProgressState(ProgressState.saved);
+          _removePendingSave(progressData);
+          
+          if (kDebugMode) {
+            print('✅ Progress saved successfully (TEST MODE) for chapter: ${progressData['chapter_id']}');
+          }
         }
       } else {
-        throw Exception(response.message);
+        final response = await _apiService.post(
+          endpoint,
+          body: requestBody,
+          token: token,
+        );
+        
+        if (response.success) {
+          _setProgressState(ProgressState.saved);
+          _removePendingSave(progressData);
+          
+          // Store successful save locally for backup
+          await _storeProgressLocally(progressData);
+          
+          if (kDebugMode) {
+            print('✅ Progress saved successfully for chapter: ${progressData['chapter_id']}');
+          }
+        } else {
+          throw Exception(response.message);
+        }
       }
       
     } catch (e) {
@@ -266,6 +298,7 @@ class ProgressProvider with ChangeNotifier {
   }
 
   void _setProgressState(ProgressState state, [String? errorMessage]) {
+    if (_isDisposed) return; // Prevent calling notifyListeners on disposed provider
     _progressState = state;
     _errorMessage = errorMessage;
     notifyListeners();
@@ -273,6 +306,7 @@ class ProgressProvider with ChangeNotifier {
 
   @override
   void dispose() {
+    _isDisposed = true;
     _debounceTimer?.cancel();
     super.dispose();
   }
@@ -286,6 +320,30 @@ class ProgressProvider with ChangeNotifier {
     _pendingSaves.clear();
     _progressState = ProgressState.initial;
     _errorMessage = null;
+    notifyListeners();
+  }
+
+  /// Test helper methods for integration tests
+  bool _testMode = false;
+  bool _isDisposed = false;
+  
+  void enableTestMode() {
+    _testMode = true;
+    notifyListeners();
+  }
+  
+  void simulateNetworkError(bool hasError) {
+    _simulateNetworkError = hasError;
+    notifyListeners();
+    
+    // When network error is resolved, try to sync pending progress
+    if (!hasError && hasPendingProgress) {
+      syncPendingProgress();
+    }
+  }
+
+  void setOfflineMode(bool isOffline) {
+    _isOfflineMode = isOffline;
     notifyListeners();
   }
 }
