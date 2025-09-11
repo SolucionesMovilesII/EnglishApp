@@ -4,6 +4,8 @@ import { User } from '../../domain/entities/user.entity';
 import { RefreshToken } from '../../domain/entities/refresh-token.entity';
 import { UserProgress } from '../../domain/entities/user-progress.entity';
 import { DailyLives } from '../../domain/entities/daily-lives.entity';
+import { Chapter } from '../../domain/entities/chapter.entity';
+import { VocabularyItem } from '../../domain/entities/vocabulary-item.entity';
 import * as dotenv from 'dotenv';
 
 // Load environment variables
@@ -19,7 +21,7 @@ export const AppDataSource = new DataSource({
   ssl: process.env.DATABASE_SSL === 'true' ? { rejectUnauthorized: false } : false,
   synchronize: false, // ALWAYS false in production
   logging: process.env.NODE_ENV === 'development',
-  entities: [Person, User, RefreshToken, UserProgress, DailyLives],
+  entities: [Person, User, RefreshToken, UserProgress, DailyLives, Chapter, VocabularyItem],
   migrations: ['src/infrastructure/database/migrations/*{.ts,.js}'],
   subscribers: ['src/infrastructure/database/subscribers/*{.ts,.js}'],
   migrationsTableName: 'migrations',

@@ -10,6 +10,8 @@ import { User } from './domain/entities/user.entity';
 import { RefreshToken } from './domain/entities/refresh-token.entity';
 import { UserProgress } from './domain/entities/user-progress.entity';
 import { DailyLives } from './domain/entities/daily-lives.entity';
+import { Chapter } from './domain/entities/chapter.entity';
+import { VocabularyItem } from './domain/entities/vocabulary-item.entity';
 import { AuthModule } from './presentation/modules/auth.module';
 import { ProgressModule } from './presentation/modules/progress.module';
 import { LivesModule } from './presentation/modules/lives.module';
@@ -48,7 +50,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
         ssl: process.env.DATABASE_SSL === 'true' ? { rejectUnauthorized: false } : false,
         synchronize: false,
         logging: process.env.NODE_ENV === 'development',
-        entities: [Person, User, RefreshToken, UserProgress, DailyLives],
+        entities: [Person, User, RefreshToken, UserProgress, DailyLives, Chapter, VocabularyItem],
         migrations: ['dist/infrastructure/database/migrations/*{.ts,.js}'],
         migrationsTableName: 'migrations',
         migrationsRun: false,
