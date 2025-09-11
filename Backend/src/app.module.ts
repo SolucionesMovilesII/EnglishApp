@@ -8,7 +8,9 @@ import { securityConfig } from './infrastructure/config/security/security.config
 import { Person } from './domain/entities/person.entity';
 import { User } from './domain/entities/user.entity';
 import { RefreshToken } from './domain/entities/refresh-token.entity';
+import { UserProgress } from './domain/entities/user-progress.entity';
 import { AuthModule } from './presentation/modules/auth.module';
+import { ProgressModule } from './presentation/modules/progress.module';
 import { SecurityModule } from './shared/security.module';
 import { ThrottlerModule } from '@nestjs/throttler';
 
@@ -41,7 +43,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
         ssl: process.env.DATABASE_SSL === 'true' ? { rejectUnauthorized: false } : false,
         synchronize: false,
         logging: process.env.NODE_ENV === 'development',
-        entities: [Person, User, RefreshToken],
+        entities: [Person, User, RefreshToken, UserProgress],
         migrations: ['dist/infrastructure/database/migrations/*{.ts,.js}'],
         migrationsTableName: 'migrations',
         migrationsRun: false,
@@ -53,6 +55,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
 
     // Feature modules
     AuthModule,
+    ProgressModule,
   ],
 })
 export class AppModule {}
