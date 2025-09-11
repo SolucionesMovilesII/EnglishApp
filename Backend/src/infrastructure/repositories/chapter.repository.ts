@@ -58,7 +58,7 @@ export class ChapterRepository implements IChapterRepository {
     const unlockedChapters: Chapter[] = [];
 
     for (const chapter of chapters) {
-      const isUnlocked = await this.isChapterUnlocked(chapter, userId, progressMap);
+      const isUnlocked = await this.isChapterUnlocked(chapter, progressMap);
       
       if (isUnlocked) {
         unlockedChapters.push(chapter);
@@ -92,7 +92,7 @@ export class ChapterRepository implements IChapterRepository {
       userProgresses.map(progress => [progress.chapterId, progress])
     );
 
-    const isUnlocked = await this.isChapterUnlocked(chapter, userId, progressMap);
+    const isUnlocked = await this.isChapterUnlocked(chapter, progressMap);
     const progressPercentage = userProgress ? userProgress.getProgressPercentage() : 0;
 
     return {
@@ -127,7 +127,7 @@ export class ChapterRepository implements IChapterRepository {
 
     for (const chapter of chapters) {
       const userProgress = progressMap.get(chapter.id) || null;
-      const isUnlocked = await this.isChapterUnlocked(chapter, userId, progressMap);
+      const isUnlocked = await this.isChapterUnlocked(chapter, progressMap);
       const progressPercentage = userProgress ? userProgress.getProgressPercentage() : 0;
 
       chapterStatuses.push({
