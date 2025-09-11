@@ -64,10 +64,12 @@ export class UserProgressRepository implements IUserProgressRepository {
     const existing = await this.findByUserAndChapter(userId, createProgressDto.chapterId);
     
     if (existing) {
-      return await this.update(existing.id, {
-        score: createProgressDto.score,
-        extraData: createProgressDto.extraData,
-      });
+      const updateData = {
+        ...(createProgressDto.score !== undefined && { score: createProgressDto.score }),
+        ...(createProgressDto.extraData !== undefined && { extraData: createProgressDto.extraData }),
+      } as UpdateProgressDto;
+      
+      return await this.update(existing.id, updateData);
     }
 
     return await this.create(userId, createProgressDto);

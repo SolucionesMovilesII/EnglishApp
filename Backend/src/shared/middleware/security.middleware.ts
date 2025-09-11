@@ -117,6 +117,11 @@ export class SecurityMiddleware implements NestMiddleware {
     const referer = req.headers.referer;
     const method = req.method.toLowerCase();
 
+    // Skip validation for documentation paths (Swagger)
+    if (req.path.startsWith('/api/docs')) {
+      return true;
+    }
+
     // Skip validation for safe methods unless explicitly required
     if (['get', 'head', 'options'].includes(method) && !originValidation.requireOriginHeader) {
       return true;

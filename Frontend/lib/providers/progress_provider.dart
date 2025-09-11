@@ -103,7 +103,7 @@ class ProgressProvider with ChangeNotifier {
         await _performSave(progressData, attemptCount: attemptCount + 1);
       } else {
         // Max retries reached, store for later sync
-        _setProgressState(ProgressState.error, 'Failed to save progress after ${_maxRetryAttempts} attempts');
+        _setProgressState(ProgressState.error, 'Failed to save progress after $_maxRetryAttempts attempts');
         await _storePendingProgress(progressData);
       }
     }

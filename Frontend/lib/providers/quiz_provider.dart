@@ -1,13 +1,23 @@
 import 'package:flutter/material.dart';
 import '../models/quiz_question.dart';
+import 'progress_provider.dart';
 
 class QuizProvider with ChangeNotifier {
   final List<QuizQuestion> _questions = QuizQuestion.getSampleQuestions();
+  final ProgressProvider? _progressProvider;
+  final String _chapterId;
+  
   int _currentQuestionIndex = 0;
   int? _selectedOption;
   int _score = 100;
   bool _hasAnswered = false;
   bool _showResult = false;
+  
+  QuizProvider({
+    ProgressProvider? progressProvider,
+    String chapterId = 'default-chapter',
+  }) : _progressProvider = progressProvider,
+       _chapterId = chapterId;
 
   List<QuizQuestion> get questions => _questions;
   QuizQuestion get currentQuestion => _questions[_currentQuestionIndex];
@@ -38,6 +48,9 @@ class QuizProvider with ChangeNotifier {
         _score = (_score - 20).clamp(0, 100);
       }
       
+      // Auto-save progress after answering
+      _progressProvider?.onQuizAnswered(_chapterId, _score.toDouble(), _currentQuestionIndex);
+      
       notifyListeners();
     }
   }
@@ -46,6 +59,12 @@ class QuizProvider with ChangeNotifier {
     if (_currentQuestionIndex < _questions.length - 1) {
       _currentQuestionIndex++;
       _resetQuestionState();
+      
+      // Auto-save progress when moving to next question
+      _progressProvider?.onQuizAnswered(_chapterId, _score.toDouble(), _currentQuestionIndex);
+    } else {
+      // Quiz completed - save final progress
+      _progressProvider?.onChapterCompleted(_chapterId, _score.toDouble());
     }
   }
 
