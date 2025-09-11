@@ -218,6 +218,32 @@ class ApiService {
       return 'Network error. Please try again later.';
     }
   }
+
+  // --- Vocabulary Chapters API Methods ---
+
+  /// Get all vocabulary chapters with their unlock status and progress
+  Future<ApiResponse> getVocabularyChapters(String token) async {
+    final endpoint = '${EnvironmentConfig.fullApiUrl}/vocab/chapters';
+    return await get(endpoint, token: token);
+  }
+
+  /// Complete a vocabulary chapter
+  Future<ApiResponse> completeVocabularyChapter(
+    String chapterId,
+    String token, {
+    int? finalScore,
+    String? completionNotes,
+    Map<String, dynamic>? extraData,
+  }) async {
+    final endpoint = '${EnvironmentConfig.fullApiUrl}/vocab/chapters/$chapterId/complete';
+    
+    final body = <String, dynamic>{};
+    if (finalScore != null) body['finalScore'] = finalScore;
+    if (completionNotes != null) body['completionNotes'] = completionNotes;
+    if (extraData != null) body['extraData'] = extraData;
+
+    return await post(endpoint, body: body, token: token);
+  }
 }
 
 // API Response wrapper class

@@ -161,5 +161,54 @@
   },
   "livesResetTomorrow": "Lives reset tomorrow",
   "nextResetTomorrow": "Next reset tomorrow",
-  "refresh": "Refresh"
+  "refresh": "Refresh",
+  "vocabularyChaptersTitle": "Vocabulary Chapters",
+  "loadingVocabularyChapters": "Loading vocabulary chapters...",
+  "errorLoadingChapters": "Error loading chapters",
+  "unknownError": "An unknown error occurred",
+  "dismiss": "Dismiss",
+  "tryAgain": "Try Again",
+  "noChaptersAvailable": "No chapters available",
+  "noChaptersDescription": "Check back later for new vocabulary chapters",
+  "yourProgress": "Your Progress",
+  "chaptersCompleted": "Chapters Completed",
+  "unlocked": "Unlocked",
+  "locked": "Locked",
+  "progress": "Progress",
+  "completed": "Completed",
+  "continue_": "Continue",
+  "start": "Start",
+  "chapterLocked": "Chapter Locked",
+  "chapterLockedDescription": "Complete chapter {previousChapter} to unlock this chapter",
+  "@chapterLockedDescription": {
+    "placeholders": {
+      "previousChapter": {
+        "type": "int"
+      }
+    }
+  },
+  "understood": "Understood",
+  "chapterCompleted": "Chapter Completed",
+  "chapterCompletedDescription": "You have already completed this chapter. You can review it anytime.",
+  "completedOn": "Completed on {date}",
+  "@completedOn": {
+    "placeholders": {
+      "date": {
+        "type": "DateTime",
+        "format": "yMd"
+      }
+    }
+  },
+  "close": "Close",
+  "reviewChapter": "Review Chapter",
+  "noLivesTitle": "No Lives Available",
+  "noLivesMessage": "You need at least one life to start a chapter. Lives reset daily.",
+  "nextResetAt": "Next reset at {time}",
+  "@nextResetAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  }
 }
