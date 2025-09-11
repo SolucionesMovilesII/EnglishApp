@@ -2,6 +2,7 @@ import { DataSource } from 'typeorm';
 import { Person } from './src/domain/entities/person.entity';
 import { User } from './src/domain/entities/user.entity';
 import { RefreshToken } from './src/domain/entities/refresh-token.entity';
+import { UserProgress } from './src/domain/entities/user-progress.entity';
 import * as dotenv from 'dotenv';
 
 // Load environment variables
@@ -17,7 +18,7 @@ const AppDataSource = new DataSource({
   ssl: process.env.DATABASE_SSL === 'true' ? { rejectUnauthorized: false } : false,
   synchronize: false,
   logging: process.env.NODE_ENV === 'development',
-  entities: [Person, User, RefreshToken],
+  entities: [Person, User, RefreshToken, UserProgress],
   migrations: ['src/infrastructure/database/migrations/*.ts'],
   subscribers: ['src/infrastructure/database/subscribers/*.ts'],
   migrationsTableName: 'migrations',

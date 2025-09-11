@@ -66,6 +66,7 @@ export class UserRepository implements IUserRepository {
     return await this.repository.findOne({
       where: { email },
       select: ['id', 'email', 'password', 'role', 'isActive', 'authProvider', 'isEmailVerified', 'createdAt', 'updatedAt'],
+      relations: ['person'],
     });
   }
 
