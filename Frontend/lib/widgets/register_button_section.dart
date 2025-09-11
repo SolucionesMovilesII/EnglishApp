@@ -13,7 +13,7 @@ class RegisterButtonSection extends StatelessWidget {
   final VoidCallback onRegister;
 
   const RegisterButtonSection({
-    Key? key,
+    super.key,
     required this.acceptTerms,
     required this.isNameValid,
     required this.isEmailValid,
@@ -21,7 +21,7 @@ class RegisterButtonSection extends StatelessWidget {
     required this.isConfirmPasswordValid,
     required this.onAcceptTermsChanged,
     required this.onRegister,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -35,15 +35,22 @@ class RegisterButtonSection extends StatelessWidget {
           children: [
             Checkbox(
               value: acceptTerms,
-              onChanged: (value) => onAcceptTermsChanged(),
+              onChanged: (value) {
+                if (value != null) {
+                  onAcceptTermsChanged();
+                }
+              },
               activeColor: Theme.of(context).colorScheme.primary,
             ),
             Expanded(
-              child: Text(
-                AppLocalizations.of(context)!.acceptTerms,
-                style: TextStyle(
-                  color: Colors.grey.shade600,
-                  fontSize: 14,
+              child: GestureDetector(
+                onTap: () => onAcceptTermsChanged(),
+                child: Text(
+                  AppLocalizations.of(context)!.acceptTerms,
+                  style: TextStyle(
+                    color: Colors.grey.shade600,
+                    fontSize: 14,
+                  ),
                 ),
               ),
             ),
@@ -63,39 +70,24 @@ class RegisterButtonSection extends StatelessWidget {
                 ? LinearGradient(
                     colors: [
                       Theme.of(context).colorScheme.primary,
-                      Color.fromRGBO(
-                        (Theme.of(context).colorScheme.primary.r * 255.0).round() & 0xff,
-                        (Theme.of(context).colorScheme.primary.g * 255.0).round() & 0xff,
-                        (Theme.of(context).colorScheme.primary.b * 255.0).round() & 0xff,
-                        0.8,
-                      ),
+                      Theme.of(context).colorScheme.primary.withValues(alpha: 0.8),
                     ],
                   )
                 : null,
             boxShadow: isFormValid ? [
               BoxShadow(
-                color: Color.fromRGBO(
-                  (Theme.of(context).colorScheme.primary.r * 255.0).round() & 0xff,
-                  (Theme.of(context).colorScheme.primary.g * 255.0).round() & 0xff,
-                  (Theme.of(context).colorScheme.primary.b * 255.0).round() & 0xff,
-                  0.3,
-                ),
+                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
                 blurRadius: 12,
                 offset: const Offset(0, 4),
               ),
             ] : null,
           ),
           child: ElevatedButton(
-            onPressed: authProvider.isLoading ? null : onRegister,
+            onPressed: authProvider.isLoading ? null : (isFormValid ? onRegister : null),
             style: ElevatedButton.styleFrom(
               backgroundColor: isFormValid
                   ? Colors.transparent
-                  : Color.fromRGBO(
-                      (Theme.of(context).colorScheme.primary.r * 255.0).round() & 0xff,
-                      (Theme.of(context).colorScheme.primary.g * 255.0).round() & 0xff,
-                      (Theme.of(context).colorScheme.primary.b * 255.0).round() & 0xff,
-                      0.6,
-                    ),
+                  : Theme.of(context).colorScheme.primary.withValues(alpha: 0.6),
               shadowColor: Colors.transparent,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),

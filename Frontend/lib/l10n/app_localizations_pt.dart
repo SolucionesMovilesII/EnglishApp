@@ -169,6 +169,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get emailPasswordRequired => 'Email and password are required';
 
   @override
+  String get invalidCredentials =>
+      'Invalid credentials. Please check your email and password.';
+
+  @override
   String get googleSignInFailed => 'Google sign in failed';
 
   @override

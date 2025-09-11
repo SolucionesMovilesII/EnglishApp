@@ -8,6 +8,7 @@ import 'package:intl/intl.dart' as intl;
 import 'app_localizations_en.dart';
 import 'app_localizations_es.dart';
 import 'app_localizations_pt.dart';
+import 'app_localizations_qu.dart';
 import 'app_localizations_ru.dart';
 
 // ignore_for_file: type=lint
@@ -99,6 +100,7 @@ abstract class AppLocalizations {
     Locale('en'),
     Locale('es'),
     Locale('pt'),
+    Locale('qu'),
     Locale('ru'),
   ];
 
@@ -165,7 +167,7 @@ abstract class AppLocalizations {
   /// No description provided for @passwordTooShort.
   ///
   /// In en, this message translates to:
-  /// **'Password must be at least 6 characters'**
+  /// **'Password must be at least 12 characters'**
   String get passwordTooShort;
 
   /// No description provided for @hi.
@@ -413,6 +415,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Email and password are required'**
   String get emailPasswordRequired;
+
+  /// No description provided for @invalidCredentials.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid credentials. Please check your email and password.'**
+  String get invalidCredentials;
 
   /// No description provided for @googleSignInFailed.
   ///
@@ -804,7 +812,7 @@ class _AppLocalizationsDelegate
 
   @override
   bool isSupported(Locale locale) =>
-      <String>['en', 'es', 'pt', 'ru'].contains(locale.languageCode);
+      <String>['en', 'es', 'pt', 'qu', 'ru'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
@@ -819,6 +827,8 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
       return AppLocalizationsEs();
     case 'pt':
       return AppLocalizationsPt();
+    case 'qu':
+      return AppLocalizationsQu();
     case 'ru':
       return AppLocalizationsRu();
   }

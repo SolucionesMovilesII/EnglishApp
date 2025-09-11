@@ -1,5 +1,5 @@
 {
-  "@@locale": "es",
+  "@@locale": "qu",
   "appTitle": "App de Aprendizaje de English",
   "login": "Iniciar Sesión",
   "email": "Correo electrónico",
@@ -10,7 +10,7 @@
   "emailRequired": "El correo es requerido",
   "emailInvalid": "Ingrese un correo válido",
   "passwordRequired": "La contraseña es requerida",
-  "passwordTooShort": "La contraseña debe tener al menos 12 caracteres",
+  "passwordTooShort": "La contraseña debe tener al menos 6 caracteres",
   "hi": "Hola",
   "continueText": "Continuar",
   "vocabulary": "Vocabulario",
@@ -60,14 +60,12 @@
     }
   },
   "emailPasswordRequired": "El correo y la contraseña son requeridos",
-  "invalidCredentials": "Credenciales inválidas. Verifica tu correo y contraseña.",
   "googleSignInFailed": "Error al iniciar sesión con Google",
   "appleSignInFailed": "Error al iniciar sesión con Apple",
   "errorDuringLogout": "Error al cerrar sesión",
   "errorCheckingAuth": "Error al verificar el estado de autenticación",
   "errorInMockLogin": "Error en el inicio de sesión de prueba",
   "folders": "Carpetas",
-  "book": "Libro",
   "comingSoon": "Próximamente",
   "sectionTitle": "Sección {title}",
   "@sectionTitle": {

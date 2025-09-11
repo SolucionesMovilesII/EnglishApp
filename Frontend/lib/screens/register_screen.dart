@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import '../providers/auth_provider.dart';
 import '../widgets/settings_button.dart';
 import '../widgets/app_banner.dart';
@@ -36,8 +35,6 @@ class _RegisterScreenState extends State<RegisterScreen>
   
   late AnimationController _fadeController;
   late AnimationController _slideController;
-  late Animation<double> _fadeAnimation;
-  late Animation<Offset> _slideAnimation;
   
   @override
   void initState() {
@@ -50,22 +47,6 @@ class _RegisterScreenState extends State<RegisterScreen>
       duration: const Duration(milliseconds: 1200),
       vsync: this,
     );
-    
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _fadeController,
-      curve: Curves.easeInOut,
-    ));
-    
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 0.3),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _slideController,
-      curve: Curves.easeOutCubic,
-    ));
     
     _nameController.addListener(_validateName);
     _emailController.addListener(_validateEmail);
@@ -88,14 +69,14 @@ class _RegisterScreenState extends State<RegisterScreen>
     final email = _emailController.text;
     setState(() {
       _isEmailValid = email.isNotEmpty && 
-          RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
+          RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$').hasMatch(email);
     });
   }
   
   void _validatePassword() {
     final password = _passwordController.text;
     setState(() {
-      _isPasswordValid = password.isNotEmpty && password.length >= 6;
+      _isPasswordValid = password.isNotEmpty && password.length >= 12;
     });
     _validateConfirmPassword(); // Re-validate confirm password
   }
@@ -128,8 +109,8 @@ class _RegisterScreenState extends State<RegisterScreen>
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              Theme.of(context).colorScheme.primary.withOpacity(0.1),
-              Theme.of(context).colorScheme.secondary.withOpacity(0.05),
+              Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+              Theme.of(context).colorScheme.secondary.withValues(alpha: 0.05),
             ],
           ),
         ),
@@ -156,7 +137,7 @@ class _RegisterScreenState extends State<RegisterScreen>
                         AppLocalizations.of(context)!.createAccount,
                         style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                           fontWeight: FontWeight.bold,
-                          color: Theme.of(context).colorScheme.onBackground,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                       ),
                       
@@ -278,25 +259,6 @@ class _RegisterScreenState extends State<RegisterScreen>
     );
   }
 
-  Widget _buildGoogleIcon() {
-    return SvgPicture.asset(
-      'assets/icons/google_icon.svg',
-      width: 24,
-      height: 24,
-    );
-  }
-
-  Widget _buildAppleIcon() {
-    return SvgPicture.asset(
-      'assets/icons/apple_icon.svg',
-      width: 24,
-      height: 24,
-      colorFilter: const ColorFilter.mode(
-        Colors.white,
-        BlendMode.srcIn,
-      ),
-    );
-  }
 
   Future<void> _handleRegister() async {
     if (_formKey.currentState?.validate() ?? false) {
@@ -310,29 +272,52 @@ class _RegisterScreenState extends State<RegisterScreen>
         return;
       }
       
-      // Show loading screen
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (context) => LoadingScreen(
-            message: AppLocalizations.of(context)!.creatingAccount,
-            duration: const Duration(seconds: 3),
-            onLoadingComplete: () => _completeRegistration(),
-          ),
-        ),
-      );
+      await _performRealRegistration();
     }
   }
 
-  void _completeRegistration() {
-    if (mounted) {
-      // Mock registration - always successful
-      final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      authProvider.mockLogin(context); // This will set user as authenticated
-      
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (context) => const HomeScreen()),
-        (route) => false,
+  Future<void> _performRealRegistration() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    
+    try {
+      // Perform real registration
+      final success = await authProvider.register(
+        context,
+        _nameController.text,
+        _emailController.text,
+        _passwordController.text,
+        _confirmPasswordController.text,
       );
+      
+      if (mounted) {
+        if (success) {
+          // Registration successful - navigate to home
+          Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (context) => const HomeScreen()),
+            (route) => false,
+          );
+        } else {
+          // Registration failed - stay on register screen and show error
+          // All fields are preserved automatically since we don't clear the controllers
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(authProvider.errorMessage ?? AppLocalizations.of(context)!.invalidCredentials),
+              backgroundColor: Colors.red,
+              duration: const Duration(seconds: 5),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.invalidCredentials),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 5),
+          ),
+        );
+      }
     }
   }
 
@@ -343,7 +328,7 @@ class _RegisterScreenState extends State<RegisterScreen>
         builder: (context) => LoadingScreen(
           message: AppLocalizations.of(context)!.creatingAccountWithGoogle,
           duration: const Duration(seconds: 3),
-          onLoadingComplete: () => _completeRegistration(),
+          onLoadingComplete: () => _completeSocialRegistration(),
         ),
       ),
     );
@@ -356,9 +341,22 @@ class _RegisterScreenState extends State<RegisterScreen>
         builder: (context) => LoadingScreen(
           message: AppLocalizations.of(context)!.creatingAccountWithApple,
           duration: const Duration(seconds: 3),
-          onLoadingComplete: () => _completeRegistration(),
+          onLoadingComplete: () => _completeSocialRegistration(),
         ),
       ),
     );
+  }
+
+  void _completeSocialRegistration() {
+    if (mounted) {
+      // Mock registration for social login - always successful
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      authProvider.mockLogin(context); // This will set user as authenticated
+      
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => const HomeScreen()),
+        (route) => false,
+      );
+    }
   }
 }

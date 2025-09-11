@@ -70,11 +70,11 @@ class _LoginScreenState extends State<LoginScreen>
   }
 
   bool _validateEmail(String email) {
-    return RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}\$').hasMatch(email);
+    return RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$').hasMatch(email);
   }
 
   bool _validatePassword(String password) {
-    return password.isNotEmpty && password.length >= 6;
+    return password.isNotEmpty && password.length >= 12;
   }
 
   void _validateEmailField() {
@@ -87,7 +87,7 @@ class _LoginScreenState extends State<LoginScreen>
   void _validatePasswordField() {
     final password = _passwordController.text;
     setState(() {
-      _isPasswordValid = password.isNotEmpty && password.length >= 6;
+      _isPasswordValid = password.isNotEmpty && password.length >= 12;
     });
   }
   
@@ -237,29 +237,50 @@ class _LoginScreenState extends State<LoginScreen>
 
   Future<void> _handleLogin() async {
     if (_formKey.currentState?.validate() ?? false) {
-      // Show loading screen
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (context) => LoadingScreen(
-            message: 'Signing you in...',
-            duration: const Duration(seconds: 3),
-            onLoadingComplete: () => _completeLogin(),
-          ),
-        ),
-      );
+      await _performRealLogin();
     }
   }
 
-  void _completeLogin() {
-    if (mounted) {
-      // Mock login - always successful
-      final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      authProvider.mockLogin(context); // This will set user as authenticated
-      
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (context) => const HomeScreen()),
-        (route) => false,
+  Future<void> _performRealLogin() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    
+    try {
+      // Perform real login with backend API
+      final success = await authProvider.login(
+        context,
+        _emailController.text,
+        _passwordController.text,
       );
+      
+      if (mounted) {
+        if (success) {
+          // Login successful - navigate to home
+          Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (context) => const HomeScreen()),
+            (route) => false,
+          );
+        } else {
+          // Login failed - stay on login screen and show error
+          // Email is preserved automatically since we don't clear the controller
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(AppLocalizations.of(context)!.invalidCredentials),
+              backgroundColor: Colors.red,
+              duration: const Duration(seconds: 5),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.invalidCredentials),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 5),
+          ),
+        );
+      }
     }
   }
 
@@ -268,9 +289,9 @@ class _LoginScreenState extends State<LoginScreen>
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => LoadingScreen(
-          message: 'Connecting with Google...',
+          message: AppLocalizations.of(context)!.connectingWithGoogle,
           duration: const Duration(seconds: 3),
-          onLoadingComplete: () => _completeLogin(),
+          onLoadingComplete: () => _completeSocialLogin(),
         ),
       ),
     );
@@ -281,11 +302,24 @@ class _LoginScreenState extends State<LoginScreen>
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => LoadingScreen(
-          message: 'Connecting with Apple...',
+          message: AppLocalizations.of(context)!.connectingWithApple,
           duration: const Duration(seconds: 3),
-          onLoadingComplete: () => _completeLogin(),
+          onLoadingComplete: () => _completeSocialLogin(),
         ),
       ),
     );
+  }
+
+  void _completeSocialLogin() {
+    if (mounted) {
+      // Mock social login - always successful for now
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      authProvider.mockLogin(context);
+      
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => const HomeScreen()),
+        (route) => false,
+      );
+    }
   }
 }

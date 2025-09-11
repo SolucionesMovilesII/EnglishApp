@@ -10,7 +10,7 @@
   "emailRequired": "Email is required",
   "emailInvalid": "Please enter a valid email",
   "passwordRequired": "Password is required",
-  "passwordTooShort": "Password must be at least 6 characters",
+  "passwordTooShort": "Password must be at least 12 characters",
   "hi": "Hi",
   "continueText": "Continue",
   "vocabulary": "Vocabulary",
@@ -60,6 +60,7 @@
     }
   },
   "emailPasswordRequired": "Email and password are required",
+  "invalidCredentials": "Invalid credentials. Please check your email and password.",
   "googleSignInFailed": "Google sign in failed",
   "appleSignInFailed": "Apple sign in failed",
   "errorDuringLogout": "Error during logout",
