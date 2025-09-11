@@ -12,6 +12,7 @@ import { UserProgress } from './domain/entities/user-progress.entity';
 import { DailyLives } from './domain/entities/daily-lives.entity';
 import { AuthModule } from './presentation/modules/auth.module';
 import { ProgressModule } from './presentation/modules/progress.module';
+import { LivesModule } from './presentation/modules/lives.module';
 import { AdminModule } from './presentation/modules/admin.module';
 import { CronModule } from './application/modules/cron.module';
 import { SecurityModule } from './shared/security.module';
@@ -60,6 +61,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
     // Feature modules
     AuthModule,
     ProgressModule,
+    LivesModule,
     AdminModule,
     CronModule,
   ],
