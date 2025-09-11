@@ -127,7 +127,7 @@ class _RegisterScreenState extends State<RegisterScreen>
                       // App Banner
                       AppBanner(
                         title: AppLocalizations.of(context)!.appTitle,
-                        livesText: AppLocalizations.of(context)!.livesRemaining,
+                        livesText: AppLocalizations.of(context)!.livesRemaining(5),
                       ),
                       
                       const SizedBox(height: 40),

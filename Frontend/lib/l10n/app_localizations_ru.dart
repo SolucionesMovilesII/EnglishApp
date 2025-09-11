@@ -147,7 +147,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get user => 'Пользователь';
 
   @override
-  String get livesRemaining => '5/5';
+  String livesRemaining(int lives) {
+    return '5/5';
+  }
 
   @override
   String get chapterProgress => 'Глава 4/5';
@@ -369,4 +371,22 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get folders => 'Папки';
+
+  @override
+  String get errorLoadingLives => 'Error loading lives';
+
+  @override
+  String get retry => 'Retry';
+
+  @override
+  String get noLivesRemaining => 'No lives remaining!';
+
+  @override
+  String get livesResetTomorrow => 'Lives reset tomorrow';
+
+  @override
+  String get nextResetTomorrow => 'Next reset tomorrow';
+
+  @override
+  String get refresh => 'Refresh';
 }

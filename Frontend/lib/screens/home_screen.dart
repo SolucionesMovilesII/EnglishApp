@@ -177,7 +177,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               return AppBanner(
                 title: '${AppLocalizations.of(context)!.hi}, ${authProvider.user?.name ?? AppLocalizations.of(context)!.user}',
                 subtitle: AppLocalizations.of(context)!.welcomeBack,
-                livesText: AppLocalizations.of(context)!.livesRemaining,
+                livesText: AppLocalizations.of(context)!.livesRemaining(5),
               );
             },
           ),
