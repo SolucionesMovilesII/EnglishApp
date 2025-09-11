@@ -1,4 +1,12 @@
-import { Injectable, CanActivate, ExecutionContext, Logger, HttpException, HttpStatus, SetMetadata } from '@nestjs/common';
+import {
+  Injectable,
+  CanActivate,
+  ExecutionContext,
+  Logger,
+  HttpException,
+  HttpStatus,
+  SetMetadata,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
@@ -32,7 +40,7 @@ export const RATE_LIMITS = {
   GENERAL: 'general',
 } as const;
 
-export type RateLimitType = typeof RATE_LIMITS[keyof typeof RATE_LIMITS];
+export type RateLimitType = (typeof RATE_LIMITS)[keyof typeof RATE_LIMITS];
 
 // Decorator for predefined rate limits
 export const UseRateLimit = (type: RateLimitType) => SetMetadata('useRateLimit', type);
@@ -41,10 +49,10 @@ export const UseRateLimit = (type: RateLimitType) => SetMetadata('useRateLimit',
 export class RateLimitGuard implements CanActivate {
   private readonly logger = new Logger(RateLimitGuard.name);
   private readonly securityConfig: SecurityConfig;
-  
+
   // In-memory store for rate limiting (in production, use Redis)
   private readonly store = new Map<string, { count: number; resetTime: number }>();
-  
+
   // Cleanup interval to remove expired entries
   private readonly cleanupInterval: NodeJS.Timeout;
 
@@ -53,11 +61,14 @@ export class RateLimitGuard implements CanActivate {
     private readonly reflector: Reflector,
   ) {
     this.securityConfig = this.configService.get<SecurityConfig>('security')!;
-    
+
     // Cleanup expired entries every 5 minutes
-    this.cleanupInterval = setInterval(() => {
-      this.cleanupExpiredEntries();
-    }, 5 * 60 * 1000);
+    this.cleanupInterval = setInterval(
+      () => {
+        this.cleanupExpiredEntries();
+      },
+      5 * 60 * 1000,
+    );
   }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -126,42 +137,42 @@ export class RateLimitGuard implements CanActivate {
         return {
           windowMs: rateLimit.registration.windowMs,
           max: rateLimit.registration.max,
-          keyGenerator: (req) => this.getIPKey(req, 'registration'),
+          keyGenerator: req => this.getIPKey(req, 'registration'),
         };
 
       case RATE_LIMITS.LOGIN:
         return {
           windowMs: rateLimit.login.windowMs,
           max: rateLimit.login.max,
-          keyGenerator: (req) => this.getIPKey(req, 'login'),
+          keyGenerator: req => this.getIPKey(req, 'login'),
         };
 
       case RATE_LIMITS.LOGIN_PER_ACCOUNT:
         return {
           windowMs: rateLimit.login.perAccount.windowMs,
           max: rateLimit.login.perAccount.max,
-          keyGenerator: (req) => this.getAccountKey(req, 'login'),
+          keyGenerator: req => this.getAccountKey(req, 'login'),
         };
 
       case RATE_LIMITS.FORGOT_PASSWORD:
         return {
           windowMs: rateLimit.forgotPassword.windowMs,
           max: rateLimit.forgotPassword.max,
-          keyGenerator: (req) => this.getIPKey(req, 'forgot-password'),
+          keyGenerator: req => this.getIPKey(req, 'forgot-password'),
         };
 
       case RATE_LIMITS.TOKEN_REFRESH:
         return {
           windowMs: rateLimit.tokenRefresh.windowMs,
           max: rateLimit.tokenRefresh.max,
-          keyGenerator: (req) => this.getIPKey(req, 'token-refresh'),
+          keyGenerator: req => this.getIPKey(req, 'token-refresh'),
         };
 
       case RATE_LIMITS.EMAIL_VERIFICATION:
         return {
           windowMs: rateLimit.emailVerification.windowMs,
           max: rateLimit.emailVerification.max,
-          keyGenerator: (req) => this.getIPKey(req, 'email-verification'),
+          keyGenerator: req => this.getIPKey(req, 'email-verification'),
         };
 
       case RATE_LIMITS.GENERAL:
@@ -175,11 +186,11 @@ export class RateLimitGuard implements CanActivate {
    */
   private getGeneralRateLimitConfig(): RateLimitConfig {
     const { rateLimit } = this.securityConfig;
-    
+
     return {
       windowMs: rateLimit.general.windowMs,
       max: rateLimit.general.max,
-      keyGenerator: (req) => this.getIPKey(req, 'general'),
+      keyGenerator: req => this.getIPKey(req, 'general'),
     };
   }
 
@@ -204,7 +215,7 @@ export class RateLimitGuard implements CanActivate {
     // Check if limit exceeded
     if (entry.count > config.max) {
       const remainingTime = Math.ceil((entry.resetTime - now) / 1000);
-      
+
       this.logger.warn('Rate limit exceeded', {
         key,
         type,
@@ -216,15 +227,18 @@ export class RateLimitGuard implements CanActivate {
         userAgent: request.headers['user-agent'],
       });
 
-      throw new HttpException({
-        error: 'RATE_LIMIT_EXCEEDED',
-        message: `Rate limit exceeded. Try again in ${remainingTime} seconds.`,
-        retryAfter: remainingTime,
-        limit: config.max,
-        remaining: 0,
-        resetTime: new Date(entry.resetTime).toISOString(),
-        timestamp: new Date().toISOString(),
-      }, HttpStatus.TOO_MANY_REQUESTS);
+      throw new HttpException(
+        {
+          error: 'RATE_LIMIT_EXCEEDED',
+          message: `Rate limit exceeded. Try again in ${remainingTime} seconds.`,
+          retryAfter: remainingTime,
+          limit: config.max,
+          remaining: 0,
+          resetTime: new Date(entry.resetTime).toISOString(),
+          timestamp: new Date().toISOString(),
+        },
+        HttpStatus.TOO_MANY_REQUESTS,
+      );
     }
 
     // Add rate limit headers to response
@@ -254,15 +268,15 @@ export class RateLimitGuard implements CanActivate {
     // Try to get account identifier from request body or user
     const email = request.body?.email || (request as any).user?.email;
     const userId = (request as any).user?.id;
-    
+
     if (userId) {
       return `user:${userId}:${type}`;
     }
-    
+
     if (email) {
       return `email:${this.hashString(email)}:${type}`;
     }
-    
+
     // Fallback to IP-based limiting
     return this.getIPKey(request, type);
   }
@@ -272,7 +286,7 @@ export class RateLimitGuard implements CanActivate {
    */
   private getAnonymizedIP(request: Request): string {
     const ip = (request as any).realIP || request.ip;
-    
+
     if (!ip) {
       return 'unknown';
     }
@@ -303,7 +317,7 @@ export class RateLimitGuard implements CanActivate {
     let hash = 0;
     for (let i = 0; i < str.length; i++) {
       const char = str.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
+      hash = (hash << 5) - hash + char;
       hash = hash & hash; // Convert to 32-bit integer
     }
     return Math.abs(hash).toString(16);

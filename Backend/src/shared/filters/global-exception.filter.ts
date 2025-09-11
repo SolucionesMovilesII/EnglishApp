@@ -31,9 +31,10 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     } else if (exception instanceof HttpException) {
       status = exception.getStatus();
       const exceptionResponse = exception.getResponse();
-      message = typeof exceptionResponse === 'string' 
-        ? exceptionResponse 
-        : (exceptionResponse as any).message;
+      message =
+        typeof exceptionResponse === 'string'
+          ? exceptionResponse
+          : (exceptionResponse as any).message;
       details = typeof exceptionResponse === 'object' ? exceptionResponse : null;
     } else if (exception instanceof QueryFailedError) {
       status = HttpStatus.BAD_REQUEST;

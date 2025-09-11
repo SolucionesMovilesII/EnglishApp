@@ -15,9 +15,14 @@ export class CreateProgressUseCase {
     private readonly userRepository: IUserRepository,
   ) {}
 
-  async execute(userId: string, createProgressDto: CreateProgressDto): Promise<ProgressResponseDto> {
-    this.logger.log(`Creating/updating progress for user: ${userId}, chapter: ${createProgressDto.chapterId}`);
-    
+  async execute(
+    userId: string,
+    createProgressDto: CreateProgressDto,
+  ): Promise<ProgressResponseDto> {
+    this.logger.log(
+      `Creating/updating progress for user: ${userId}, chapter: ${createProgressDto.chapterId}`,
+    );
+
     try {
       // Validate that user exists
       const user = await this.userRepository.findById(userId);
@@ -32,10 +37,12 @@ export class CreateProgressUseCase {
       const progress = await this.userProgressRepository.createOrUpdate(userId, createProgressDto);
 
       this.logger.log(`Progress saved successfully for user: ${userId}`);
-      
+
       return this.mapToResponseDto(progress);
     } catch (error) {
-      this.logger.error(`Error creating progress: ${error instanceof Error ? error.message : String(error)}`);
+      this.logger.error(
+        `Error creating progress: ${error instanceof Error ? error.message : String(error)}`,
+      );
       throw error;
     }
   }

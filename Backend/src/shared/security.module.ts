@@ -16,16 +16,16 @@ import { JwtService } from './services/jwt.service';
     // Middleware
     SecurityMiddleware,
     CorsMiddleware,
-    
+
     // Guards
     CSRFGuard,
     EnhancedJwtGuard,
     OriginValidationGuard,
     RateLimitGuard,
-    
+
     // Services
     JwtService,
-    
+
     // Global guards registration
     {
       provide: APP_GUARD,

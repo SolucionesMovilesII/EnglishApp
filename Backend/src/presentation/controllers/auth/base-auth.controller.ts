@@ -24,7 +24,7 @@ export abstract class BaseAuthController {
   protected extractIpAddress(request: Request): string {
     const xForwardedFor = request.headers['x-forwarded-for'];
     const xRealIp = request.headers['x-real-ip'];
-    
+
     return (
       (Array.isArray(xForwardedFor) ? xForwardedFor[0] : xForwardedFor)?.split(',')[0] ||
       (Array.isArray(xRealIp) ? xRealIp[0] : xRealIp) ||
@@ -51,10 +51,12 @@ export abstract class BaseAuthController {
       if (userAgent.includes('Chrome')) return 'Chrome Browser';
       if (userAgent.includes('Firefox')) return 'Firefox Browser';
       if (userAgent.includes('Safari')) return 'Safari Browser';
-      
+
       return 'Unknown Device';
     } catch (error: unknown) {
-      this.logger.debug(`Error extracting device info: ${error instanceof Error ? error.message : String(error)}`);
+      this.logger.debug(
+        `Error extracting device info: ${error instanceof Error ? error.message : String(error)}`,
+      );
       return 'Unknown Device';
     }
   }
@@ -65,16 +67,16 @@ export abstract class BaseAuthController {
   protected handleAuthError(error: unknown): never {
     if (error instanceof Error) {
       this.logger.error(`Authentication error: ${error.message}`, error.stack);
-      
+
       // Handle specific error types
       if (error.message.includes('rate limit') || error.message.includes('too many')) {
         throw error; // Let rate limiting middleware handle it
       }
-      
+
       if (error.message.includes('email') && error.message.includes('exists')) {
         throw error; // Let validation handle it
       }
-      
+
       if (error.message.includes('invalid') || error.message.includes('not found')) {
         throw error; // Let business logic errors pass through
       }

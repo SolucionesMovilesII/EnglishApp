@@ -31,7 +31,7 @@ export class UserRepository implements IUserRepository {
       const savedUser = await queryRunner.manager.save(user);
 
       await queryRunner.commitTransaction();
-      return await this.findByIdWithPerson(savedUser.id) as User;
+      return (await this.findByIdWithPerson(savedUser.id)) as User;
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw error;
@@ -65,7 +65,17 @@ export class UserRepository implements IUserRepository {
   async findByEmailWithPassword(email: string): Promise<User | null> {
     return await this.repository.findOne({
       where: { email },
-      select: ['id', 'email', 'password', 'role', 'isActive', 'authProvider', 'isEmailVerified', 'createdAt', 'updatedAt'],
+      select: [
+        'id',
+        'email',
+        'password',
+        'role',
+        'isActive',
+        'authProvider',
+        'isEmailVerified',
+        'createdAt',
+        'updatedAt',
+      ],
       relations: ['person'],
     });
   }
@@ -98,18 +108,23 @@ export class UserRepository implements IUserRepository {
         const updatePersonData: any = {
           ...updateUserDto.person,
         };
-        
+
         await queryRunner.manager.update(Person, user.personId, updatePersonData);
       }
 
       const updateUserData: any = {};
       if (updateUserDto.email) updateUserData.email = updateUserDto.email;
       if (updateUserDto.role) updateUserData.role = updateUserDto.role;
-      if (updateUserDto.passwordResetToken !== undefined) updateUserData.passwordResetToken = updateUserDto.passwordResetToken;
-      if (updateUserDto.passwordResetTokenExpires !== undefined) updateUserData.passwordResetTokenExpires = updateUserDto.passwordResetTokenExpires;
-      if (updateUserDto.emailVerificationToken !== undefined) updateUserData.emailVerificationToken = updateUserDto.emailVerificationToken;
-      if (updateUserDto.isEmailVerified !== undefined) updateUserData.isEmailVerified = updateUserDto.isEmailVerified;
-      if (updateUserDto.lastLoginAt !== undefined) updateUserData.lastLoginAt = updateUserDto.lastLoginAt;
+      if (updateUserDto.passwordResetToken !== undefined)
+        updateUserData.passwordResetToken = updateUserDto.passwordResetToken;
+      if (updateUserDto.passwordResetTokenExpires !== undefined)
+        updateUserData.passwordResetTokenExpires = updateUserDto.passwordResetTokenExpires;
+      if (updateUserDto.emailVerificationToken !== undefined)
+        updateUserData.emailVerificationToken = updateUserDto.emailVerificationToken;
+      if (updateUserDto.isEmailVerified !== undefined)
+        updateUserData.isEmailVerified = updateUserDto.isEmailVerified;
+      if (updateUserDto.lastLoginAt !== undefined)
+        updateUserData.lastLoginAt = updateUserDto.lastLoginAt;
 
       if (Object.keys(updateUserData).length > 0) {
         await queryRunner.manager.update(User, id, updateUserData);
@@ -134,7 +149,9 @@ export class UserRepository implements IUserRepository {
     // Note: Refresh tokens are managed through RefreshToken entity, not directly on User
     // This method signature exists for interface compliance but should be implemented
     // differently or the interface should be updated
-    throw new Error('updateRefreshToken should be implemented through RefreshToken entity management');
+    throw new Error(
+      'updateRefreshToken should be implemented through RefreshToken entity management',
+    );
   }
 
   async updateLastLoginAt(id: string): Promise<boolean> {

@@ -1,10 +1,4 @@
-import { 
-  IsNumber, 
-  IsOptional,
-  IsObject,
-  Min,
-  Max
-} from 'class-validator';
+import { IsNumber, IsOptional, IsObject, Min, Max } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class UpdateProgressDto {
@@ -13,7 +7,7 @@ export class UpdateProgressDto {
     example: 92.0,
     minimum: 0,
     maximum: 100,
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsNumber({}, { message: 'Score must be a number' })
@@ -24,11 +18,11 @@ export class UpdateProgressDto {
   @ApiProperty({
     description: 'Additional data in JSON format',
     example: {
-      vocab: { chapter: 3, lastWord: "banana" },
+      vocab: { chapter: 3, lastWord: 'banana' },
       reading: { chapter: 1, lastParagraph: 8 },
-      interview: { lastQuestion: 5 }
+      interview: { lastQuestion: 5 },
     },
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsObject({ message: 'Extra data must be an object' })

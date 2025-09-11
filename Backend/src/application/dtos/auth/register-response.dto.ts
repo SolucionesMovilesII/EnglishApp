@@ -3,43 +3,43 @@ import { ApiProperty } from '@nestjs/swagger';
 export class RegisterResponseDto {
   @ApiProperty({
     description: 'Unique identifier for the user',
-    example: 'uuid-string-here'
+    example: 'uuid-string-here',
   })
   readonly userId!: string;
 
   @ApiProperty({
     description: 'Email address of the registered user',
-    example: 'user@example.com'
+    example: 'user@example.com',
   })
   readonly email!: string;
 
   @ApiProperty({
     description: 'Full name of the registered user',
-    example: 'John Doe'
+    example: 'John Doe',
   })
   readonly fullName!: string;
 
   @ApiProperty({
     description: 'Whether the user email has been verified',
-    example: false
+    example: false,
   })
   readonly isEmailVerified!: boolean;
 
   @ApiProperty({
     description: 'JWT access token for authentication',
-    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
   })
   readonly accessToken!: string;
 
   @ApiProperty({
     description: 'Token expiration time in seconds',
-    example: 3600
+    example: 3600,
   })
   readonly expiresIn!: number;
 
   @ApiProperty({
     description: 'Success message for the registration',
-    example: 'Registration successful'
+    example: 'Registration successful',
   })
   readonly message!: string;
 
@@ -50,7 +50,7 @@ export class RegisterResponseDto {
     isEmailVerified: boolean,
     accessToken: string,
     expiresIn: number,
-    message: string = 'Registration successful'
+    message: string = 'Registration successful',
   ) {
     this.userId = userId;
     this.email = email;

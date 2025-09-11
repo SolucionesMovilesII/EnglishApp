@@ -16,8 +16,10 @@ export class GetUserProgressUseCase {
   ) {}
 
   async execute(targetUserId: string, requestingUserId: string): Promise<UserProgressListDto> {
-    this.logger.log(`Getting progress for user: ${targetUserId}, requested by: ${requestingUserId}`);
-    
+    this.logger.log(
+      `Getting progress for user: ${targetUserId}, requested by: ${requestingUserId}`,
+    );
+
     try {
       // Validate that target user exists
       const targetUser = await this.userRepository.findById(targetUserId);
@@ -40,15 +42,17 @@ export class GetUserProgressUseCase {
       const stats = await this.userProgressRepository.getUserStats(targetUserId);
 
       this.logger.log(`Found ${progressRecords.length} progress records for user: ${targetUserId}`);
-      
+
       return {
         userId: targetUserId,
         totalRecords: stats.totalRecords,
         lastActivity: stats.lastActivity,
-        progress: progressRecords.map(record => this.mapToResponseDto(record))
+        progress: progressRecords.map(record => this.mapToResponseDto(record)),
       };
     } catch (error) {
-      this.logger.error(`Error getting user progress: ${error instanceof Error ? error.message : String(error)}`);
+      this.logger.error(
+        `Error getting user progress: ${error instanceof Error ? error.message : String(error)}`,
+      );
       throw error;
     }
   }

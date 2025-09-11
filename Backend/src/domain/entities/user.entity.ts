@@ -27,20 +27,20 @@ export class User {
   @Column({ type: 'varchar', length: 255, select: false })
   password!: string;
 
-  @Column({ 
-    type: 'enum', 
+  @Column({
+    type: 'enum',
     enum: ['EMAIL_PASSWORD', 'GOOGLE', 'APPLE', 'FACEBOOK'],
-    default: 'EMAIL_PASSWORD'
+    default: 'EMAIL_PASSWORD',
   })
   authProvider!: 'EMAIL_PASSWORD' | 'GOOGLE' | 'APPLE' | 'FACEBOOK';
 
   @Column({ type: 'varchar', length: 255, nullable: true })
   providerUserId!: string | null;
 
-  @Column({ 
-    type: 'enum', 
+  @Column({
+    type: 'enum',
     enum: ['STUDENT', 'TEACHER', 'ADMIN', 'SUPER_ADMIN'],
-    default: 'STUDENT'
+    default: 'STUDENT',
   })
   role!: 'STUDENT' | 'TEACHER' | 'ADMIN' | 'SUPER_ADMIN';
 
@@ -66,8 +66,8 @@ export class User {
   @JoinColumn({ name: 'personId' })
   person!: Person;
 
-  @OneToMany(() => RefreshToken, (refreshToken) => refreshToken.user, {
-    cascade: true
+  @OneToMany(() => RefreshToken, refreshToken => refreshToken.user, {
+    cascade: true,
   })
   refreshTokens!: RefreshToken[];
 

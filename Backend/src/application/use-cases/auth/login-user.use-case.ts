@@ -25,16 +25,16 @@ export class LoginUserUseCase {
   ) {}
 
   async execute(
-    loginDto: LoginDto, 
-    deviceInfo?: string, 
-    userAgent?: string, 
-    ipAddress?: string
+    loginDto: LoginDto,
+    deviceInfo?: string,
+    userAgent?: string,
+    ipAddress?: string,
   ): Promise<LoginResponseDto> {
     this.logger.log(`Login attempt for email: ${loginDto.email}`);
-    
+
     try {
       await this.validateLoginData(loginDto);
-      
+
       // Find user with password field included
       const user = await this.userRepository.findByEmailWithPassword(loginDto.email);
       if (!user) {
@@ -64,18 +64,18 @@ export class LoginUserUseCase {
       // Generate access token only (no refresh token in response body)
       const accessToken = await this.jwtService.createAccessToken(user.id, user.role, user.email);
       const expiresIn = this.jwtService.getAccessTokenExpirationTime();
-      
+
       // Generate and store refresh token separately
       const refreshToken = await this.jwtService.createRefreshToken(user.id, user.role);
       await this.saveRefreshToken(user.id, refreshToken, deviceInfo, userAgent, ipAddress);
 
       // Update last login time
-      await this.userRepository.update(user.id, { 
-        lastLoginAt: new Date() 
+      await this.userRepository.update(user.id, {
+        lastLoginAt: new Date(),
       });
 
       this.logger.log(`User logged in successfully: ${user.id}`);
-      
+
       return new LoginResponseDto(
         user.id,
         user.email,
@@ -84,10 +84,13 @@ export class LoginUserUseCase {
         accessToken,
         expiresIn,
         'Login successful',
-        refreshToken
+        refreshToken,
       );
     } catch (error: unknown) {
-      this.logger.error(`Login failed for email: ${loginDto.email}`, error instanceof Error ? error.stack : undefined);
+      this.logger.error(
+        `Login failed for email: ${loginDto.email}`,
+        error instanceof Error ? error.stack : undefined,
+      );
       throw error;
     }
   }
@@ -102,11 +105,11 @@ export class LoginUserUseCase {
   }
 
   private async saveRefreshToken(
-    userId: string, 
-    token: string, 
-    deviceInfo?: string, 
-    userAgent?: string, 
-    ipAddress?: string
+    userId: string,
+    token: string,
+    deviceInfo?: string,
+    userAgent?: string,
+    ipAddress?: string,
   ): Promise<void> {
     const refreshToken = new RefreshToken();
     refreshToken.tokenHash = await this.hashService.hash(token);

@@ -3,43 +3,43 @@ import { ApiProperty } from '@nestjs/swagger';
 export class LoginResponseDto {
   @ApiProperty({
     description: 'Unique identifier for the user',
-    example: 'uuid-string-here'
+    example: 'uuid-string-here',
   })
   readonly userId!: string;
 
   @ApiProperty({
     description: 'Email address of the logged in user',
-    example: 'user@example.com'
+    example: 'user@example.com',
   })
   readonly email!: string;
 
   @ApiProperty({
     description: 'Full name of the logged in user',
-    example: 'John Doe'
+    example: 'John Doe',
   })
   readonly fullName!: string;
 
   @ApiProperty({
     description: 'Whether the user email has been verified',
-    example: true
+    example: true,
   })
   readonly isEmailVerified!: boolean;
 
   @ApiProperty({
     description: 'JWT access token for authentication',
-    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
   })
   readonly accessToken!: string;
 
   @ApiProperty({
     description: 'Token expiration time in seconds',
-    example: 3600
+    example: 3600,
   })
   readonly expiresIn!: number;
 
   @ApiProperty({
     description: 'Success message for the login',
-    example: 'Login successful'
+    example: 'Login successful',
   })
   readonly message!: string;
 
@@ -55,7 +55,7 @@ export class LoginResponseDto {
     accessToken: string,
     expiresIn: number,
     message: string = 'Login successful',
-    refreshToken?: string
+    refreshToken?: string,
   ) {
     this.userId = userId;
     this.email = email;

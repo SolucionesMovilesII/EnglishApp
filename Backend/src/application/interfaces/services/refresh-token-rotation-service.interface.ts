@@ -51,7 +51,10 @@ export interface IRefreshTokenRotationService {
    * @param context Additional context for validation and rotation
    * @returns Promise with validation and rotation result
    */
-  validateAndRotateToken(presentedToken: string, context?: RotationContext): Promise<TokenValidationResult & { rotation?: TokenRotationResult }>;
+  validateAndRotateToken(
+    presentedToken: string,
+    context?: RotationContext,
+  ): Promise<TokenValidationResult & { rotation?: TokenRotationResult }>;
 
   /**
    * Detects if a token is being reused (already rotated/revoked)
@@ -84,7 +87,12 @@ export interface IRefreshTokenRotationService {
    * @param ipAddress IP address (will be hashed)
    * @returns Promise with family information
    */
-  createTokenFamily(userId: string, deviceInfo?: string, userAgent?: string, ipAddress?: string): Promise<TokenFamilyInfo>;
+  createTokenFamily(
+    userId: string,
+    deviceInfo?: string,
+    userAgent?: string,
+    ipAddress?: string,
+  ): Promise<TokenFamilyInfo>;
 
   /**
    * Gets active token families for a user

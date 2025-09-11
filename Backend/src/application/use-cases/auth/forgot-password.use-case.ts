@@ -20,18 +20,23 @@ export class ForgotPasswordUseCase {
     private readonly hashService: IHashService,
   ) {}
 
-  async execute(forgotPasswordDto: ForgotPasswordDto, _ipAddress?: string): Promise<ForgotPasswordResponseDto> {
+  async execute(
+    forgotPasswordDto: ForgotPasswordDto,
+    _ipAddress?: string,
+  ): Promise<ForgotPasswordResponseDto> {
     this.logger.log(`Password reset request for email: ${forgotPasswordDto.email}`);
-    
+
     try {
       await this.validateForgotPasswordData(forgotPasswordDto);
 
       const user = await this.userRepository.findByEmail(forgotPasswordDto.email);
-      
+
       // For security reasons, we don't reveal if email exists or not
       // Always return success response to prevent email enumeration
       if (!user) {
-        this.logger.warn(`Password reset request for non-existent email: ${forgotPasswordDto.email}`);
+        this.logger.warn(
+          `Password reset request for non-existent email: ${forgotPasswordDto.email}`,
+        );
         return this.createSuccessResponse(forgotPasswordDto.email);
       }
 
@@ -69,10 +74,12 @@ export class ForgotPasswordUseCase {
       // await this.emailService.sendPasswordResetEmail(user.email, resetToken);
 
       return this.createSuccessResponse(forgotPasswordDto.email);
-
     } catch (error: unknown) {
-      this.logger.error(`Password reset request failed for email: ${forgotPasswordDto.email}`, error instanceof Error ? error.stack : undefined);
-      
+      this.logger.error(
+        `Password reset request failed for email: ${forgotPasswordDto.email}`,
+        error instanceof Error ? error.stack : undefined,
+      );
+
       // For security, don't reveal internal errors
       return this.createSuccessResponse(forgotPasswordDto.email);
     }
@@ -81,7 +88,10 @@ export class ForgotPasswordUseCase {
   /**
    * Verify if password reset token is valid
    */
-  async verifyResetToken(email: string, token: string): Promise<{ isValid: boolean; userId?: string }> {
+  async verifyResetToken(
+    email: string,
+    token: string,
+  ): Promise<{ isValid: boolean; userId?: string }> {
     this.logger.debug(`Verifying reset token for email: ${email}`);
 
     try {
@@ -110,9 +120,11 @@ export class ForgotPasswordUseCase {
       }
 
       return { isValid: true, userId: user.id };
-
     } catch (error: unknown) {
-      this.logger.error(`Error verifying reset token: ${error instanceof Error ? error.message : String(error)}`, error instanceof Error ? error.stack : undefined);
+      this.logger.error(
+        `Error verifying reset token: ${error instanceof Error ? error.message : String(error)}`,
+        error instanceof Error ? error.stack : undefined,
+      );
       return { isValid: false };
     }
   }
@@ -133,9 +145,11 @@ export class ForgotPasswordUseCase {
     // Check if user has recently requested a password reset
     const user = await this.userRepository.findById(userId);
     if (user?.passwordResetTokenExpires) {
-      const timeSinceLastRequest = Date.now() - (user.passwordResetTokenExpires.getTime() - (this.RESET_TOKEN_EXPIRY_MINUTES * 60 * 1000));
+      const timeSinceLastRequest =
+        Date.now() -
+        (user.passwordResetTokenExpires.getTime() - this.RESET_TOKEN_EXPIRY_MINUTES * 60 * 1000);
       const minIntervalMs = 60 * 1000; // 1 minute minimum between requests
-      
+
       if (timeSinceLastRequest < minIntervalMs) {
         this.logger.warn(`Rate limit exceeded for password reset: ${userId}`);
         throw new ValidationException('Please wait before requesting another password reset');
@@ -148,7 +162,7 @@ export class ForgotPasswordUseCase {
       true,
       email,
       'If the email exists in our system, password reset instructions have been sent.',
-      this.RESET_TOKEN_EXPIRY_MINUTES
+      this.RESET_TOKEN_EXPIRY_MINUTES,
     );
   }
 }

@@ -43,11 +43,11 @@ describe('CreateProgressUseCase', () => {
   describe('execute', () => {
     const mockUserId = 'user-123';
     const mockChapterId = 'chapter-456';
-    
+
     const validCreateProgressDto: CreateProgressDto = {
       chapterId: mockChapterId,
       score: 85.5,
-      extraData: { vocab: { chapter: 2, lastWord: 'apple' } }
+      extraData: { vocab: { chapter: 2, lastWord: 'apple' } },
     };
 
     const mockUser = {
@@ -73,7 +73,10 @@ describe('CreateProgressUseCase', () => {
       const result = await useCase.execute(mockUserId, validCreateProgressDto);
 
       expect(mockUserRepository.findById).toHaveBeenCalledWith(mockUserId);
-      expect(mockUserProgressRepository.createOrUpdate).toHaveBeenCalledWith(mockUserId, validCreateProgressDto);
+      expect(mockUserProgressRepository.createOrUpdate).toHaveBeenCalledWith(
+        mockUserId,
+        validCreateProgressDto,
+      );
       expect(result).toEqual({
         id: mockProgress.id,
         userId: mockProgress.userId,
@@ -89,9 +92,9 @@ describe('CreateProgressUseCase', () => {
     it('should throw NotFoundException when user does not exist', async () => {
       mockUserRepository.findById.mockResolvedValue(null);
 
-      await expect(useCase.execute(mockUserId, validCreateProgressDto))
-        .rejects
-        .toThrow(NotFoundException);
+      await expect(useCase.execute(mockUserId, validCreateProgressDto)).rejects.toThrow(
+        NotFoundException,
+      );
 
       expect(mockUserRepository.findById).toHaveBeenCalledWith(mockUserId);
       expect(mockUserProgressRepository.createOrUpdate).not.toHaveBeenCalled();
@@ -101,18 +104,14 @@ describe('CreateProgressUseCase', () => {
       const invalidDto = { ...validCreateProgressDto, score: 150 };
       mockUserRepository.findById.mockResolvedValue(mockUser);
 
-      await expect(useCase.execute(mockUserId, invalidDto))
-        .rejects
-        .toThrow(BadRequestException);
+      await expect(useCase.execute(mockUserId, invalidDto)).rejects.toThrow(BadRequestException);
     });
 
     it('should throw BadRequestException when score is negative', async () => {
       const invalidDto = { ...validCreateProgressDto, score: -10 };
       mockUserRepository.findById.mockResolvedValue(mockUser);
 
-      await expect(useCase.execute(mockUserId, invalidDto))
-        .rejects
-        .toThrow(BadRequestException);
+      await expect(useCase.execute(mockUserId, invalidDto)).rejects.toThrow(BadRequestException);
     });
 
     it('should handle progress without score', async () => {
@@ -125,7 +124,10 @@ describe('CreateProgressUseCase', () => {
       const result = await useCase.execute(mockUserId, dtoWithoutScore);
 
       expect(result.score).toBeNull();
-      expect(mockUserProgressRepository.createOrUpdate).toHaveBeenCalledWith(mockUserId, dtoWithoutScore);
+      expect(mockUserProgressRepository.createOrUpdate).toHaveBeenCalledWith(
+        mockUserId,
+        dtoWithoutScore,
+      );
     });
   });
 });

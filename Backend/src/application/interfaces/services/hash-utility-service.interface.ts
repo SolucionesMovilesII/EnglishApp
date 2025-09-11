@@ -13,7 +13,7 @@ export interface IHashUtilityService {
     ipAddress: string,
     acceptLanguage?: string,
     acceptEncoding?: string,
-    salt?: string
+    salt?: string,
   ): { fingerprint: string; salt: string };
   verifyHash(data: string, hash: string, salt?: string): boolean;
   createRateLimitHash(identifier: string, window: string, salt?: string): string;

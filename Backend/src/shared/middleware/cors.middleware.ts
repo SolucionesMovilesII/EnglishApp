@@ -68,10 +68,8 @@ export class CorsMiddleware implements NestMiddleware {
     const requestedHeaders = req.headers['access-control-request-headers'];
     if (requestedHeaders) {
       const requestedHeadersArray = requestedHeaders.split(',').map(h => h.trim());
-      const allowedRequestedHeaders = requestedHeadersArray.filter(header => 
-        corsConfig.allowedHeaders.some(allowed => 
-          allowed.toLowerCase() === header.toLowerCase()
-        )
+      const allowedRequestedHeaders = requestedHeadersArray.filter(header =>
+        corsConfig.allowedHeaders.some(allowed => allowed.toLowerCase() === header.toLowerCase()),
       );
 
       if (allowedRequestedHeaders.length === requestedHeadersArray.length) {

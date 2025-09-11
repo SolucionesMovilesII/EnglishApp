@@ -25,8 +25,8 @@ export class RefreshTokenRotationService implements IRefreshTokenRotationService
   }
 
   async validateAndRotateToken(
-    presentedToken: string, 
-    context?: RotationContext
+    presentedToken: string,
+    context?: RotationContext,
   ): Promise<TokenValidationResult & { rotation?: TokenRotationResult }> {
     return this.coreRotationService.validateAndRotateToken(presentedToken, context);
   }
@@ -47,7 +47,7 @@ export class RefreshTokenRotationService implements IRefreshTokenRotationService
     userId: string,
     deviceInfo?: string,
     userAgent?: string,
-    ipAddress?: string
+    ipAddress?: string,
   ): Promise<TokenFamilyInfo> {
     return this.revocationService.createTokenFamily(userId, deviceInfo, userAgent, ipAddress);
   }

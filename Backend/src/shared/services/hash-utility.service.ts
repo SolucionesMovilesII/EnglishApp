@@ -14,7 +14,7 @@ export class HashUtilityService implements IHashUtilityService {
   hashIPAddress(ipAddress: string, salt?: string): { hash: string; salt: string } {
     const usedSalt = salt || randomBytes(16).toString('hex');
     const hash = createHmac('sha256', usedSalt).update(ipAddress).digest('hex');
-    
+
     return {
       hash,
       salt: usedSalt,
@@ -94,7 +94,9 @@ export class HashUtilityService implements IHashUtilityService {
    * @returns string Hex-encoded salted hash
    */
   saltedHash(data: string, salt: string): string {
-    return createHash('sha256').update(data + salt).digest('hex');
+    return createHash('sha256')
+      .update(data + salt)
+      .digest('hex');
   }
 
   /**
@@ -112,15 +114,15 @@ export class HashUtilityService implements IHashUtilityService {
     ipAddress: string,
     acceptLanguage?: string,
     acceptEncoding?: string,
-    salt?: string
+    salt?: string,
   ): { fingerprint: string; salt: string } {
     const usedSalt = salt || this.generateSalt();
-    
+
     // Normalize inputs to reduce false negatives
     const normalizedUserAgent = userAgent.toLowerCase().trim();
     const normalizedLanguage = acceptLanguage?.toLowerCase().trim() || '';
     const normalizedEncoding = acceptEncoding?.toLowerCase().trim() || '';
-    
+
     // Create fingerprint from combined normalized data
     const fingerprintData = [
       normalizedUserAgent,
@@ -128,9 +130,9 @@ export class HashUtilityService implements IHashUtilityService {
       normalizedLanguage,
       normalizedEncoding,
     ].join('|');
-    
+
     const fingerprint = createHmac('sha256', usedSalt).update(fingerprintData).digest('hex');
-    
+
     return {
       fingerprint,
       salt: usedSalt,

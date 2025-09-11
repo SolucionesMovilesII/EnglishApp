@@ -1,10 +1,4 @@
-import { 
-  IsEmail, 
-  IsString, 
-  MinLength, 
-  IsNotEmpty,
-  MaxLength,
-} from 'class-validator';
+import { IsEmail, IsString, MinLength, IsNotEmpty, MaxLength } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class RegisterDto {
@@ -12,7 +6,7 @@ export class RegisterDto {
     description: 'Full name of the user',
     example: 'John Doe',
     minLength: 2,
-    maxLength: 200
+    maxLength: 200,
   })
   @IsNotEmpty({ message: 'Name is required' })
   @IsString({ message: 'Name must be a string' })
@@ -24,7 +18,7 @@ export class RegisterDto {
     description: 'Email address of the user',
     example: 'user@example.com',
     format: 'email',
-    maxLength: 255
+    maxLength: 255,
   })
   @IsNotEmpty({ message: 'Email is required' })
   @IsEmail({}, { message: 'Email must be a valid email address' })
@@ -35,7 +29,7 @@ export class RegisterDto {
     description: 'Password for the user account',
     example: 'MySecurePassword123',
     minLength: 12,
-    maxLength: 128
+    maxLength: 128,
   })
   @IsNotEmpty({ message: 'Password is required' })
   @IsString({ message: 'Password must be a string' })
@@ -47,7 +41,7 @@ export class RegisterDto {
     description: 'Password confirmation to ensure passwords match',
     example: 'MySecurePassword123',
     minLength: 12,
-    maxLength: 128
+    maxLength: 128,
   })
   @IsNotEmpty({ message: 'Password confirmation is required' })
   @IsString({ message: 'Password confirmation must be a string' })

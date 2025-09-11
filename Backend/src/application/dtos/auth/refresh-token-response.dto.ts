@@ -3,25 +3,25 @@ import { ApiProperty } from '@nestjs/swagger';
 export class RefreshTokenResponseDto {
   @ApiProperty({
     description: 'User unique identifier',
-    example: 'uuid-user-id'
+    example: 'uuid-user-id',
   })
   readonly userId!: string;
 
   @ApiProperty({
     description: 'New access token',
-    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
   })
   readonly accessToken!: string;
 
   @ApiProperty({
     description: 'Access token expiration time in seconds',
-    example: 900
+    example: 900,
   })
   readonly expiresIn!: number;
 
   @ApiProperty({
     description: 'Success message',
-    example: 'Token refreshed successfully'
+    example: 'Token refreshed successfully',
   })
   readonly message!: string;
 
@@ -34,7 +34,7 @@ export class RefreshTokenResponseDto {
     accessToken: string,
     expiresIn: number,
     message: string,
-    refreshToken?: string
+    refreshToken?: string,
   ) {
     this.userId = userId;
     this.accessToken = accessToken;

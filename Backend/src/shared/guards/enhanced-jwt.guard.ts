@@ -41,7 +41,7 @@ export class EnhancedJwtGuard implements CanActivate {
     }
 
     const request = context.switchToHttp().getRequest<Request>();
-    
+
     // Extract and validate JWT token
     const token = this.extractTokenFromHeader(request);
     if (!token) {
@@ -51,7 +51,7 @@ export class EnhancedJwtGuard implements CanActivate {
         path: request.path,
         userAgent: request.headers['user-agent'],
       });
-      
+
       throw new UnauthorizedException({
         error: 'UNAUTHORIZED',
         message: 'Access token is required',
@@ -62,7 +62,7 @@ export class EnhancedJwtGuard implements CanActivate {
     try {
       // Verify the token
       const payload = await this.jwtService.verify(token);
-      
+
       // Validate token type
       if (payload.type !== 'access') {
         this.logger.warn('JWT validation failed: Invalid token type', {
@@ -70,7 +70,7 @@ export class EnhancedJwtGuard implements CanActivate {
           userId: payload.sub,
           ip: (request as any).realIP || request.ip,
         });
-        
+
         throw new UnauthorizedException({
           error: 'INVALID_TOKEN_TYPE',
           message: 'Invalid token type. Access token required.',
@@ -85,7 +85,7 @@ export class EnhancedJwtGuard implements CanActivate {
           tokenId: payload.jti,
           ip: (request as any).realIP || request.ip,
         });
-        
+
         throw new UnauthorizedException({
           error: 'INVALID_TOKEN_CLAIMS',
           message: 'Invalid token claims',
@@ -107,7 +107,7 @@ export class EnhancedJwtGuard implements CanActivate {
           path: request.path,
           ip: (request as any).realIP || request.ip,
         });
-        
+
         throw new UnauthorizedException({
           error: 'INSUFFICIENT_PERMISSIONS',
           message: 'Insufficient permissions to access this resource',
@@ -216,7 +216,8 @@ export class EnhancedJwtGuard implements CanActivate {
     }
 
     // Check issued at (prevent tokens from the future)
-    if (payload.iat && payload.iat > now + 60) { // Allow 1 minute clock skew
+    if (payload.iat && payload.iat > now + 60) {
+      // Allow 1 minute clock skew
       return false;
     }
 

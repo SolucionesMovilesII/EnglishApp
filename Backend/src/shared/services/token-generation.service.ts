@@ -1,6 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { randomBytes } from 'crypto';
-import { ITokenGenerationService, TokenInfo } from '../../application/interfaces/services/token-generation-service.interface';
+import {
+  ITokenGenerationService,
+  TokenInfo,
+} from '../../application/interfaces/services/token-generation-service.interface';
 
 @Injectable()
 export class TokenGenerationService implements ITokenGenerationService {
@@ -51,10 +54,7 @@ export class TokenGenerationService implements ITokenGenerationService {
    * @param encoding Encoding format (default: 'base64url')
    * @returns string Encoded secure random token
    */
-  generateSecureToken(
-    lengthBytes: number = 32,
-    encoding: BufferEncoding = 'base64url'
-  ): string {
+  generateSecureToken(lengthBytes: number = 32, encoding: BufferEncoding = 'base64url'): string {
     return randomBytes(lengthBytes).toString(encoding);
   }
 
@@ -64,10 +64,7 @@ export class TokenGenerationService implements ITokenGenerationService {
    * @param expirationMinutes Minutes until expiration (default: 60)
    * @returns TokenInfo object with token and expiration
    */
-  generateTokenWithExpiration(
-    lengthBytes: number = 32,
-    expirationMinutes: number = 60
-  ): TokenInfo {
+  generateTokenWithExpiration(lengthBytes: number = 32, expirationMinutes: number = 60): TokenInfo {
     const token = randomBytes(lengthBytes).toString('base64url');
     const expiresAt = new Date();
     expiresAt.setMinutes(expiresAt.getMinutes() + expirationMinutes);
@@ -86,15 +83,15 @@ export class TokenGenerationService implements ITokenGenerationService {
   generateNumericOTP(length: number = 6): string {
     const digits = '0123456789';
     let otp = '';
-    
+
     // Ensure first digit is not 0 for better UX
     otp += digits.charAt(Math.floor(Math.random() * 9) + 1);
-    
+
     for (let i = 1; i < length; i++) {
       const randomByte = randomBytes(1)[0];
       otp += digits.charAt(randomByte % 10);
     }
-    
+
     return otp;
   }
 

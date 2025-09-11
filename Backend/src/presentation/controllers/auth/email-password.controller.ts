@@ -1,23 +1,9 @@
-import {
-  Controller,
-  Post,
-  Get,
-  Body,
-  Query,
-  HttpStatus,
-  HttpCode,
-  Req,
-} from '@nestjs/common';
+import { Controller, Post, Get, Body, Query, HttpStatus, HttpCode, Req } from '@nestjs/common';
 import { Public } from '../../../shared/guards/enhanced-jwt.guard';
 import { SkipCSRF } from '../../../shared/guards/csrf.guard';
 import { SkipOriginValidation } from '../../../shared/guards/origin-validation.guard';
 import { UseRateLimit, RATE_LIMITS } from '../../../shared/guards/rate-limit.guard';
-import { 
-  ApiTags, 
-  ApiOperation, 
-  ApiResponse,
-  ApiQuery,
-} from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import { Request } from 'express';
 import { BaseAuthController } from './base-auth.controller';
 
@@ -54,36 +40,38 @@ export class EmailPasswordController extends BaseAuthController {
   @Public()
   @SkipCSRF()
   @UseRateLimit(RATE_LIMITS.EMAIL_VERIFICATION)
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Verify email with verification code',
-    description: 'Verifies a user email address using the verification token sent via email.'
+    description: 'Verifies a user email address using the verification token sent via email.',
   })
   @ApiResponse({
     status: 200,
     description: 'Email verified successfully',
     type: VerifyEmailResponseDto,
   })
-  @ApiResponse({ 
-    status: 400, 
-    description: 'Invalid or expired verification token'
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid or expired verification token',
   })
-  @ApiResponse({ 
-    status: 429, 
-    description: 'Too many verification attempts'
+  @ApiResponse({
+    status: 429,
+    description: 'Too many verification attempts',
   })
-  async verifyEmail(
-    @Body() verifyEmailDto: VerifyEmailDto,
-  ): Promise<VerifyEmailResponseDto> {
+  async verifyEmail(@Body() verifyEmailDto: VerifyEmailDto): Promise<VerifyEmailResponseDto> {
     try {
-      this.logger.log(`Email verification attempt for token: ${verifyEmailDto.token.substring(0, 8)}...`);
-      
+      this.logger.log(
+        `Email verification attempt for token: ${verifyEmailDto.token.substring(0, 8)}...`,
+      );
+
       const result = await this.verifyEmailUseCase.execute(verifyEmailDto);
-      
+
       this.logger.log(`Email verified successfully for user: ${result.userId}`);
       return result;
-
     } catch (error: unknown) {
-      this.logger.error(`Email verification failed: ${error instanceof Error ? error.message : String(error)}`, error instanceof Error ? error.stack : undefined);
+      this.logger.error(
+        `Email verification failed: ${error instanceof Error ? error.message : String(error)}`,
+        error instanceof Error ? error.stack : undefined,
+      );
       this.handleAuthError(error);
     }
   }
@@ -94,9 +82,9 @@ export class EmailPasswordController extends BaseAuthController {
   @SkipCSRF()
   @SkipOriginValidation()
   @UseRateLimit(RATE_LIMITS.EMAIL_VERIFICATION)
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Verify email via GET link (email link)',
-    description: 'Alternative endpoint for email verification via GET request (for email links)'
+    description: 'Alternative endpoint for email verification via GET request (for email links)',
   })
   @ApiQuery({ name: 'token', description: 'Email verification token', required: true })
   @ApiResponse({ status: 200, description: 'Email verified successfully' })
@@ -110,37 +98,40 @@ export class EmailPasswordController extends BaseAuthController {
   @Public()
   @SkipCSRF()
   @UseRateLimit(RATE_LIMITS.EMAIL_VERIFICATION)
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Resend email verification',
-    description: 'Sends a new verification email to the specified email address if it exists in the system.'
+    description:
+      'Sends a new verification email to the specified email address if it exists in the system.',
   })
   @ApiResponse({
     status: 200,
     description: 'Verification email sent (if email exists)',
     type: ResendVerificationResponseDto,
   })
-  @ApiResponse({ 
-    status: 429, 
-    description: 'Too many resend attempts'
+  @ApiResponse({
+    status: 429,
+    description: 'Too many resend attempts',
   })
   async resendVerificationEmail(
     @Body() resendDto: ResendVerificationDto,
   ): Promise<ResendVerificationResponseDto> {
     try {
       this.logger.log(`Resend verification request for email: ${resendDto.email}`);
-      
+
       const result = await this.verifyEmailUseCase.resendVerificationEmail(resendDto.email);
-      
+
       this.logger.log(`Verification email resent for: ${resendDto.email}`);
       return {
         success: result.success,
         message: result.message,
         email: resendDto.email,
       };
-
     } catch (error: unknown) {
-      this.logger.error(`Resend verification failed for ${resendDto.email}: ${error instanceof Error ? error.message : String(error)}`, error instanceof Error ? error.stack : undefined);
-      
+      this.logger.error(
+        `Resend verification failed for ${resendDto.email}: ${error instanceof Error ? error.message : String(error)}`,
+        error instanceof Error ? error.stack : undefined,
+      );
+
       // For security, always return success to prevent email enumeration
       return {
         success: true,
@@ -157,18 +148,19 @@ export class EmailPasswordController extends BaseAuthController {
   @Public()
   @SkipCSRF()
   @UseRateLimit(RATE_LIMITS.FORGOT_PASSWORD)
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Request password reset',
-    description: 'Sends a password reset code to the specified email address if it exists in the system.'
+    description:
+      'Sends a password reset code to the specified email address if it exists in the system.',
   })
   @ApiResponse({
     status: 200,
     description: 'Password reset email sent (if email exists)',
     type: ForgotPasswordResponseDto,
   })
-  @ApiResponse({ 
-    status: 429, 
-    description: 'Too many password reset attempts'
+  @ApiResponse({
+    status: 429,
+    description: 'Too many password reset attempts',
   })
   async forgotPassword(
     @Body() forgotPasswordDto: ForgotPasswordDto,
@@ -176,17 +168,19 @@ export class EmailPasswordController extends BaseAuthController {
   ): Promise<ForgotPasswordResponseDto> {
     try {
       const ipAddress = this.extractIpAddress(request);
-      
+
       this.logger.log(`Password reset request for email: ${forgotPasswordDto.email}`);
-      
+
       const result = await this.forgotPasswordUseCase.execute(forgotPasswordDto, ipAddress);
-      
+
       this.logger.log(`Password reset request processed for: ${forgotPasswordDto.email}`);
       return result;
-
     } catch (error: unknown) {
-      this.logger.error(`Password reset request failed: ${error instanceof Error ? error.message : String(error)}`, error instanceof Error ? error.stack : undefined);
-      
+      this.logger.error(
+        `Password reset request failed: ${error instanceof Error ? error.message : String(error)}`,
+        error instanceof Error ? error.stack : undefined,
+      );
+
       // For security, always return success to prevent email enumeration
       return {
         success: true,
@@ -201,22 +195,23 @@ export class EmailPasswordController extends BaseAuthController {
   @HttpCode(HttpStatus.OK)
   @Public()
   @SkipCSRF()
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Reset password with verification code',
-    description: 'Resets user password using the verification code sent via email during forgot password process.'
+    description:
+      'Resets user password using the verification code sent via email during forgot password process.',
   })
   @ApiResponse({
     status: 200,
     description: 'Password reset successfully',
     type: ResetPasswordResponseDto,
   })
-  @ApiResponse({ 
-    status: 400, 
-    description: 'Invalid or expired reset code'
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid or expired reset code',
   })
-  @ApiResponse({ 
-    status: 401, 
-    description: 'Reset code verification failed'
+  @ApiResponse({
+    status: 401,
+    description: 'Reset code verification failed',
   })
   async resetPassword(
     @Body() resetPasswordDto: ResetPasswordDto,
@@ -224,16 +219,18 @@ export class EmailPasswordController extends BaseAuthController {
   ): Promise<ResetPasswordResponseDto> {
     try {
       const ipAddress = this.extractIpAddress(request);
-      
+
       this.logger.log(`Password reset attempt for email: ${resetPasswordDto.email}`);
-      
+
       const result = await this.resetPasswordUseCase.execute(resetPasswordDto, ipAddress);
-      
+
       this.logger.log(`Password reset successfully for user: ${result.userId}`);
       return result;
-
     } catch (error: unknown) {
-      this.logger.error(`Password reset failed: ${error instanceof Error ? error.message : String(error)}`, error instanceof Error ? error.stack : undefined);
+      this.logger.error(
+        `Password reset failed: ${error instanceof Error ? error.message : String(error)}`,
+        error instanceof Error ? error.stack : undefined,
+      );
       this.handleAuthError(error);
     }
   }

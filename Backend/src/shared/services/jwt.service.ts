@@ -29,10 +29,13 @@ export class JwtService implements IJwtService {
   private readonly algorithm: string;
 
   constructor(private readonly configService: ConfigService) {
-    this.accessTokenSecret = this.configService.get<string>('jwt.accessTokenSecret') || 'access-secret';
-    this.refreshTokenSecret = this.configService.get<string>('jwt.refreshTokenSecret') || 'refresh-secret';
+    this.accessTokenSecret =
+      this.configService.get<string>('jwt.accessTokenSecret') || 'access-secret';
+    this.refreshTokenSecret =
+      this.configService.get<string>('jwt.refreshTokenSecret') || 'refresh-secret';
     this.accessTokenExpiresIn = this.configService.get<string>('jwt.accessTokenExpiresIn') || '15m';
-    this.refreshTokenExpiresIn = this.configService.get<string>('jwt.refreshTokenExpiresIn') || '7d';
+    this.refreshTokenExpiresIn =
+      this.configService.get<string>('jwt.refreshTokenExpiresIn') || '7d';
     this.issuer = this.configService.get<string>('jwt.issuer') || 'english-app-backend';
     this.audience = this.configService.get<string>('jwt.audience') || 'english-app-client';
     this.keyId = this.configService.get<string>('jwt.keyId');
@@ -98,7 +101,7 @@ export class JwtService implements IJwtService {
    */
   async sign(payload: object, options?: { expiresIn?: string }): Promise<string> {
     const expiresIn = options?.expiresIn || this.accessTokenExpiresIn;
-    const signOptions: SignOptions = { 
+    const signOptions: SignOptions = {
       expiresIn: expiresIn as any,
       algorithm: this.algorithm as any,
       ...(this.keyId && { keyid: this.keyId }),
@@ -133,11 +136,11 @@ export class JwtService implements IJwtService {
         algorithms: [this.algorithm as any],
       };
       const payload = jwt.verify(token, this.refreshTokenSecret, verifyOptions) as JwtPayload;
-      
+
       if (payload.type !== 'refresh') {
         throw new Error('Invalid token type');
       }
-      
+
       return payload;
     } catch (error: any) {
       throw new Error(`Invalid refresh token: ${error?.message || 'Unknown error'}`);
