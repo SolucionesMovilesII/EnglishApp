@@ -2,18 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../providers/quiz_provider.dart';
+import '../providers/progress_provider.dart';
 import '../widgets/quiz_question_card.dart';
 import '../widgets/quiz_option_card.dart';
 import '../widgets/app_banner.dart';
 import '../l10n/app_localizations.dart';
 
 class QuizScreen extends StatelessWidget {
-  const QuizScreen({super.key});
+  final String chapterId;
+  
+  const QuizScreen({super.key, this.chapterId = 'default-chapter'});
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => QuizProvider(),
+      create: (context) => QuizProvider(
+        progressProvider: Provider.of<ProgressProvider>(context, listen: false),
+        chapterId: chapterId,
+      ),
       child: const _QuizScreenContent(),
     );
   }
