@@ -185,7 +185,7 @@ class _VocabularyChaptersScreenState extends State<VocabularyChaptersScreen>
             Icon(
               Icons.book_outlined,
               size: 64,
-              color: theme.colorScheme.primary.withOpacity(0.5),
+              color: theme.colorScheme.primary.withValues(alpha: 0.5),
             ),
             const SizedBox(height: 16),
             Text(
@@ -275,7 +275,7 @@ class _VocabularyChaptersScreenState extends State<VocabularyChaptersScreen>
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: theme.colorScheme.shadow.withOpacity(0.1),
+              color: theme.colorScheme.shadow.withValues(alpha: 0.1),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -297,7 +297,7 @@ class _VocabularyChaptersScreenState extends State<VocabularyChaptersScreen>
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.primary.withOpacity(0.2),
+                    color: theme.colorScheme.primary.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
@@ -322,7 +322,7 @@ class _VocabularyChaptersScreenState extends State<VocabularyChaptersScreen>
                       borderRadius: BorderRadius.circular(8),
                       child: LinearProgressIndicator(
                         value: _progressAnimation.value * (chaptersProvider.overallProgress / 100),
-                        backgroundColor: theme.colorScheme.outline.withOpacity(0.2),
+                        backgroundColor: theme.colorScheme.outline.withValues(alpha: 0.2),
                         valueColor: AlwaysStoppedAnimation<Color>(theme.colorScheme.primary),
                         minHeight: 8,
                       ),
@@ -334,7 +334,7 @@ class _VocabularyChaptersScreenState extends State<VocabularyChaptersScreen>
                         Text(
                           l10n.chaptersCompleted,
                           style: theme.textTheme.bodyMedium?.copyWith(
-                            color: theme.colorScheme.onPrimaryContainer.withOpacity(0.7),
+                            color: theme.colorScheme.onPrimaryContainer.withValues(alpha: 0.7),
                           ),
                         ),
                         Text(
@@ -389,9 +389,9 @@ class _VocabularyChaptersScreenState extends State<VocabularyChaptersScreen>
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: color.withOpacity(0.2)),
+        border: Border.all(color: color.withValues(alpha: 0.2)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -409,7 +409,7 @@ class _VocabularyChaptersScreenState extends State<VocabularyChaptersScreen>
           Text(
             label,
             style: theme.textTheme.labelSmall?.copyWith(
-              color: color.withOpacity(0.8),
+              color: color.withValues(alpha: 0.8),
             ),
           ),
         ],
