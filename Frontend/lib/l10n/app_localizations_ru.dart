@@ -167,6 +167,10 @@ class AppLocalizationsRu extends AppLocalizations {
   String get emailPasswordRequired => 'Требуется электронная почта и пароль';
 
   @override
+  String get invalidCredentials =>
+      'Invalid credentials. Please check your email and password.';
+
+  @override
   String get googleSignInFailed => 'Ошибка входа через Google';
 
   @override

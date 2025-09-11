@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/user_model.dart';
 import '../l10n/app_localizations.dart';
+import '../utils/api_service.dart';
+import '../utils/environment_config.dart';
 
 enum AuthState {
   initial,
@@ -14,10 +16,15 @@ enum AuthState {
 class AuthProvider with ChangeNotifier {
   static const String _userKey = 'user_data';
   static const String _isLoggedInKey = 'is_logged_in';
+  static const String _tokenKey = 'auth_token';
+  static const String _refreshTokenKey = 'refresh_token';
   
   AuthState _authState = AuthState.initial;
   UserModel? _user;
   String? _errorMessage;
+  String? _accessToken;
+  String? _refreshToken;
+  final ApiService _apiService = ApiService();
   
   AuthState get authState => _authState;
   UserModel? get user => _user;
@@ -38,6 +45,7 @@ class AuthProvider with ChangeNotifier {
         final userData = prefs.getString(_userKey);
         if (userData != null) {
           _user = UserModel.fromJson(userData);
+          await _loadTokens(); // Load saved tokens
           _authState = AuthState.authenticated;
         } else {
           _authState = AuthState.unauthenticated;
@@ -72,7 +80,11 @@ class AuthProvider with ChangeNotifier {
       notifyListeners();
     } catch (e) {
       _authState = AuthState.error;
-      _errorMessage = AppLocalizations.of(context)!.errorCheckingAuth;
+      if (context.mounted) {
+        _errorMessage = AppLocalizations.of(context)!.errorCheckingAuth;
+      } else {
+        _errorMessage = 'Error checking authentication status';
+      }
       notifyListeners();
     }
   }
@@ -81,35 +93,82 @@ class AuthProvider with ChangeNotifier {
     _setLoading(true);
     
     try {
-      await Future.delayed(const Duration(seconds: 2));
-      
+      // Basic validation
       if (email.isEmpty || password.isEmpty) {
-        throw Exception(AppLocalizations.of(context)!.emailPasswordRequired);
+        final errorMsg = context.mounted 
+            ? AppLocalizations.of(context)!.emailPasswordRequired
+            : 'Email and password are required';
+        throw Exception(errorMsg);
       }
       
       if (!_isValidEmail(email)) {
-        throw Exception(AppLocalizations.of(context)!.emailInvalid);
+        final errorMsg = context.mounted 
+            ? AppLocalizations.of(context)!.emailInvalid
+            : 'Invalid email format';
+        throw Exception(errorMsg);
       }
       
-      if (password.length < 6) {
-        throw Exception(AppLocalizations.of(context)!.passwordTooShort);
+      if (password.length < 12) {
+        final errorMsg = context.mounted 
+            ? AppLocalizations.of(context)!.passwordTooShort
+            : 'Password must be at least 12 characters';
+        throw Exception(errorMsg);
       }
       
-      _user = UserModel(
-        id: '1',
-        name: 'Ximena',
-        email: email,
-        profileImage: null,
+      // Prepare request body according to backend expectations
+      final requestBody = {
+        'email': email.trim().toLowerCase(),
+        'password': password,
+      };
+      
+      // Log configuration for debugging
+      if (EnvironmentConfig.isDevelopment) {
+        EnvironmentConfig.logConfiguration();
+      }
+      
+      // Make API call to backend
+      final response = await _apiService.post(
+        EnvironmentConfig.loginEndpoint,
+        body: requestBody,
+        withCredentials: true,
       );
       
-      await _saveUserData();
-      _authState = AuthState.authenticated;
-      _errorMessage = null;
-      notifyListeners();
-      
-      return true;
+      if (response.success) {
+        // Parse response data
+        final responseData = response.data as Map<String, dynamic>?;
+        
+        if (responseData != null) {
+          // Extract tokens from LoginResponseDto structure
+          _accessToken = responseData['accessToken'] as String?;
+          // Note: refreshToken comes in HttpOnly cookie, not in response body as per backend security
+          
+          // Create user from LoginResponseDto fields
+          _user = UserModel(
+            id: responseData['userId'] ?? '',
+            name: responseData['fullName'] ?? email.split('@').first,
+            email: responseData['email'] ?? email,
+            profileImage: null, // Profile image not included in login response
+          );
+          
+          // Save user data and tokens
+          await _saveUserData();
+          if (_accessToken != null) {
+            await _saveTokens();
+          }
+          
+          _authState = AuthState.authenticated;
+          _errorMessage = null;
+          notifyListeners();
+          
+          return true;
+        } else {
+          throw Exception('Invalid response format');
+        }
+      } else {
+        throw Exception(response.message);
+      }
     } catch (e) {
-      _authState = AuthState.error;
+      _authState = AuthState.unauthenticated;
       _errorMessage = e.toString().replaceFirst('Exception: ', '');
       notifyListeners();
       return false;
@@ -137,7 +196,11 @@ class AuthProvider with ChangeNotifier {
       return true;
     } catch (e) {
       _authState = AuthState.error;
-      _errorMessage = AppLocalizations.of(context)!.googleSignInFailed;
+      if (context.mounted) {
+        _errorMessage = AppLocalizations.of(context)!.googleSignInFailed;
+      } else {
+        _errorMessage = 'Google sign in failed';
+      }
       notifyListeners();
       return false;
     }
@@ -164,7 +227,11 @@ class AuthProvider with ChangeNotifier {
       return true;
     } catch (e) {
       _authState = AuthState.error;
-      _errorMessage = AppLocalizations.of(context)!.appleSignInFailed;
+      if (context.mounted) {
+        _errorMessage = AppLocalizations.of(context)!.appleSignInFailed;
+      } else {
+        _errorMessage = 'Apple sign in failed';
+      }
       notifyListeners();
       return false;
     }
@@ -175,23 +242,123 @@ class AuthProvider with ChangeNotifier {
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove(_userKey);
       await prefs.setBool(_isLoggedInKey, false);
+      await _clearTokens(); // Clear stored tokens
       
       _user = null;
       _authState = AuthState.unauthenticated;
       _errorMessage = null;
       notifyListeners();
     } catch (e) {
-      _errorMessage = AppLocalizations.of(context)!.errorDuringLogout;
+      if (context.mounted) {
+        _errorMessage = AppLocalizations.of(context)!.errorDuringLogout;
+      } else {
+        _errorMessage = 'Error during logout';
+      }
       notifyListeners();
     }
   }
   
   void clearError() {
     _errorMessage = null;
-    if (_authState == AuthState.error) {
+    if (_authState == AuthState.error || _authState == AuthState.loading) {
       _authState = AuthState.unauthenticated;
     }
     notifyListeners();
+  }
+
+  // Real API registration method
+  Future<bool> register(BuildContext context, String fullName, String email, String password, String confirmPassword) async {
+    _setLoading(true);
+    
+    try {
+      // Basic validation
+      if (fullName.isEmpty || email.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
+        final errorMsg = context.mounted 
+            ? AppLocalizations.of(context)!.emailPasswordRequired
+            : 'All fields are required';
+        throw Exception(errorMsg);
+      }
+      
+      if (!_isValidEmail(email)) {
+        final errorMsg = context.mounted 
+            ? AppLocalizations.of(context)!.emailInvalid
+            : 'Invalid email format';
+        throw Exception(errorMsg);
+      }
+      
+      if (password.length < 12) {
+        final errorMsg = context.mounted 
+            ? AppLocalizations.of(context)!.passwordTooShort
+            : 'Password must be at least 12 characters';
+        throw Exception(errorMsg);
+      }
+      
+      if (password != confirmPassword) {
+        final errorMsg = context.mounted 
+            ? AppLocalizations.of(context)!.passwordTooShort
+            : 'Passwords do not match';
+        throw Exception(errorMsg);
+      }
+      
+      // Prepare request body according to backend expectations
+      final requestBody = {
+        'fullName': fullName.trim(),
+        'email': email.trim().toLowerCase(),
+        'password': password,
+        'confirmPassword': confirmPassword,
+      };
+      
+      // Log configuration for debugging
+      if (EnvironmentConfig.isDevelopment) {
+        EnvironmentConfig.logConfiguration();
+      }
+      
+      // Make API call
+      final response = await _apiService.post(
+        EnvironmentConfig.registerEndpoint,
+        body: requestBody,
+        withCredentials: true,
+      );
+      
+      if (response.success) {
+        // Parse response data
+        final responseData = response.data as Map<String, dynamic>?;
+        
+        if (responseData != null) {
+          // Extract tokens from RegisterResponseDto structure
+          _accessToken = responseData['accessToken'] as String?;
+          // Note: refreshToken comes in HttpOnly cookie, not in response body as per backend security
+          _refreshToken = null; // Set to null since it comes via cookie
+          
+          // Create user from RegisterResponseDto fields
+          _user = UserModel(
+            id: responseData['userId'] ?? '',
+            name: responseData['fullName'] ?? fullName,
+            email: responseData['email'] ?? email,
+            profileImage: null, // Profile image not included in registration response
+          );
+          
+          // Save user data and tokens
+          await _saveUserData();
+          await _saveTokens();
+          
+          _authState = AuthState.authenticated;
+          _errorMessage = null;
+          notifyListeners();
+          
+          return true;
+        } else {
+          throw Exception('Invalid response format');
+        }
+      } else {
+        throw Exception(response.message);
+      }
+    } catch (e) {
+      _authState = AuthState.unauthenticated;
+      _errorMessage = e.toString().replaceFirst('Exception: ', '');
+      notifyListeners();
+      return false;
+    }
   }
 
   // Mock login method - always successful
@@ -218,7 +385,11 @@ class AuthProvider with ChangeNotifier {
       notifyListeners();
     } catch (e) {
       _authState = AuthState.error;
-      _errorMessage = AppLocalizations.of(context)!.errorInMockLogin;
+      if (context.mounted) {
+        _errorMessage = AppLocalizations.of(context)!.errorInMockLogin;
+      } else {
+        _errorMessage = 'Error in mock login';
+      }
       notifyListeners();
     }
   }
@@ -227,12 +398,17 @@ class AuthProvider with ChangeNotifier {
     if (loading) {
       _authState = AuthState.loading;
       _errorMessage = null;
+    } else {
+      // Reset to unauthenticated when loading stops (if not authenticated)
+      if (_authState == AuthState.loading) {
+        _authState = AuthState.unauthenticated;
+      }
     }
     notifyListeners();
   }
   
   bool _isValidEmail(String email) {
-    return RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
+    return RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$').hasMatch(email);
   }
   
   Future<void> _saveUserData() async {
@@ -241,5 +417,29 @@ class AuthProvider with ChangeNotifier {
       await prefs.setString(_userKey, _user!.toJson());
       await prefs.setBool(_isLoggedInKey, true);
     }
+  }
+  
+  Future<void> _saveTokens() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (_accessToken != null) {
+      await prefs.setString(_tokenKey, _accessToken!);
+    }
+    if (_refreshToken != null) {
+      await prefs.setString(_refreshTokenKey, _refreshToken!);
+    }
+  }
+  
+  Future<void> _loadTokens() async {
+    final prefs = await SharedPreferences.getInstance();
+    _accessToken = prefs.getString(_tokenKey);
+    _refreshToken = prefs.getString(_refreshTokenKey);
+  }
+  
+  Future<void> _clearTokens() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_tokenKey);
+    await prefs.remove(_refreshTokenKey);
+    _accessToken = null;
+    _refreshToken = null;
   }
 }

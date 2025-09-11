@@ -43,7 +43,7 @@ class LoginFormFields extends StatelessWidget {
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
+                  color: Colors.black.withValues(alpha: 0.05),
                   blurRadius: 10,
                   offset: const Offset(0, 2),
                 ),
@@ -83,7 +83,7 @@ class LoginFormFields extends StatelessWidget {
                 if (value == null || value.isEmpty) {
                   return AppLocalizations.of(context)!.emailRequired;
                 }
-                if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}\$').hasMatch(value)) {
+                if (!RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$').hasMatch(value)) {
                   return AppLocalizations.of(context)!.emailInvalid;
                 }
                 return null;
@@ -99,7 +99,7 @@ class LoginFormFields extends StatelessWidget {
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
+                  color: Colors.black.withValues(alpha: 0.05),
                   blurRadius: 10,
                   offset: const Offset(0, 2),
                 ),
@@ -152,7 +152,7 @@ class LoginFormFields extends StatelessWidget {
                 if (value == null || value.isEmpty) {
                   return AppLocalizations.of(context)!.passwordRequired;
                 }
-                if (value.length < 6) {
+                if (value.length < 12) {
                   return AppLocalizations.of(context)!.passwordTooShort;
                 }
                 return null;

@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../providers/auth_provider.dart';
 import '../widgets/settings_button.dart';
 import '../widgets/forgot_password_form.dart';
 import '../widgets/forgot_password_success_actions.dart';

@@ -21,24 +21,6 @@ class LoginButtonSection extends StatelessWidget {
       builder: (context, authProvider, child) {
         return Column(
           children: [
-            // Error Message
-            if (authProvider.errorMessage != null)
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(12),
-                margin: const EdgeInsets.only(bottom: 16),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.errorContainer,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  authProvider.errorMessage!,
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onErrorContainer,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ),
             
             // Login Button
             AnimatedContainer(
@@ -51,54 +33,53 @@ class LoginButtonSection extends StatelessWidget {
                     ? LinearGradient(
                         colors: [
                           Theme.of(context).colorScheme.primary,
-                          Color.fromRGBO(
-                            (Theme.of(context).colorScheme.primary.r * 255.0).round() & 0xff,
-                            (Theme.of(context).colorScheme.primary.g * 255.0).round() & 0xff,
-                            (Theme.of(context).colorScheme.primary.b * 255.0).round() & 0xff,
-                            0.8,
-                          ),
+                          Theme.of(context).colorScheme.primary.withValues(alpha: 0.8),
                         ],
                       )
                     : null,
                 boxShadow: (isEmailValid && isPasswordValid) ? [
                   BoxShadow(
-                    color: Color.fromRGBO(
-                      (Theme.of(context).colorScheme.primary.r * 255.0).round() & 0xff,
-                      (Theme.of(context).colorScheme.primary.g * 255.0).round() & 0xff,
-                      (Theme.of(context).colorScheme.primary.b * 255.0).round() & 0xff,
-                      0.3,
-                    ),
+                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
                     blurRadius: 12,
                     offset: const Offset(0, 4),
                   ),
                 ] : null,
               ),
               child: ElevatedButton(
-                onPressed: authProvider.isLoading ? null : onLoginPressed,
+                onPressed: (authProvider.isLoading || !(isEmailValid && isPasswordValid)) ? null : onLoginPressed,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: (isEmailValid && isPasswordValid)
                       ? Colors.transparent
-                      : Color.fromRGBO(
-                          (Theme.of(context).colorScheme.primary.r * 255.0).round() & 0xff,
-                          (Theme.of(context).colorScheme.primary.g * 255.0).round() & 0xff,
-                          (Theme.of(context).colorScheme.primary.b * 255.0).round() & 0xff,
-                          0.6,
-                        ),
+                      : Theme.of(context).colorScheme.primary.withValues(alpha: 0.6),
                   shadowColor: Colors.transparent,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
                   ),
                 ),
                 child: authProvider.isLoading
-                    ? const SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            Colors.white,
+                    ? Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                Colors.white,
+                              ),
+                            ),
                           ),
-                        ),
+                          const SizedBox(width: 12),
+                          Text(
+                            AppLocalizations.of(context)!.signingYouIn,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
                       )
                     : Text(
                         AppLocalizations.of(context)!.loginButton,

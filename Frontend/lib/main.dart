@@ -8,8 +8,12 @@ import 'screens/login_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/loading_screen.dart';
 import 'l10n/app_localizations.dart';
+import 'utils/environment_config.dart';
 
 void main() {
+  // Log environment configuration in development mode
+  EnvironmentConfig.logConfiguration();
+  
   runApp(const EnglishApp());
 }
 

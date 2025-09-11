@@ -39,7 +39,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get passwordRequired => 'Password is required';
 
   @override
-  String get passwordTooShort => 'Password must be at least 6 characters';
+  String get passwordTooShort => 'Password must be at least 12 characters';
 
   @override
   String get hi => 'Hi';
@@ -166,6 +166,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get emailPasswordRequired => 'Email and password are required';
+
+  @override
+  String get invalidCredentials =>
+      'Invalid credentials. Please check your email and password.';
 
   @override
   String get googleSignInFailed => 'Google sign in failed';

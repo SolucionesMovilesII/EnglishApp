@@ -16,7 +16,7 @@ class RegisterFormFields extends StatelessWidget {
   final VoidCallback onToggleConfirmPasswordVisibility;
 
   const RegisterFormFields({
-    Key? key,
+    super.key,
     required this.nameController,
     required this.emailController,
     required this.passwordController,
@@ -29,7 +29,7 @@ class RegisterFormFields extends StatelessWidget {
     required this.obscureConfirmPassword,
     required this.onTogglePasswordVisibility,
     required this.onToggleConfirmPasswordVisibility,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -60,17 +60,17 @@ class RegisterFormFields extends StatelessWidget {
         _buildFormField(
           context: context,
           controller: emailController,
-          labelText: 'Email',
-          hintText: 'Enter your email',
+          labelText: AppLocalizations.of(context)!.email,
+          hintText: AppLocalizations.of(context)!.emailAddress,
           prefixIcon: Icons.email_outlined,
           isValid: isEmailValid,
           keyboardType: TextInputType.emailAddress,
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return 'Please enter your email';
+              return AppLocalizations.of(context)!.emailRequired;
             }
-            if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
-              return 'Please enter a valid email';
+            if (!RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$').hasMatch(value)) {
+              return AppLocalizations.of(context)!.emailInvalid;
             }
             return null;
           },
@@ -108,10 +108,10 @@ class RegisterFormFields extends StatelessWidget {
           ),
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return 'Please enter a password';
+              return AppLocalizations.of(context)!.passwordRequired;
             }
-            if (value.length < 6) {
-              return 'Password must be at least 6 characters';
+            if (value.length < 12) {
+              return AppLocalizations.of(context)!.passwordTooShort;
             }
             return null;
           },

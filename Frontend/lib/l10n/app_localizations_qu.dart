@@ -4,9 +4,9 @@ import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
 
-/// The translations for Spanish Castilian (`es`).
-class AppLocalizationsEs extends AppLocalizations {
-  AppLocalizationsEs([String locale = 'es']) : super(locale);
+/// The translations for Quechua (`qu`).
+class AppLocalizationsQu extends AppLocalizations {
+  AppLocalizationsQu([String locale = 'qu']) : super(locale);
 
   @override
   String get appTitle => 'App de Aprendizaje de English';
@@ -40,7 +40,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get passwordTooShort =>
-      'La contraseña debe tener al menos 12 caracteres';
+      'La contraseña debe tener al menos 6 caracteres';
 
   @override
   String get hi => 'Hola';
@@ -172,7 +172,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get invalidCredentials =>
-      'Credenciales inválidas. Verifica tu correo y contraseña.';
+      'Invalid credentials. Please check your email and password.';
 
   @override
   String get googleSignInFailed => 'Error al iniciar sesión con Google';

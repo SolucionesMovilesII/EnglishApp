@@ -10,10 +10,10 @@ class SocialRegisterSection extends StatelessWidget {
   final VoidCallback onAppleRegister;
 
   const SocialRegisterSection({
-    Key? key,
+    super.key,
     required this.onGoogleRegister,
     required this.onAppleRegister,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
