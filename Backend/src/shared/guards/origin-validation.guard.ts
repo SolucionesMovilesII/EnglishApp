@@ -1,4 +1,11 @@
-import { Injectable, CanActivate, ExecutionContext, Logger, ForbiddenException, SetMetadata } from '@nestjs/common';
+import {
+  Injectable,
+  CanActivate,
+  ExecutionContext,
+  Logger,
+  ForbiddenException,
+  SetMetadata,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
@@ -37,7 +44,10 @@ export class OriginValidationGuard implements CanActivate {
 
     // Skip for safe methods unless strict validation is enabled
     const method = request.method.toLowerCase();
-    if (!this.securityConfig.originValidation.strict && ['get', 'head', 'options'].includes(method)) {
+    if (
+      !this.securityConfig.originValidation.strict &&
+      ['get', 'head', 'options'].includes(method)
+    ) {
       return true;
     }
 
@@ -58,10 +68,7 @@ export class OriginValidationGuard implements CanActivate {
       context.getClass(),
     ]);
 
-    const allowedOrigins = [
-      ...originValidation.allowedOrigins,
-      ...(endpointOrigins || []),
-    ];
+    const allowedOrigins = [...originValidation.allowedOrigins, ...(endpointOrigins || [])];
 
     // Check Origin header
     if (originValidation.requireOriginHeader || origin) {
@@ -187,7 +194,7 @@ export class OriginValidationGuard implements CanActivate {
     try {
       const requestUrl = new URL(`${request.protocol}://${request.get('host')}`);
       const originUrl = new URL(origin);
-      
+
       return requestUrl.origin === originUrl.origin;
     } catch (error) {
       return false;
@@ -227,7 +234,7 @@ export class OriginValidationGuard implements CanActivate {
       if (origin === '*') {
         return '*';
       }
-      
+
       try {
         const url = new URL(origin);
         return `${url.protocol}//${url.hostname}:${url.port}`;

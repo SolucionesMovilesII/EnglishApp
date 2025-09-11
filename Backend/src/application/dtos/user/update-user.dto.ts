@@ -1,9 +1,4 @@
-import {
-  IsEmail,
-  IsOptional,
-  IsEnum,
-  ValidateNested,
-} from 'class-validator';
+import { IsEmail, IsOptional, IsEnum, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 import { UpdatePersonDto } from '../person/update-person.dto';

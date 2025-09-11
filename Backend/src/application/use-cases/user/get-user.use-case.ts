@@ -38,5 +38,5 @@ export class GetUserUseCase {
     if (!emailRegex.test(email)) {
       throw new Error('Invalid email format');
     }
-  }  
+  }
 }

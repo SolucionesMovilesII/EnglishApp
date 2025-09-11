@@ -106,7 +106,7 @@ describe('GetUserProgressUseCase', () => {
           extraData: record.extraData,
           createdAt: record.createdAt,
           updatedAt: record.updatedAt,
-        }))
+        })),
       });
     });
 
@@ -128,9 +128,9 @@ describe('GetUserProgressUseCase', () => {
         .mockResolvedValueOnce(mockTargetUser) // target user
         .mockResolvedValueOnce(mockRequestingUser); // requesting user (different, non-admin)
 
-      await expect(useCase.execute(targetUserId, requestingUserId))
-        .rejects
-        .toThrow(ForbiddenException);
+      await expect(useCase.execute(targetUserId, requestingUserId)).rejects.toThrow(
+        ForbiddenException,
+      );
 
       expect(mockUserProgressRepository.findByUserId).not.toHaveBeenCalled();
     });
@@ -138,9 +138,9 @@ describe('GetUserProgressUseCase', () => {
     it('should throw NotFoundException when target user does not exist', async () => {
       mockUserRepository.findById.mockResolvedValueOnce(null); // target user not found
 
-      await expect(useCase.execute(targetUserId, requestingUserId))
-        .rejects
-        .toThrow(NotFoundException);
+      await expect(useCase.execute(targetUserId, requestingUserId)).rejects.toThrow(
+        NotFoundException,
+      );
     });
 
     it('should throw NotFoundException when requesting user does not exist', async () => {
@@ -148,9 +148,9 @@ describe('GetUserProgressUseCase', () => {
         .mockResolvedValueOnce(mockTargetUser) // target user exists
         .mockResolvedValueOnce(null); // requesting user not found
 
-      await expect(useCase.execute(targetUserId, requestingUserId))
-        .rejects
-        .toThrow(NotFoundException);
+      await expect(useCase.execute(targetUserId, requestingUserId)).rejects.toThrow(
+        NotFoundException,
+      );
     });
 
     it('should handle empty progress records', async () => {

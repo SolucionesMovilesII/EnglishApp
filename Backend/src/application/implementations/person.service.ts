@@ -4,9 +4,7 @@ import { CreatePersonDto } from '../dtos/person/create-person.dto';
 import { UpdatePersonDto } from '../dtos/person/update-person.dto';
 import { PersonResponseDto } from '../dtos/person/person-response.dto';
 import { Person } from '../../domain/entities/person.entity';
-import {
-  PersonNotFoundError,
-} from '../../domain/errors/domain.errors';
+import { PersonNotFoundError } from '../../domain/errors/domain.errors';
 
 @Injectable()
 export class PersonService {
@@ -29,7 +27,10 @@ export class PersonService {
     return this.mapToResponseDto(person);
   }
 
-  async getAllPersons(page: number = 1, limit: number = 10): Promise<{
+  async getAllPersons(
+    page: number = 1,
+    limit: number = 10,
+  ): Promise<{
     data: PersonResponseDto[];
     total: number;
     page: number;
@@ -37,7 +38,7 @@ export class PersonService {
     totalPages: number;
   }> {
     const [persons, total] = await this.personRepository.findAll(page, limit);
-    
+
     return {
       data: persons.map(person => this.mapToResponseDto(person)),
       total,

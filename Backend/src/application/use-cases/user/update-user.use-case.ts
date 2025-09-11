@@ -57,7 +57,6 @@ export class UpdateUserUseCase {
   }
 
   private validateBusinessRules(updateUserDto: UpdateUserDto): void {
-
     if (updateUserDto.email !== undefined) {
       this.validateEmail(updateUserDto.email);
     }
@@ -122,12 +121,12 @@ export class UpdateUserUseCase {
 
   private validateRole(role: 'STUDENT' | 'TEACHER' | 'ADMIN' | 'SUPER_ADMIN'): void {
     const validRoles: ('STUDENT' | 'TEACHER' | 'ADMIN' | 'SUPER_ADMIN')[] = [
-      'STUDENT', 
-      'TEACHER', 
-      'ADMIN', 
-      'SUPER_ADMIN'
+      'STUDENT',
+      'TEACHER',
+      'ADMIN',
+      'SUPER_ADMIN',
     ];
-    
+
     if (!validRoles.includes(role)) {
       throw new Error(`Invalid role. Must be one of: ${validRoles.join(', ')}`);
     }
@@ -169,7 +168,7 @@ export class UpdateUserUseCase {
       const birthDate = new Date(person.birthDate);
       const today = new Date();
       const age = today.getFullYear() - birthDate.getFullYear();
-      
+
       if (age < 13 || age > 120) {
         throw new Error('Person must be between 13 and 120 years old');
       }

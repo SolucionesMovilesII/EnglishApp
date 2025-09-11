@@ -36,7 +36,10 @@ export class SecurityMiddleware implements NestMiddleware {
   private extractRealIP(req: Request): void {
     let realIP = req.ip;
 
-    if (this.securityConfig.ipExtraction.trustProxy && this.securityConfig.ipExtraction.proxiedHeaders) {
+    if (
+      this.securityConfig.ipExtraction.trustProxy &&
+      this.securityConfig.ipExtraction.proxiedHeaders
+    ) {
       for (const header of this.securityConfig.ipExtraction.proxiedHeaders) {
         const headerValue = req.headers[header.toLowerCase()];
         if (headerValue && typeof headerValue === 'string') {
@@ -130,7 +133,9 @@ export class SecurityMiddleware implements NestMiddleware {
     // Check Origin header
     if (originValidation.requireOriginHeader || origin) {
       if (!origin) {
-        this.logger.warn(`Missing Origin header for ${method.toUpperCase()} request to ${req.path}`);
+        this.logger.warn(
+          `Missing Origin header for ${method.toUpperCase()} request to ${req.path}`,
+        );
         res.status(403).json({
           error: 'Forbidden',
           message: 'Origin header is required',
@@ -139,7 +144,9 @@ export class SecurityMiddleware implements NestMiddleware {
       }
 
       if (!this.isOriginAllowed(origin)) {
-        this.logger.warn(`Invalid origin: ${origin} for ${method.toUpperCase()} request to ${req.path}`);
+        this.logger.warn(
+          `Invalid origin: ${origin} for ${method.toUpperCase()} request to ${req.path}`,
+        );
         res.status(403).json({
           error: 'Forbidden',
           message: 'Origin not allowed',
@@ -151,7 +158,9 @@ export class SecurityMiddleware implements NestMiddleware {
     // Check Referer header if required
     if (originValidation.requireRefererHeader) {
       if (!referer) {
-        this.logger.warn(`Missing Referer header for ${method.toUpperCase()} request to ${req.path}`);
+        this.logger.warn(
+          `Missing Referer header for ${method.toUpperCase()} request to ${req.path}`,
+        );
         res.status(403).json({
           error: 'Forbidden',
           message: 'Referer header is required',
@@ -162,7 +171,9 @@ export class SecurityMiddleware implements NestMiddleware {
       try {
         const refererOrigin = new URL(referer).origin;
         if (!this.isOriginAllowed(refererOrigin)) {
-          this.logger.warn(`Invalid referer: ${referer} for ${method.toUpperCase()} request to ${req.path}`);
+          this.logger.warn(
+            `Invalid referer: ${referer} for ${method.toUpperCase()} request to ${req.path}`,
+          );
           res.status(403).json({
             error: 'Forbidden',
             message: 'Referer not allowed',
@@ -170,7 +181,9 @@ export class SecurityMiddleware implements NestMiddleware {
           return false;
         }
       } catch (error) {
-        this.logger.warn(`Invalid referer format: ${referer} for ${method.toUpperCase()} request to ${req.path}`);
+        this.logger.warn(
+          `Invalid referer format: ${referer} for ${method.toUpperCase()} request to ${req.path}`,
+        );
         res.status(403).json({
           error: 'Forbidden',
           message: 'Invalid referer format',
@@ -246,7 +259,7 @@ export class SecurityMiddleware implements NestMiddleware {
    */
   private isOriginAllowed(origin: string): boolean {
     const { originValidation } = this.securityConfig;
-    
+
     // Always allow same-origin requests
     if (!origin || origin === 'null') {
       return true;
@@ -259,9 +272,10 @@ export class SecurityMiddleware implements NestMiddleware {
    * Validate IP address format
    */
   private isValidIP(ip: string): boolean {
-    const ipv4Regex = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+    const ipv4Regex =
+      /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
     const ipv6Regex = /^(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$|^::1$|^::/;
-    
+
     return ipv4Regex.test(ip) || ipv6Regex.test(ip);
   }
 

@@ -26,9 +26,9 @@ export class UserProgressRepository implements IUserProgressRepository {
   }
 
   async findById(id: string): Promise<UserProgress | null> {
-    return await this.repository.findOne({ 
+    return await this.repository.findOne({
       where: { id },
-      relations: ['user']
+      relations: ['user'],
     });
   }
 
@@ -53,22 +53,30 @@ export class UserProgressRepository implements IUserProgressRepository {
 
     const updated = this.repository.merge(existing, {
       score: updateProgressDto.score !== undefined ? updateProgressDto.score : existing.score,
-      extraData: updateProgressDto.extraData !== undefined ? updateProgressDto.extraData : existing.extraData,
+      extraData:
+        updateProgressDto.extraData !== undefined
+          ? updateProgressDto.extraData
+          : existing.extraData,
       lastActivity: new Date(),
     });
 
     return await this.repository.save(updated);
   }
 
-  async createOrUpdate(userId: string, createProgressDto: CreateProgressDto): Promise<UserProgress> {
+  async createOrUpdate(
+    userId: string,
+    createProgressDto: CreateProgressDto,
+  ): Promise<UserProgress> {
     const existing = await this.findByUserAndChapter(userId, createProgressDto.chapterId);
-    
+
     if (existing) {
       const updateData = {
         ...(createProgressDto.score !== undefined && { score: createProgressDto.score }),
-        ...(createProgressDto.extraData !== undefined && { extraData: createProgressDto.extraData }),
+        ...(createProgressDto.extraData !== undefined && {
+          extraData: createProgressDto.extraData,
+        }),
       } as UpdateProgressDto;
-      
+
       return await this.update(existing.id, updateData);
     }
 
@@ -82,7 +90,7 @@ export class UserProgressRepository implements IUserProgressRepository {
   async getUserStats(userId: string): Promise<{ totalRecords: number; lastActivity: Date | null }> {
     const records = await this.findByUserId(userId);
     const lastActivity = records.length > 0 ? records[0].lastActivity : null;
-    
+
     return {
       totalRecords: records.length,
       lastActivity,

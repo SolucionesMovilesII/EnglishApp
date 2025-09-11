@@ -1,9 +1,4 @@
-import { 
-  IsString, 
-  IsNotEmpty,
-  MinLength,
-  MaxLength,
-} from 'class-validator';
+import { IsString, IsNotEmpty, MinLength, MaxLength } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class VerifyEmailDto {
@@ -11,7 +6,7 @@ export class VerifyEmailDto {
     description: 'Email verification token',
     example: 'abc123def456ghi789jkl012mno345pqr678stu901vwx234yz567',
     minLength: 6,
-    maxLength: 255
+    maxLength: 255,
   })
   @IsNotEmpty({ message: 'Token is required' })
   @IsString({ message: 'Token must be a string' })

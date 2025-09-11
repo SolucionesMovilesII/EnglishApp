@@ -1,4 +1,11 @@
-import { Injectable, CanActivate, ExecutionContext, Logger, ForbiddenException, SetMetadata } from '@nestjs/common';
+import {
+  Injectable,
+  CanActivate,
+  ExecutionContext,
+  Logger,
+  ForbiddenException,
+  SetMetadata,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Reflector } from '@nestjs/core';
 import { Request, Response } from 'express';
@@ -64,7 +71,7 @@ export class CSRFGuard implements CanActivate {
         path: request.path,
         userAgent: request.headers['user-agent'],
       });
-      
+
       throw new ForbiddenException({
         error: 'CSRF_VALIDATION_FAILED',
         message: 'CSRF validation failed: X-Requested-With header is required',
@@ -74,7 +81,7 @@ export class CSRFGuard implements CanActivate {
 
     // Get CSRF token from cookie
     const csrfCookie = request.cookies?.[csrf.cookie.name];
-    
+
     // Get CSRF token from header or body
     const csrfHeader = request.headers['x-csrf-token'] || request.headers['x-xsrf-token'];
     const csrfBody = request.body?.['_csrf'] || request.body?.['csrf_token'];
@@ -83,7 +90,7 @@ export class CSRFGuard implements CanActivate {
     // If no cookie exists, generate one
     if (!csrfCookie) {
       this.generateCSRFToken(response);
-      
+
       // For cookie-based endpoints, require token on subsequent requests
       throw new ForbiddenException({
         error: 'CSRF_TOKEN_REQUIRED',
@@ -118,10 +125,10 @@ export class CSRFGuard implements CanActivate {
    */
   private generateCSRFToken(response: Response): string {
     const { csrf } = this.securityConfig;
-    
+
     // Generate a cryptographically secure random token
     const token = crypto.randomBytes(32).toString('hex');
-    
+
     // Set the token as an HTTP-only cookie
     response.cookie(csrf.cookie.name, token, {
       httpOnly: csrf.cookie.httpOnly,
@@ -154,7 +161,7 @@ export class CSRFGuard implements CanActivate {
     // Use timing-safe comparison to prevent timing attacks
     return crypto.timingSafeEqual(
       Buffer.from(cookieToken, 'hex'),
-      Buffer.from(providedToken, 'hex')
+      Buffer.from(providedToken, 'hex'),
     );
   }
 }

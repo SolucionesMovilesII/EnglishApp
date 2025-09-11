@@ -17,8 +17,10 @@ export class VerifyEmailUseCase {
   ) {}
 
   async execute(verifyEmailDto: VerifyEmailDto): Promise<VerifyEmailResponseDto> {
-    this.logger.log(`Email verification attempt with token: ${verifyEmailDto.token.substring(0, 8)}...`);
-    
+    this.logger.log(
+      `Email verification attempt with token: ${verifyEmailDto.token.substring(0, 8)}...`,
+    );
+
     try {
       await this.validateVerificationData(verifyEmailDto);
 
@@ -48,14 +50,12 @@ export class VerifyEmailUseCase {
 
       this.logger.log(`Email verified successfully for user: ${user.id}`);
 
-      return new VerifyEmailResponseDto(
-        true,
-        user.id,
-        user.email,
-        'Email verified successfully'
-      );
+      return new VerifyEmailResponseDto(true, user.id, user.email, 'Email verified successfully');
     } catch (error: unknown) {
-      this.logger.error(`Email verification failed: ${error instanceof Error ? error.message : String(error)}`, error instanceof Error ? error.stack : undefined);
+      this.logger.error(
+        `Email verification failed: ${error instanceof Error ? error.message : String(error)}`,
+        error instanceof Error ? error.stack : undefined,
+      );
       throw error;
     }
   }
@@ -96,7 +96,10 @@ export class VerifyEmailUseCase {
         message: 'Verification email sent successfully',
       };
     } catch (error: unknown) {
-      this.logger.error(`Failed to resend verification email: ${error instanceof Error ? error.message : String(error)}`, error instanceof Error ? error.stack : undefined);
+      this.logger.error(
+        `Failed to resend verification email: ${error instanceof Error ? error.message : String(error)}`,
+        error instanceof Error ? error.stack : undefined,
+      );
       throw error;
     }
   }

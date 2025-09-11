@@ -15,7 +15,7 @@ export class PersonRepository implements IPersonRepository {
 
   async create(createPersonDto: CreatePersonDto): Promise<Person> {
     const person = this.repository.create({
-      ...createPersonDto
+      ...createPersonDto,
     });
     return await this.repository.save(person);
   }
@@ -36,7 +36,7 @@ export class PersonRepository implements IPersonRepository {
     const updateData: any = {
       ...updatePersonDto,
     };
-  
+
     const result = await this.repository.update(id, updateData);
     if (result.affected === 0) {
       return null;

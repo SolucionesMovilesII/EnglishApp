@@ -42,7 +42,7 @@ export class RefreshTokenUseCase {
 
   async execute(request: RefreshTokenRequest): Promise<RefreshResponseDto> {
     const { refreshToken, deviceInfo, userAgent, ipAddress } = request;
-    
+
     this.logger.debug(`Processing refresh token request for device: ${deviceInfo}`);
 
     try {
@@ -54,16 +54,20 @@ export class RefreshTokenUseCase {
           userAgent: userAgent || undefined,
           ipAddress: ipAddress || undefined,
           reason: 'TOKEN_REFRESH',
-        }
+        },
       );
 
       // Handle validation failures
       if (!validationResult.isValid) {
         if (validationResult.shouldRevokeFamily) {
           this.logger.error(`Token family compromised during refresh: ${validationResult.reason}`);
-          throw new TokenFamilyCompromisedException('', '', 'Token family has been revoked due to security violation');
+          throw new TokenFamilyCompromisedException(
+            '',
+            '',
+            'Token family has been revoked due to security violation',
+          );
         }
-        
+
         this.logger.warn(`Token validation failed: ${validationResult.reason}`);
         throw new InvalidTokenException(`Token validation failed: ${validationResult.reason}`);
       }
@@ -82,44 +86,42 @@ export class RefreshTokenUseCase {
       }
 
       // Generate new access token
-      const accessToken = await this.jwtService.createAccessToken(
-        user.id,
-        user.role,
-        user.email
-      );
+      const accessToken = await this.jwtService.createAccessToken(user.id, user.role, user.email);
 
       // Get access token expiration time
       const expiresIn = this.jwtService.getAccessTokenExpirationTime();
 
       this.logger.log(`Successfully refreshed tokens for user: ${user.id}`);
-      
+
       // Return DTO with new refresh token for cookie setting
       return new RefreshResponseDto(
         user.id,
         accessToken,
         expiresIn,
         'Token refreshed successfully',
-        validationResult.rotation.newToken.tokenHash
+        validationResult.rotation.newToken.tokenHash,
       );
-
     } catch (error: unknown) {
       if (error instanceof TokenReuseDetectedException) {
         this.logger.error(`Token reuse detected for family: ${error.familyId}`);
-        
+
         // Revoke the entire family
         await this.refreshTokenRotationService.revokeFamilyTokens(
           error.familyId,
-          'TOKEN_REUSE_DETECTED'
+          'TOKEN_REUSE_DETECTED',
         );
-        
+
         throw new TokenFamilyCompromisedException(
           error.familyId,
           '',
-          'Token reuse detected - all tokens in family have been revoked'
+          'Token reuse detected - all tokens in family have been revoked',
         );
       }
 
-      this.logger.error(`Token refresh failed: ${error instanceof Error ? error.message : String(error)}`, error instanceof Error ? error.stack : undefined);
+      this.logger.error(
+        `Token refresh failed: ${error instanceof Error ? error.message : String(error)}`,
+        error instanceof Error ? error.stack : undefined,
+      );
       throw error;
     }
   }
@@ -127,15 +129,21 @@ export class RefreshTokenUseCase {
   /**
    * Revoke all tokens for a user (e.g., during logout from all devices)
    */
-  async revokeAllUserTokens(userId: string, reason: string = 'USER_INITIATED_LOGOUT'): Promise<number> {
+  async revokeAllUserTokens(
+    userId: string,
+    reason: string = 'USER_INITIATED_LOGOUT',
+  ): Promise<number> {
     this.logger.log(`Revoking all tokens for user: ${userId}`);
-    
+
     try {
       const revokedCount = await this.refreshTokenRotationService.revokeUserTokens(userId, reason);
       this.logger.log(`Successfully revoked ${revokedCount} tokens for user: ${userId}`);
       return revokedCount;
     } catch (error: unknown) {
-      this.logger.error(`Failed to revoke user tokens: ${error instanceof Error ? error.message : String(error)}`, error instanceof Error ? error.stack : undefined);
+      this.logger.error(
+        `Failed to revoke user tokens: ${error instanceof Error ? error.message : String(error)}`,
+        error instanceof Error ? error.stack : undefined,
+      );
       throw error;
     }
   }
@@ -145,13 +153,19 @@ export class RefreshTokenUseCase {
    */
   async revokeTokenFamily(familyId: string, reason: string = 'DEVICE_LOGOUT'): Promise<number> {
     this.logger.log(`Revoking token family: ${familyId}`);
-    
+
     try {
-      const revokedCount = await this.refreshTokenRotationService.revokeFamilyTokens(familyId, reason);
+      const revokedCount = await this.refreshTokenRotationService.revokeFamilyTokens(
+        familyId,
+        reason,
+      );
       this.logger.log(`Successfully revoked ${revokedCount} tokens in family: ${familyId}`);
       return revokedCount;
     } catch (error: unknown) {
-      this.logger.error(`Failed to revoke token family: ${error instanceof Error ? error.message : String(error)}`, error instanceof Error ? error.stack : undefined);
+      this.logger.error(
+        `Failed to revoke token family: ${error instanceof Error ? error.message : String(error)}`,
+        error instanceof Error ? error.stack : undefined,
+      );
       throw error;
     }
   }
@@ -161,11 +175,11 @@ export class RefreshTokenUseCase {
    */
   async getUserActiveSessions(userId: string) {
     this.logger.debug(`Getting active sessions for user: ${userId}`);
-    
+
     try {
       const activeFamilies = await this.refreshTokenRotationService.getActiveFamilies(userId);
       this.logger.debug(`Found ${activeFamilies.length} active sessions for user: ${userId}`);
-      
+
       return activeFamilies.map(family => ({
         familyId: family.familyId,
         deviceInfo: family.deviceInfo,
@@ -173,7 +187,10 @@ export class RefreshTokenUseCase {
         // Don't expose IP hash for security
       }));
     } catch (error: unknown) {
-      this.logger.error(`Failed to get user active sessions: ${error instanceof Error ? error.message : String(error)}`, error instanceof Error ? error.stack : undefined);
+      this.logger.error(
+        `Failed to get user active sessions: ${error instanceof Error ? error.message : String(error)}`,
+        error instanceof Error ? error.stack : undefined,
+      );
       throw error;
     }
   }
@@ -183,7 +200,7 @@ export class RefreshTokenUseCase {
    */
   async cleanupExpiredTokens(): Promise<number> {
     this.logger.debug('Starting cleanup of expired tokens');
-    
+
     try {
       const cleanedCount = await this.refreshTokenRotationService.cleanupExpiredTokens();
       if (cleanedCount > 0) {
@@ -191,21 +208,23 @@ export class RefreshTokenUseCase {
       }
       return cleanedCount;
     } catch (error: unknown) {
-      this.logger.error(`Failed to cleanup expired tokens: ${error instanceof Error ? error.message : String(error)}`, error instanceof Error ? error.stack : undefined);
+      this.logger.error(
+        `Failed to cleanup expired tokens: ${error instanceof Error ? error.message : String(error)}`,
+        error instanceof Error ? error.stack : undefined,
+      );
       return 0;
     }
   }
-
 
   /**
    * Generate initial tokens for login
    * Creates a new refresh token for the user after login
    */
   async generateInitialTokens(
-    userId: string, 
-    deviceInfo?: string, 
-    userAgent?: string, 
-    ipAddress?: string
+    userId: string,
+    deviceInfo?: string,
+    userAgent?: string,
+    ipAddress?: string,
   ): Promise<{ refreshToken: string; familyId: string }> {
     this.logger.debug(`Generating initial tokens for user: ${userId}`);
 
@@ -215,7 +234,7 @@ export class RefreshTokenUseCase {
         userId,
         deviceInfo,
         userAgent,
-        ipAddress
+        ipAddress,
       );
 
       // For now, return placeholder values - this should be handled by the login flow
@@ -225,14 +244,16 @@ export class RefreshTokenUseCase {
       };
 
       this.logger.debug(`Initial tokens created for user: ${userId}`);
-      
+
       return {
         refreshToken: tokenResult.tokenHash,
         familyId: tokenResult.familyId,
       };
-
     } catch (error: unknown) {
-      this.logger.error(`Failed to generate initial tokens for user ${userId}: ${error instanceof Error ? error.message : String(error)}`, error instanceof Error ? error.stack : undefined);
+      this.logger.error(
+        `Failed to generate initial tokens for user ${userId}: ${error instanceof Error ? error.message : String(error)}`,
+        error instanceof Error ? error.stack : undefined,
+      );
       throw error;
     }
   }
@@ -245,15 +266,17 @@ export class RefreshTokenUseCase {
     this.logger.debug('Validating refresh token');
 
     try {
-      const validationResult = await this.refreshTokenRotationService.validateAndRotateToken(refreshToken);
-      
+      const validationResult =
+        await this.refreshTokenRotationService.validateAndRotateToken(refreshToken);
+
       return {
         isValid: validationResult.isValid,
         token: validationResult.token,
       };
-
     } catch (error: unknown) {
-      this.logger.debug(`Token validation failed: ${error instanceof Error ? error.message : String(error)}`);
+      this.logger.debug(
+        `Token validation failed: ${error instanceof Error ? error.message : String(error)}`,
+      );
       return { isValid: false };
     }
   }

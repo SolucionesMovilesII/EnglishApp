@@ -7,10 +7,10 @@ export interface IJwtService {
   verify(token: string): Promise<JwtPayload>;
   verifyRefreshToken(token: string): Promise<JwtPayload>;
   decode(token: string): any;
-  
+
   // Legacy method for backward compatibility
   sign(payload: object, options?: { expiresIn?: string }): Promise<string>;
-  
+
   // Utility methods
   getAccessTokenExpirationTime(): number;
   getRefreshTokenExpirationTime(): number;

@@ -27,7 +27,11 @@ export class TokenReuseDetectedException extends TokenRotationException {
   public readonly familyId: string;
   public readonly tokenHash: string;
 
-  constructor(familyId: string, tokenHash: string, message: string = 'Token reuse detected - security violation') {
+  constructor(
+    familyId: string,
+    tokenHash: string,
+    message: string = 'Token reuse detected - security violation',
+  ) {
     super(message, HttpStatus.UNAUTHORIZED);
     this.name = 'TokenReuseDetectedException';
     this.familyId = familyId;
@@ -42,7 +46,11 @@ export class TokenFamilyCompromisedException extends TokenRotationException {
   public readonly familyId: string;
   public readonly userId: string;
 
-  constructor(familyId: string, userId: string, message: string = 'Token family has been compromised') {
+  constructor(
+    familyId: string,
+    userId: string,
+    message: string = 'Token family has been compromised',
+  ) {
     super(message, HttpStatus.UNAUTHORIZED);
     this.name = 'TokenFamilyCompromisedException';
     this.familyId = familyId;
@@ -98,7 +106,11 @@ export class TokenOperationRateLimitedException extends TokenRotationException {
   public readonly identifier: string;
   public readonly retryAfter: number;
 
-  constructor(identifier: string, retryAfter: number, message: string = 'Token operation rate limit exceeded') {
+  constructor(
+    identifier: string,
+    retryAfter: number,
+    message: string = 'Token operation rate limit exceeded',
+  ) {
     super(message, HttpStatus.TOO_MANY_REQUESTS);
     this.name = 'TokenOperationRateLimitedException';
     this.identifier = identifier;

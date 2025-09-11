@@ -52,10 +52,14 @@ export class TokenRevocationService {
 
       this.logger.log(`Successfully revoked ${activeTokensCount} tokens in family: ${familyId}`);
       return activeTokensCount;
-
     } catch (error: unknown) {
-      this.logger.error(`Failed to revoke family tokens: ${error instanceof Error ? error.message : 'Unknown error'}`, error instanceof Error ? error.stack : undefined);
-      throw new TokenRotationFailedException(`Failed to revoke family tokens: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      this.logger.error(
+        `Failed to revoke family tokens: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        error instanceof Error ? error.stack : undefined,
+      );
+      throw new TokenRotationFailedException(
+        `Failed to revoke family tokens: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      );
     }
   }
 
@@ -81,10 +85,14 @@ export class TokenRevocationService {
 
       this.logger.log(`Successfully revoked ${activeCount} tokens for user: ${userId}`);
       return activeCount;
-
     } catch (error: unknown) {
-      this.logger.error(`Failed to revoke user tokens: ${error instanceof Error ? error.message : 'Unknown error'}`, error instanceof Error ? error.stack : undefined);
-      throw new TokenRotationFailedException(`Failed to revoke user tokens: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      this.logger.error(
+        `Failed to revoke user tokens: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        error instanceof Error ? error.stack : undefined,
+      );
+      throw new TokenRotationFailedException(
+        `Failed to revoke user tokens: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      );
     }
   }
 
@@ -92,16 +100,22 @@ export class TokenRevocationService {
     userId: string,
     deviceInfo?: string,
     userAgent?: string,
-    ipAddress?: string
+    ipAddress?: string,
   ): Promise<TokenFamilyInfo> {
     try {
       // Check family limit
       const existingFamilies = await this.refreshTokenRepository.findValidByUserId(userId);
       const uniqueFamilyIds = new Set(existingFamilies.map(token => token.familyId));
-      
+
       if (uniqueFamilyIds.size >= this.MAX_FAMILIES_PER_USER) {
-        this.logger.warn(`Family limit exceeded for user ${userId}: ${uniqueFamilyIds.size}/${this.MAX_FAMILIES_PER_USER}`);
-        throw new TokenFamilyLimitExceededException(userId, uniqueFamilyIds.size, this.MAX_FAMILIES_PER_USER);
+        this.logger.warn(
+          `Family limit exceeded for user ${userId}: ${uniqueFamilyIds.size}/${this.MAX_FAMILIES_PER_USER}`,
+        );
+        throw new TokenFamilyLimitExceededException(
+          userId,
+          uniqueFamilyIds.size,
+          this.MAX_FAMILIES_PER_USER,
+        );
       }
 
       // Generate new family ID and token
@@ -138,13 +152,17 @@ export class TokenRevocationService {
         createdAt: tokenEntity.createdAt,
         lastUsedAt: tokenEntity.updatedAt,
       };
-
     } catch (error: unknown) {
-      this.logger.error(`Failed to create token family: ${error instanceof Error ? error.message : 'Unknown error'}`, error instanceof Error ? error.stack : undefined);
+      this.logger.error(
+        `Failed to create token family: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        error instanceof Error ? error.stack : undefined,
+      );
       if (error instanceof TokenRotationException) {
         throw error;
       }
-      throw new TokenRotationFailedException(`Failed to create token family: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new TokenRotationFailedException(
+        `Failed to create token family: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      );
     }
   }
 
@@ -154,7 +172,7 @@ export class TokenRevocationService {
     try {
       // Revoke all tokens in the compromised family
       const revokedCount = await this.revokeFamilyTokens(familyId, `REUSE_DETECTED_${context}`);
-      
+
       // Log critical security event
       this.tokenSecurityService.logSecurityEvent('CRITICAL_TOKEN_REUSE', {
         familyId: familyId,
@@ -163,9 +181,11 @@ export class TokenRevocationService {
         revokedTokens: revokedCount,
         timestamp: new Date().toISOString(),
       });
-
     } catch (error: unknown) {
-      this.logger.error(`Failed to handle token reuse: ${error instanceof Error ? error.message : 'Unknown error'}`, error instanceof Error ? error.stack : undefined);
+      this.logger.error(
+        `Failed to handle token reuse: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        error instanceof Error ? error.stack : undefined,
+      );
     }
   }
 }

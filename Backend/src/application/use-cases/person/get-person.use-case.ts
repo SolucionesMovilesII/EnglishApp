@@ -12,7 +12,10 @@ export class GetPersonUseCase {
     return await this.personService.getPersonById(id);
   }
 
-  async executeGetAll(page: number = 1, limit: number = 10): Promise<{
+  async executeGetAll(
+    page: number = 1,
+    limit: number = 10,
+  ): Promise<{
     data: PersonResponseDto[];
     total: number;
     page: number;

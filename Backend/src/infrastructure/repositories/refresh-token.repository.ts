@@ -14,7 +14,7 @@ export class RefreshTokenRepository implements IRefreshTokenRepository {
   async save(refreshToken: RefreshToken): Promise<RefreshToken> {
     return await this.repository.save(refreshToken);
   }
-  
+
   async findById(id: string): Promise<RefreshToken | null> {
     return await this.repository.findOne({ where: { id } });
   }
@@ -49,10 +49,10 @@ export class RefreshTokenRepository implements IRefreshTokenRepository {
 
   async findValidByUserId(userId: string): Promise<RefreshToken[]> {
     return await this.repository.find({
-      where: { 
-        userId, 
+      where: {
+        userId,
         revokedAt: IsNull(),
-        expiresAt: MoreThan(new Date())
+        expiresAt: MoreThan(new Date()),
       },
       order: { createdAt: 'DESC' },
     });
@@ -60,10 +60,10 @@ export class RefreshTokenRepository implements IRefreshTokenRepository {
 
   async findValidByFamilyId(familyId: string): Promise<RefreshToken[]> {
     return await this.repository.find({
-      where: { 
-        familyId, 
+      where: {
+        familyId,
         revokedAt: IsNull(),
-        expiresAt: MoreThan(new Date())
+        expiresAt: MoreThan(new Date()),
       },
       order: { createdAt: 'DESC' },
     });
@@ -82,11 +82,11 @@ export class RefreshTokenRepository implements IRefreshTokenRepository {
     const updateData: any = {
       revokedAt: new Date(),
     };
-    
+
     if (reason) {
       updateData.reason = reason;
     }
-    
+
     if (replacedBy) {
       updateData.replacedBy = replacedBy;
     }
@@ -98,41 +98,35 @@ export class RefreshTokenRepository implements IRefreshTokenRepository {
     const updateData: any = {
       revokedAt: new Date(),
     };
-    
+
     if (reason) {
       updateData.reason = reason;
     }
 
-    await this.repository.update(
-      { userId, revokedAt: IsNull() },
-      updateData,
-    );
+    await this.repository.update({ userId, revokedAt: IsNull() }, updateData);
   }
 
   async revokeByFamilyId(familyId: string, reason?: string): Promise<void> {
     const updateData: any = {
       revokedAt: new Date(),
     };
-    
+
     if (reason) {
       updateData.reason = reason;
     }
 
-    await this.repository.update(
-      { familyId, revokedAt: IsNull() },
-      updateData,
-    );
+    await this.repository.update({ familyId, revokedAt: IsNull() }, updateData);
   }
 
   async revokeExpiredTokens(): Promise<void> {
     await this.repository.update(
-      { 
+      {
         expiresAt: LessThan(new Date()),
-        revokedAt: IsNull()
+        revokedAt: IsNull(),
       },
-      { 
+      {
         revokedAt: new Date(),
-        reason: 'EXPIRED'
+        reason: 'EXPIRED',
       },
     );
   }

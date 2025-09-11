@@ -22,7 +22,7 @@ export class GetActiveSessionsUseCase {
 
   async execute(request: GetActiveSessionsRequest): Promise<ActiveSessionsResponseDto> {
     this.logger.debug(`Getting active sessions for user: ${request.userId}`);
-    
+
     try {
       await this.validateRequest(request);
 
@@ -39,7 +39,9 @@ export class GetActiveSessionsUseCase {
       }
 
       // Get active token families from the rotation service
-      const activeFamilies = await this.refreshTokenRotationService.getActiveFamilies(request.userId);
+      const activeFamilies = await this.refreshTokenRotationService.getActiveFamilies(
+        request.userId,
+      );
 
       // Transform to DTOs with additional processing
       const sessionDtos = activeFamilies.map(family => {
@@ -53,7 +55,7 @@ export class GetActiveSessionsUseCase {
           location, // In production, you might use IP geolocation
           family.createdAt || new Date(),
           family.lastUsedAt || new Date(),
-          isCurrent
+          isCurrent,
         );
       });
 
@@ -66,14 +68,12 @@ export class GetActiveSessionsUseCase {
 
       this.logger.debug(`Found ${sessionDtos.length} active sessions for user: ${request.userId}`);
 
-      return new ActiveSessionsResponseDto(
-        sessionDtos,
-        sessionDtos.length,
-        request.userId
-      );
-
+      return new ActiveSessionsResponseDto(sessionDtos, sessionDtos.length, request.userId);
     } catch (error: unknown) {
-      this.logger.error(`Failed to get active sessions for user ${request.userId}: ${error instanceof Error ? error.message : String(error)}`, error instanceof Error ? error.stack : undefined);
+      this.logger.error(
+        `Failed to get active sessions for user ${request.userId}: ${error instanceof Error ? error.message : String(error)}`,
+        error instanceof Error ? error.stack : undefined,
+      );
       throw error;
     }
   }
@@ -87,12 +87,14 @@ export class GetActiveSessionsUseCase {
     try {
       const activeFamilies = await this.refreshTokenRotationService.getActiveFamilies(userId);
       const count = activeFamilies.length;
-      
+
       this.logger.debug(`User ${userId} has ${count} active sessions`);
       return count;
-
     } catch (error: unknown) {
-      this.logger.error(`Failed to get session count for user ${userId}: ${error instanceof Error ? error.message : String(error)}`, error instanceof Error ? error.stack : undefined);
+      this.logger.error(
+        `Failed to get session count for user ${userId}: ${error instanceof Error ? error.message : String(error)}`,
+        error instanceof Error ? error.stack : undefined,
+      );
       return 0;
     }
   }
@@ -106,12 +108,16 @@ export class GetActiveSessionsUseCase {
     try {
       const activeFamilies = await this.refreshTokenRotationService.getActiveFamilies(userId);
       const isActive = activeFamilies.some(family => family.familyId === familyId);
-      
-      this.logger.debug(`Session ${familyId} for user ${userId} is ${isActive ? 'active' : 'inactive'}`);
-      return isActive;
 
+      this.logger.debug(
+        `Session ${familyId} for user ${userId} is ${isActive ? 'active' : 'inactive'}`,
+      );
+      return isActive;
     } catch (error: unknown) {
-      this.logger.error(`Failed to check session status: ${error instanceof Error ? error.message : String(error)}`, error instanceof Error ? error.stack : undefined);
+      this.logger.error(
+        `Failed to check session status: ${error instanceof Error ? error.message : String(error)}`,
+        error instanceof Error ? error.stack : undefined,
+      );
       return false;
     }
   }
@@ -140,11 +146,13 @@ export class GetActiveSessionsUseCase {
         location,
         family.createdAt || new Date(),
         family.lastUsedAt || new Date(),
-        false // We don't know if it's current without additional context
+        false, // We don't know if it's current without additional context
       );
-
     } catch (error: unknown) {
-      this.logger.error(`Failed to get session details: ${error instanceof Error ? error.message : String(error)}`, error instanceof Error ? error.stack : undefined);
+      this.logger.error(
+        `Failed to get session details: ${error instanceof Error ? error.message : String(error)}`,
+        error instanceof Error ? error.stack : undefined,
+      );
       return null;
     }
   }
@@ -175,10 +183,12 @@ export class GetActiveSessionsUseCase {
       if (userAgent.includes('Chrome')) return 'Web Browser (Chrome)';
       if (userAgent.includes('Firefox')) return 'Web Browser (Firefox)';
       if (userAgent.includes('Safari')) return 'Web Browser (Safari)';
-      
+
       return 'Unknown Device';
     } catch (error: unknown) {
-      this.logger.debug(`Error extracting location from user agent: ${error instanceof Error ? error.message : String(error)}`);
+      this.logger.debug(
+        `Error extracting location from user agent: ${error instanceof Error ? error.message : String(error)}`,
+      );
       return null;
     }
   }

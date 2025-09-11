@@ -29,14 +29,8 @@ import { TokenRevocationService } from '../../application/implementations/token-
 import { SessionManagementService } from '../../application/implementations/session-management.service';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([User, Person, RefreshToken])
-  ],
-  controllers: [
-    UserAuthController,
-    EmailPasswordController,
-    SessionManagementController,
-  ],
+  imports: [TypeOrmModule.forFeature([User, Person, RefreshToken])],
+  controllers: [UserAuthController, EmailPasswordController, SessionManagementController],
   providers: [
     RegisterUserUseCase,
     LoginUserUseCase,

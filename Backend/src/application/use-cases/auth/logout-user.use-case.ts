@@ -32,7 +32,7 @@ export class LogoutUserUseCase {
    */
   async logoutFromDevice(request: LogoutFromDeviceRequest): Promise<LogoutResponse> {
     const { refreshToken, familyId, deviceInfo } = request;
-    
+
     this.logger.log(`Processing logout from device: ${deviceInfo || 'Unknown'}`);
 
     try {
@@ -42,12 +42,15 @@ export class LogoutUserUseCase {
       // If we have a refresh token, extract the family ID from it first
       if (refreshToken && !targetFamilyId) {
         try {
-          const validationResult = await this.refreshTokenRotationService.validateAndRotateToken(refreshToken);
+          const validationResult =
+            await this.refreshTokenRotationService.validateAndRotateToken(refreshToken);
           if (validationResult.isValid && validationResult.token) {
             targetFamilyId = validationResult.token.familyId;
           }
         } catch (error: unknown) {
-          this.logger.warn(`Could not validate refresh token during logout: ${error instanceof Error ? error.message : String(error)}`);
+          this.logger.warn(
+            `Could not validate refresh token during logout: ${error instanceof Error ? error.message : String(error)}`,
+          );
           // Continue with logout even if token is invalid
         }
       }
@@ -55,7 +58,7 @@ export class LogoutUserUseCase {
       if (targetFamilyId) {
         revokedCount = await this.refreshTokenRotationService.revokeFamilyTokens(
           targetFamilyId,
-          'USER_INITIATED_LOGOUT'
+          'USER_INITIATED_LOGOUT',
         );
         this.logger.log(`Revoked ${revokedCount} tokens from family: ${targetFamilyId}`);
       } else {
@@ -68,7 +71,10 @@ export class LogoutUserUseCase {
         revokedTokensCount: revokedCount,
       };
     } catch (error: unknown) {
-      this.logger.error(`Device logout failed: ${error instanceof Error ? error.message : String(error)}`, error instanceof Error ? error.stack : undefined);
+      this.logger.error(
+        `Device logout failed: ${error instanceof Error ? error.message : String(error)}`,
+        error instanceof Error ? error.stack : undefined,
+      );
       throw error;
     }
   }
@@ -82,7 +88,7 @@ export class LogoutUserUseCase {
     try {
       const revokedCount = await this.refreshTokenRotationService.revokeUserTokens(
         userId,
-        'USER_INITIATED_LOGOUT_ALL'
+        'USER_INITIATED_LOGOUT_ALL',
       );
 
       this.logger.log(`Revoked ${revokedCount} tokens for user: ${userId}`);
@@ -93,7 +99,10 @@ export class LogoutUserUseCase {
         revokedTokensCount: revokedCount,
       };
     } catch (error: unknown) {
-      this.logger.error(`Logout from all devices failed for user ${userId}: ${error instanceof Error ? error.message : String(error)}`, error instanceof Error ? error.stack : undefined);
+      this.logger.error(
+        `Logout from all devices failed for user ${userId}: ${error instanceof Error ? error.message : String(error)}`,
+        error instanceof Error ? error.stack : undefined,
+      );
       throw error;
     }
   }
@@ -101,14 +110,14 @@ export class LogoutUserUseCase {
   /**
    * Emergency logout - revoke all tokens for a user (admin action)
    */
-  async emergencyLogout(userId: string, reason: string = 'ADMIN_INITIATED_LOGOUT'): Promise<LogoutResponse> {
+  async emergencyLogout(
+    userId: string,
+    reason: string = 'ADMIN_INITIATED_LOGOUT',
+  ): Promise<LogoutResponse> {
     this.logger.log(`Processing emergency logout for user: ${userId}, reason: ${reason}`);
 
     try {
-      const revokedCount = await this.refreshTokenRotationService.revokeUserTokens(
-        userId,
-        reason
-      );
+      const revokedCount = await this.refreshTokenRotationService.revokeUserTokens(userId, reason);
 
       this.logger.log(`Emergency logout: Revoked ${revokedCount} tokens for user: ${userId}`);
 
@@ -118,7 +127,10 @@ export class LogoutUserUseCase {
         revokedTokensCount: revokedCount,
       };
     } catch (error: unknown) {
-      this.logger.error(`Emergency logout failed for user ${userId}: ${error instanceof Error ? error.message : String(error)}`, error instanceof Error ? error.stack : undefined);
+      this.logger.error(
+        `Emergency logout failed for user ${userId}: ${error instanceof Error ? error.message : String(error)}`,
+        error instanceof Error ? error.stack : undefined,
+      );
       throw error;
     }
   }
@@ -126,13 +138,16 @@ export class LogoutUserUseCase {
   /**
    * Revoke specific token family (for device management)
    */
-  async revokeTokenFamily(familyId: string, reason: string = 'DEVICE_REMOVED'): Promise<LogoutResponse> {
+  async revokeTokenFamily(
+    familyId: string,
+    reason: string = 'DEVICE_REMOVED',
+  ): Promise<LogoutResponse> {
     this.logger.log(`Revoking token family: ${familyId}, reason: ${reason}`);
 
     try {
       const revokedCount = await this.refreshTokenRotationService.revokeFamilyTokens(
         familyId,
-        reason
+        reason,
       );
 
       this.logger.log(`Revoked ${revokedCount} tokens from family: ${familyId}`);
@@ -143,7 +158,10 @@ export class LogoutUserUseCase {
         revokedTokensCount: revokedCount,
       };
     } catch (error: unknown) {
-      this.logger.error(`Token family revocation failed: ${error instanceof Error ? error.message : String(error)}`, error instanceof Error ? error.stack : undefined);
+      this.logger.error(
+        `Token family revocation failed: ${error instanceof Error ? error.message : String(error)}`,
+        error instanceof Error ? error.stack : undefined,
+      );
       throw error;
     }
   }
@@ -151,14 +169,18 @@ export class LogoutUserUseCase {
   /**
    * Revoke session by family ID for a specific user
    */
-  async revokeSessionByFamilyId(userId: string, familyId: string, reason: string = 'USER_REVOCATION'): Promise<LogoutResponse> {
+  async revokeSessionByFamilyId(
+    userId: string,
+    familyId: string,
+    reason: string = 'USER_REVOCATION',
+  ): Promise<LogoutResponse> {
     this.logger.log(`User ${userId} revoking session family: ${familyId}, reason: ${reason}`);
 
     try {
       // First verify the family belongs to the user by getting their active sessions
       const activeFamilies = await this.refreshTokenRotationService.getActiveFamilies(userId);
       const familyExists = activeFamilies.some(family => family.familyId === familyId);
-      
+
       if (!familyExists) {
         this.logger.warn(`User ${userId} attempted to revoke non-existent family: ${familyId}`);
         throw new Error('Session family not found or not authorized');
@@ -166,7 +188,7 @@ export class LogoutUserUseCase {
 
       const revokedCount = await this.refreshTokenRotationService.revokeFamilyTokens(
         familyId,
-        reason
+        reason,
       );
 
       this.logger.log(`User ${userId} revoked ${revokedCount} tokens from family: ${familyId}`);
@@ -177,7 +199,10 @@ export class LogoutUserUseCase {
         revokedTokensCount: revokedCount,
       };
     } catch (error: unknown) {
-      this.logger.error(`Session revocation failed: ${error instanceof Error ? error.message : String(error)}`, error instanceof Error ? error.stack : undefined);
+      this.logger.error(
+        `Session revocation failed: ${error instanceof Error ? error.message : String(error)}`,
+        error instanceof Error ? error.stack : undefined,
+      );
       throw error;
     }
   }

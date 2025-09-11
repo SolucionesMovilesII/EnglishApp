@@ -85,7 +85,7 @@ export class UserService {
 
     const hashedPassword = await this.hashingService.hash(newPassword);
     const updated = await this.userRepository.updatePassword(id, hashedPassword);
-    
+
     if (!updated) {
       throw new UserNotFoundError(id);
     }

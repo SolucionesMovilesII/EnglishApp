@@ -19,15 +19,20 @@ export class ResetPasswordUseCase {
     private readonly hashService: IHashService,
   ) {}
 
-  async execute(resetPasswordDto: ResetPasswordDto, _ipAddress?: string): Promise<ResetPasswordResponseDto> {
+  async execute(
+    resetPasswordDto: ResetPasswordDto,
+    _ipAddress?: string,
+  ): Promise<ResetPasswordResponseDto> {
     this.logger.log(`Password reset attempt for email: ${resetPasswordDto.email}`);
-    
+
     try {
       await this.validateResetPasswordData(resetPasswordDto);
 
       const user = await this.userRepository.findByEmail(resetPasswordDto.email);
       if (!user) {
-        this.logger.warn(`Password reset attempt for non-existent email: ${resetPasswordDto.email}`);
+        this.logger.warn(
+          `Password reset attempt for non-existent email: ${resetPasswordDto.email}`,
+        );
         throw new UnauthorizedException('Invalid reset code or email');
       }
 
@@ -40,18 +45,21 @@ export class ResetPasswordUseCase {
       // Check if reset token has expired
       if (new Date() > user.passwordResetTokenExpires) {
         this.logger.warn(`Password reset attempt with expired token for user: ${user.id}`);
-        
+
         // Clear expired token
         await this.userRepository.update(user.id, {
           passwordResetToken: null,
           passwordResetTokenExpires: null,
         });
-        
+
         throw new UnauthorizedException('Reset code has expired');
       }
 
       // Verify the reset code
-      const isValidCode = await this.hashService.compare(resetPasswordDto.code, user.passwordResetToken);
+      const isValidCode = await this.hashService.compare(
+        resetPasswordDto.code,
+        user.passwordResetToken,
+      );
       if (!isValidCode) {
         this.logger.warn(`Invalid reset code for user: ${user.id}`);
         throw new UnauthorizedException('Invalid reset code or email');
@@ -73,7 +81,10 @@ export class ResetPasswordUseCase {
       await this.validatePasswordStrength(resetPasswordDto.newPassword);
 
       // Check if new password is different from current password
-      const isSamePassword = await this.hashService.compare(resetPasswordDto.newPassword, user.password);
+      const isSamePassword = await this.hashService.compare(
+        resetPasswordDto.newPassword,
+        user.password,
+      );
       if (isSamePassword) {
         this.logger.warn(`Password reset attempt with same password for user: ${user.id}`);
         throw new ValidationException('New password must be different from current password');
@@ -103,11 +114,13 @@ export class ResetPasswordUseCase {
         true,
         user.id,
         user.email,
-        'Password reset successfully. Please login with your new password.'
+        'Password reset successfully. Please login with your new password.',
       );
-
     } catch (error: unknown) {
-      this.logger.error(`Password reset failed for email: ${resetPasswordDto.email}`, error instanceof Error ? error.stack : undefined);
+      this.logger.error(
+        `Password reset failed for email: ${resetPasswordDto.email}`,
+        error instanceof Error ? error.stack : undefined,
+      );
       throw error;
     }
   }
@@ -176,7 +189,10 @@ export class ResetPasswordUseCase {
       const revokedCount = await this.refreshTokenRotationService.revokeUserTokens(userId, reason);
       this.logger.log(`Revoked ${revokedCount} tokens for user ${userId} due to password reset`);
     } catch (error: unknown) {
-      this.logger.error(`Failed to revoke user tokens during password reset: ${error instanceof Error ? error.message : String(error)}`, error instanceof Error ? error.stack : undefined);
+      this.logger.error(
+        `Failed to revoke user tokens during password reset: ${error instanceof Error ? error.message : String(error)}`,
+        error instanceof Error ? error.stack : undefined,
+      );
       // Don't throw error as password reset was successful
     }
   }

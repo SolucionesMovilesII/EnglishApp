@@ -10,22 +10,18 @@ import { UserProgressRepository } from '../../infrastructure/repositories/user-p
 import { UserRepository } from '../../infrastructure/repositories/user.repository';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([UserProgress, User])
-  ],
-  controllers: [
-    ProgressController,
-  ],
+  imports: [TypeOrmModule.forFeature([UserProgress, User])],
+  controllers: [ProgressController],
   providers: [
     // Use Cases
     CreateProgressUseCase,
     GetUserProgressUseCase,
     UpdateProgressUseCase,
-    
+
     // Repositories
     UserProgressRepository,
     UserRepository,
-    
+
     // Interface bindings
     {
       provide: 'IUserProgressRepository',

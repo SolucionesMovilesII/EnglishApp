@@ -38,7 +38,7 @@ export class RefreshTokenRotationCoreService {
     const startTime = Date.now();
     this.logger.debug(`Starting token rotation for hash: ${oldTokenHash.substring(0, 10)}...`);
 
-    return await this.dataSource.transaction(async (_transactionalEntityManager) => {
+    return await this.dataSource.transaction(async _transactionalEntityManager => {
       try {
         // Find the existing token
         const existingToken = await this.refreshTokenRepository.findByTokenHash(oldTokenHash);
@@ -49,13 +49,17 @@ export class RefreshTokenRotationCoreService {
 
         // Check if token is already revoked
         if (existingToken.isRevoked()) {
-          this.logger.warn(`Attempted rotation of revoked token: ${oldTokenHash.substring(0, 10)}...`);
+          this.logger.warn(
+            `Attempted rotation of revoked token: ${oldTokenHash.substring(0, 10)}...`,
+          );
           throw new InvalidTokenException('Token is revoked');
         }
 
         // Check if token is expired
         if (existingToken.isExpired()) {
-          this.logger.warn(`Attempted rotation of expired token: ${oldTokenHash.substring(0, 10)}...`);
+          this.logger.warn(
+            `Attempted rotation of expired token: ${oldTokenHash.substring(0, 10)}...`,
+          );
           throw new InvalidTokenException('Token is expired');
         }
 
@@ -112,20 +116,24 @@ export class RefreshTokenRotationCoreService {
             familyId: newToken.familyId,
           },
         };
-
       } catch (error: unknown) {
-        this.logger.error(`Token rotation failed: ${error instanceof Error ? error.message : 'Unknown error'}`, error instanceof Error ? error.stack : undefined);
+        this.logger.error(
+          `Token rotation failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          error instanceof Error ? error.stack : undefined,
+        );
         if (error instanceof TokenRotationException) {
           throw error;
         }
-        throw new TokenRotationFailedException(`Token rotation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        throw new TokenRotationFailedException(
+          `Token rotation failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        );
       }
     });
   }
 
   async validateAndRotateToken(
-    presentedToken: string, 
-    context?: RotationContext
+    presentedToken: string,
+    context?: RotationContext,
   ): Promise<TokenValidationResult & { rotation?: TokenRotationResult }> {
     this.logger.debug('Validating and rotating token');
 
@@ -152,14 +160,14 @@ export class RefreshTokenRotationCoreService {
 
       if (token.isRevoked()) {
         this.logger.warn(`Token validation failed: token is revoked (Family: ${token.familyId})`);
-        
+
         // This might indicate token reuse - handle it
         await this.tokenRevocationService.handleTokenReuse(
-          token.familyId, 
-          tokenHash, 
-          'VALIDATION_OF_REVOKED_TOKEN'
+          token.familyId,
+          tokenHash,
+          'VALIDATION_OF_REVOKED_TOKEN',
         );
-        
+
         return {
           isValid: false,
           reason: 'TOKEN_REVOKED',
@@ -193,13 +201,17 @@ export class RefreshTokenRotationCoreService {
         token: token,
         rotation: rotation,
       };
-
     } catch (error: unknown) {
-      this.logger.error(`Token validation and rotation failed: ${error instanceof Error ? error.message : 'Unknown error'}`, error instanceof Error ? error.stack : undefined);
+      this.logger.error(
+        `Token validation and rotation failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        error instanceof Error ? error.stack : undefined,
+      );
       if (error instanceof TokenRotationException) {
         throw error;
       }
-      throw new TokenRotationFailedException(`Token validation and rotation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new TokenRotationFailedException(
+        `Token validation and rotation failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      );
     }
   }
 }

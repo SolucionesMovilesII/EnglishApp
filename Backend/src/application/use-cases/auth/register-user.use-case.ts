@@ -32,9 +32,14 @@ export class RegisterUserUseCase {
     private readonly tokenGenerationService: ITokenGenerationService,
   ) {}
 
-  async execute(registerDto: RegisterDto, deviceInfo?: string, userAgent?: string, ipAddress?: string): Promise<RegisterResponseDto> {
+  async execute(
+    registerDto: RegisterDto,
+    deviceInfo?: string,
+    userAgent?: string,
+    ipAddress?: string,
+  ): Promise<RegisterResponseDto> {
     this.logger.log(`Registration attempt for email: ${registerDto.email}`);
-    
+
     try {
       await this.validateRegistrationData(registerDto);
 
@@ -43,23 +48,23 @@ export class RegisterUserUseCase {
 
       const person = await this.createPerson(registerDto);
       const user = await this.createUser(registerDto, hashedPassword, person.id);
-      
+
       // Generate email verification token
       await this.generateEmailVerificationToken(user.id);
-      
+
       // Generate access token only (no refresh token in response body)
       const accessToken = await this.jwtService.createAccessToken(user.id, user.role, user.email);
       const expiresIn = this.jwtService.getAccessTokenExpirationTime();
-      
+
       // Generate and store refresh token separately
       const refreshToken = await this.jwtService.createRefreshToken(user.id, user.role);
       await this.saveRefreshToken(user.id, refreshToken, deviceInfo, userAgent, ipAddress);
 
       this.logger.log(`User registered successfully: ${user.id}`);
-      
+
       // TODO: Send email verification email with emailVerificationToken
       // await this.emailService.sendVerificationEmail(user.email, emailVerificationToken);
-      
+
       return new RegisterResponseDto(
         user.id,
         user.email,
@@ -67,10 +72,13 @@ export class RegisterUserUseCase {
         user.isEmailVerified,
         accessToken,
         expiresIn,
-        'Registration successful. Please check your email to verify your account.'
+        'Registration successful. Please check your email to verify your account.',
       );
     } catch (error: unknown) {
-      this.logger.error(`Registration failed for email: ${registerDto.email}`, error instanceof Error ? error.stack : undefined);
+      this.logger.error(
+        `Registration failed for email: ${registerDto.email}`,
+        error instanceof Error ? error.stack : undefined,
+      );
       throw error;
     }
   }
@@ -103,9 +111,9 @@ export class RegisterUserUseCase {
   }
 
   private async createUser(
-    registerDto: RegisterDto, 
+    registerDto: RegisterDto,
     hashedPassword: string,
-    personId: string
+    personId: string,
   ): Promise<User> {
     const createUserDto = {
       username: registerDto.email.split('@')[0], // Generate username from email
@@ -115,8 +123,8 @@ export class RegisterUserUseCase {
       role: 'STUDENT' as const,
       personId: personId,
       person: {
-        fullName: registerDto.fullName
-      }
+        fullName: registerDto.fullName,
+      },
     };
 
     return await this.userRepository.create(createUserDto);
@@ -124,21 +132,21 @@ export class RegisterUserUseCase {
 
   private async generateEmailVerificationToken(userId: string): Promise<string> {
     const { token } = this.tokenGenerationService.generateEmailVerificationToken(24); // 24 hours expiration
-    
+
     // Store token in user entity
-    await this.userRepository.update(userId, { 
-      emailVerificationToken: token 
+    await this.userRepository.update(userId, {
+      emailVerificationToken: token,
     });
-    
+
     return token;
   }
 
   private async saveRefreshToken(
-    userId: string, 
-    token: string, 
-    deviceInfo?: string, 
-    userAgent?: string, 
-    ipAddress?: string
+    userId: string,
+    token: string,
+    deviceInfo?: string,
+    userAgent?: string,
+    ipAddress?: string,
   ): Promise<void> {
     const refreshToken = new RefreshToken();
     refreshToken.tokenHash = await this.hashService.hash(token);

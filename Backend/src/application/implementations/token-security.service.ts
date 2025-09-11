@@ -1,8 +1,6 @@
 import { Injectable, Logger, Inject } from '@nestjs/common';
 import { IRefreshTokenRepository } from '../interfaces/repositories/refresh-token-repository.interface';
-import { 
-  TokenOperationRateLimitedException 
-} from '../../shared/exceptions/token-rotation.exceptions';
+import { TokenOperationRateLimitedException } from '../../shared/exceptions/token-rotation.exceptions';
 
 export interface SecurityEventDetails {
   familyId?: string;
@@ -28,20 +26,25 @@ export class TokenSecurityService {
     try {
       // Check if the token exists and is revoked
       const token = await this.refreshTokenRepository.findByTokenHash(tokenHash);
-      
+
       if (!token) {
         // Token doesn't exist, could be a reuse attempt with invalid token
         return false;
       }
 
       if (token.isRevoked()) {
-        this.logger.error(`Token reuse detected: ${tokenHash.substring(0, 10)}... (Family: ${token.familyId})`);
+        this.logger.error(
+          `Token reuse detected: ${tokenHash.substring(0, 10)}... (Family: ${token.familyId})`,
+        );
         return true;
       }
 
       return false;
     } catch (error: unknown) {
-      this.logger.error(`Error detecting token reuse: ${error instanceof Error ? error.message : 'Unknown error'}`, error instanceof Error ? error.stack : undefined);
+      this.logger.error(
+        `Error detecting token reuse: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        error instanceof Error ? error.stack : undefined,
+      );
       return false;
     }
   }
@@ -52,13 +55,13 @@ export class TokenSecurityService {
     const windowMs = 60 * 1000; // 1 minute
 
     const current = this.rateLimitMap.get(key);
-    
+
     if (current) {
       if (now < current.resetTime) {
         if (current.count >= this.TOKEN_ROTATION_RATE_LIMIT) {
           throw new TokenOperationRateLimitedException(
             identifier,
-            Math.ceil((current.resetTime - now) / 1000)
+            Math.ceil((current.resetTime - now) / 1000),
           );
         }
         current.count++;
@@ -72,7 +75,8 @@ export class TokenSecurityService {
     }
 
     // Clean up old entries periodically
-    if (Math.random() < 0.1) { // 10% chance to clean up
+    if (Math.random() < 0.1) {
+      // 10% chance to clean up
       this.cleanupRateLimitMap(now);
     }
   }

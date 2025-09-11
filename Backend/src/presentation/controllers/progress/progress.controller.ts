@@ -48,80 +48,85 @@ export class ProgressController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Create or update user progress',
-    description: 'Creates a new progress record or updates existing one for the authenticated user'
+    description: 'Creates a new progress record or updates existing one for the authenticated user',
   })
   @ApiResponse({
     status: 201,
     description: 'Progress created or updated successfully',
-    type: ProgressResponseDto
+    type: ProgressResponseDto,
   })
   @ApiResponse({
     status: 400,
-    description: 'Invalid input data'
+    description: 'Invalid input data',
   })
   @ApiResponse({
     status: 401,
-    description: 'Unauthorized - Invalid or missing JWT token'
+    description: 'Unauthorized - Invalid or missing JWT token',
   })
   @ApiResponse({
     status: 404,
-    description: 'User not found'
+    description: 'User not found',
   })
   async createProgress(
     @Body() createProgressDto: CreateProgressDto,
     @Request() req: AuthenticatedRequest,
   ): Promise<ProgressResponseDto> {
     this.logger.log(`Creating progress for user: ${req.user.userId}`);
-    
+
     try {
       return await this.createProgressUseCase.execute(req.user.userId, createProgressDto);
     } catch (error) {
-      this.logger.error(`Error creating progress: ${error instanceof Error ? error.message : String(error)}`);
+      this.logger.error(
+        `Error creating progress: ${error instanceof Error ? error.message : String(error)}`,
+      );
       throw error;
     }
   }
 
   @Get(':userId')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Get user progress',
-    description: 'Retrieves all progress records for a user. Users can only access their own progress unless they are admin.'
+    description:
+      'Retrieves all progress records for a user. Users can only access their own progress unless they are admin.',
   })
   @ApiParam({
     name: 'userId',
     description: 'User ID to get progress for',
     type: 'string',
-    format: 'uuid'
+    format: 'uuid',
   })
   @ApiResponse({
     status: 200,
     description: 'User progress retrieved successfully',
-    type: UserProgressListDto
+    type: UserProgressListDto,
   })
   @ApiResponse({
     status: 401,
-    description: 'Unauthorized - Invalid or missing JWT token'
+    description: 'Unauthorized - Invalid or missing JWT token',
   })
   @ApiResponse({
     status: 403,
-    description: 'Forbidden - Cannot access other user\'s progress'
+    description: "Forbidden - Cannot access other user's progress",
   })
   @ApiResponse({
     status: 404,
-    description: 'User not found'
+    description: 'User not found',
   })
   async getUserProgress(
     @Param('userId') targetUserId: string,
     @Request() req: AuthenticatedRequest,
   ): Promise<UserProgressListDto> {
     this.logger.log(`Getting progress for user: ${targetUserId}, requested by: ${req.user.userId}`);
-    
+
     try {
       return await this.getUserProgressUseCase.execute(targetUserId, req.user.userId);
     } catch (error) {
-      this.logger.error(`Error getting user progress: ${error instanceof Error ? error.message : String(error)}`);
+      this.logger.error(
+        `Error getting user progress: ${error instanceof Error ? error.message : String(error)}`,
+      );
       throw error;
     }
   }
@@ -129,36 +134,36 @@ export class ProgressController {
   @Put(':id')
   @HttpCode(HttpStatus.OK)
   @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Update progress record',
-    description: 'Updates an existing progress record. Users can only update their own progress.'
+    description: 'Updates an existing progress record. Users can only update their own progress.',
   })
   @ApiParam({
     name: 'id',
     description: 'Progress record ID',
     type: 'string',
-    format: 'uuid'
+    format: 'uuid',
   })
   @ApiResponse({
     status: 200,
     description: 'Progress updated successfully',
-    type: ProgressResponseDto
+    type: ProgressResponseDto,
   })
   @ApiResponse({
     status: 400,
-    description: 'Invalid input data'
+    description: 'Invalid input data',
   })
   @ApiResponse({
     status: 401,
-    description: 'Unauthorized - Invalid or missing JWT token'
+    description: 'Unauthorized - Invalid or missing JWT token',
   })
   @ApiResponse({
     status: 403,
-    description: 'Forbidden - Cannot update other user\'s progress'
+    description: "Forbidden - Cannot update other user's progress",
   })
   @ApiResponse({
     status: 404,
-    description: 'Progress record not found'
+    description: 'Progress record not found',
   })
   async updateProgress(
     @Param('id') progressId: string,
@@ -166,11 +171,17 @@ export class ProgressController {
     @Request() req: AuthenticatedRequest,
   ): Promise<ProgressResponseDto> {
     this.logger.log(`Updating progress: ${progressId} by user: ${req.user.userId}`);
-    
+
     try {
-      return await this.updateProgressUseCase.execute(progressId, req.user.userId, updateProgressDto);
+      return await this.updateProgressUseCase.execute(
+        progressId,
+        req.user.userId,
+        updateProgressDto,
+      );
     } catch (error) {
-      this.logger.error(`Error updating progress: ${error instanceof Error ? error.message : String(error)}`);
+      this.logger.error(
+        `Error updating progress: ${error instanceof Error ? error.message : String(error)}`,
+      );
       throw error;
     }
   }

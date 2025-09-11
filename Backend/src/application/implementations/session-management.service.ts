@@ -14,10 +14,10 @@ export class SessionManagementService {
   async getActiveFamilies(userId: string): Promise<TokenFamilyInfo[]> {
     try {
       const activeTokens = await this.refreshTokenRepository.findValidByUserId(userId);
-      
+
       // Group tokens by family and get unique families
       const familyMap = new Map<string, TokenFamilyInfo>();
-      
+
       activeTokens.forEach(token => {
         if (!familyMap.has(token.familyId)) {
           familyMap.set(token.familyId, {
@@ -34,7 +34,10 @@ export class SessionManagementService {
 
       return Array.from(familyMap.values());
     } catch (error: unknown) {
-      this.logger.error(`Failed to get active families: ${error instanceof Error ? error.message : 'Unknown error'}`, error instanceof Error ? error.stack : undefined);
+      this.logger.error(
+        `Failed to get active families: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        error instanceof Error ? error.stack : undefined,
+      );
       return [];
     }
   }
@@ -51,7 +54,10 @@ export class SessionManagementService {
       this.logger.log('Expired tokens cleanup completed');
       return 0; // Repository method doesn't return count, but operation completed
     } catch (error: unknown) {
-      this.logger.error(`Failed to cleanup expired tokens: ${error instanceof Error ? error.message : 'Unknown error'}`, error instanceof Error ? error.stack : undefined);
+      this.logger.error(
+        `Failed to cleanup expired tokens: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        error instanceof Error ? error.stack : undefined,
+      );
       return 0;
     }
   }
