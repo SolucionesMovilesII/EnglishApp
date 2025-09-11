@@ -395,4 +395,98 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get refresh => 'Refresh';
+
+  @override
+  String get vocabularyChaptersTitle => 'Capítulos de Vocabulario';
+
+  @override
+  String get loadingVocabularyChapters =>
+      'Cargando capítulos de vocabulario...';
+
+  @override
+  String get errorLoadingChapters => 'Error al cargar capítulos';
+
+  @override
+  String get unknownError => 'Ocurrió un error desconocido';
+
+  @override
+  String get dismiss => 'Descartar';
+
+  @override
+  String get tryAgain => 'Intentar de nuevo';
+
+  @override
+  String get noChaptersAvailable => 'No hay capítulos disponibles';
+
+  @override
+  String get noChaptersDescription =>
+      'Vuelve más tarde para ver nuevos capítulos de vocabulario';
+
+  @override
+  String get yourProgress => 'Tu Progreso';
+
+  @override
+  String get chaptersCompleted => 'Capítulos Completados';
+
+  @override
+  String get unlocked => 'Desbloqueado';
+
+  @override
+  String get locked => 'Bloqueado';
+
+  @override
+  String get progress => 'Progreso';
+
+  @override
+  String get completed => 'Completado';
+
+  @override
+  String get continue_ => 'Continuar';
+
+  @override
+  String get start => 'Comenzar';
+
+  @override
+  String get chapterLocked => 'Capítulo Bloqueado';
+
+  @override
+  String chapterLockedDescription(int previousChapter) {
+    return 'Completa el capítulo $previousChapter para desbloquear este capítulo';
+  }
+
+  @override
+  String get understood => 'Entendido';
+
+  @override
+  String get chapterCompleted => 'Capítulo Completado';
+
+  @override
+  String get chapterCompletedDescription =>
+      'Ya completaste este capítulo. Puedes repasarlo cuando quieras.';
+
+  @override
+  String completedOn(DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.yMd(localeName);
+    final String dateString = dateDateFormat.format(date);
+
+    return 'Completado el $dateString';
+  }
+
+  @override
+  String get close => 'Cerrar';
+
+  @override
+  String get reviewChapter => 'Repasar Capítulo';
+
+  @override
+  String get noLivesTitle => 'Sin Vidas Disponibles';
+
+  @override
+  String get noLivesMessage =>
+      'Necesitas al menos una vida para comenzar un capítulo. Las vidas se reinician diariamente.';
+
+  @override
+  String nextResetAt(String time) {
+    return 'Próximo reinicio a las $time';
+  }
 }

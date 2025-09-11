@@ -390,4 +390,97 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get refresh => 'Refresh';
+
+  @override
+  String get vocabularyChaptersTitle => 'Vocabulary Chapters';
+
+  @override
+  String get loadingVocabularyChapters => 'Loading vocabulary chapters...';
+
+  @override
+  String get errorLoadingChapters => 'Error loading chapters';
+
+  @override
+  String get unknownError => 'An unknown error occurred';
+
+  @override
+  String get dismiss => 'Dismiss';
+
+  @override
+  String get tryAgain => 'Try Again';
+
+  @override
+  String get noChaptersAvailable => 'No chapters available';
+
+  @override
+  String get noChaptersDescription =>
+      'Check back later for new vocabulary chapters';
+
+  @override
+  String get yourProgress => 'Your Progress';
+
+  @override
+  String get chaptersCompleted => 'Chapters Completed';
+
+  @override
+  String get unlocked => 'Unlocked';
+
+  @override
+  String get locked => 'Locked';
+
+  @override
+  String get progress => 'Progress';
+
+  @override
+  String get completed => 'Completed';
+
+  @override
+  String get continue_ => 'Continue';
+
+  @override
+  String get start => 'Start';
+
+  @override
+  String get chapterLocked => 'Chapter Locked';
+
+  @override
+  String chapterLockedDescription(int previousChapter) {
+    return 'Complete chapter $previousChapter to unlock this chapter';
+  }
+
+  @override
+  String get understood => 'Understood';
+
+  @override
+  String get chapterCompleted => 'Chapter Completed';
+
+  @override
+  String get chapterCompletedDescription =>
+      'You have already completed this chapter. You can review it anytime.';
+
+  @override
+  String completedOn(DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.yMd(localeName);
+    final String dateString = dateDateFormat.format(date);
+
+    return 'Completed on $dateString';
+  }
+
+  @override
+  String get close => 'Close';
+
+  @override
+  String get reviewChapter => 'Review Chapter';
+
+  @override
+  String get noLivesTitle => 'No Lives Available';
+
+  @override
+  String get noLivesMessage =>
+      'You need at least one life to start a chapter. Lives reset daily.';
+
+  @override
+  String nextResetAt(String time) {
+    return 'Next reset at $time';
+  }
 }

@@ -835,6 +835,168 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Refresh'**
   String get refresh;
+
+  /// No description provided for @vocabularyChaptersTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Vocabulary Chapters'**
+  String get vocabularyChaptersTitle;
+
+  /// No description provided for @loadingVocabularyChapters.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading vocabulary chapters...'**
+  String get loadingVocabularyChapters;
+
+  /// No description provided for @errorLoadingChapters.
+  ///
+  /// In en, this message translates to:
+  /// **'Error loading chapters'**
+  String get errorLoadingChapters;
+
+  /// No description provided for @unknownError.
+  ///
+  /// In en, this message translates to:
+  /// **'An unknown error occurred'**
+  String get unknownError;
+
+  /// No description provided for @dismiss.
+  ///
+  /// In en, this message translates to:
+  /// **'Dismiss'**
+  String get dismiss;
+
+  /// No description provided for @tryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Try Again'**
+  String get tryAgain;
+
+  /// No description provided for @noChaptersAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'No chapters available'**
+  String get noChaptersAvailable;
+
+  /// No description provided for @noChaptersDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Check back later for new vocabulary chapters'**
+  String get noChaptersDescription;
+
+  /// No description provided for @yourProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Progress'**
+  String get yourProgress;
+
+  /// No description provided for @chaptersCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Chapters Completed'**
+  String get chaptersCompleted;
+
+  /// No description provided for @unlocked.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlocked'**
+  String get unlocked;
+
+  /// No description provided for @locked.
+  ///
+  /// In en, this message translates to:
+  /// **'Locked'**
+  String get locked;
+
+  /// No description provided for @progress.
+  ///
+  /// In en, this message translates to:
+  /// **'Progress'**
+  String get progress;
+
+  /// No description provided for @completed.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed'**
+  String get completed;
+
+  /// No description provided for @continue_.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get continue_;
+
+  /// No description provided for @start.
+  ///
+  /// In en, this message translates to:
+  /// **'Start'**
+  String get start;
+
+  /// No description provided for @chapterLocked.
+  ///
+  /// In en, this message translates to:
+  /// **'Chapter Locked'**
+  String get chapterLocked;
+
+  /// No description provided for @chapterLockedDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete chapter {previousChapter} to unlock this chapter'**
+  String chapterLockedDescription(int previousChapter);
+
+  /// No description provided for @understood.
+  ///
+  /// In en, this message translates to:
+  /// **'Understood'**
+  String get understood;
+
+  /// No description provided for @chapterCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Chapter Completed'**
+  String get chapterCompleted;
+
+  /// No description provided for @chapterCompletedDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'You have already completed this chapter. You can review it anytime.'**
+  String get chapterCompletedDescription;
+
+  /// No description provided for @completedOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed on {date}'**
+  String completedOn(DateTime date);
+
+  /// No description provided for @close.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get close;
+
+  /// No description provided for @reviewChapter.
+  ///
+  /// In en, this message translates to:
+  /// **'Review Chapter'**
+  String get reviewChapter;
+
+  /// No description provided for @noLivesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No Lives Available'**
+  String get noLivesTitle;
+
+  /// No description provided for @noLivesMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'You need at least one life to start a chapter. Lives reset daily.'**
+  String get noLivesMessage;
+
+  /// No description provided for @nextResetAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Next reset at {time}'**
+  String nextResetAt(String time);
 }
 
 class _AppLocalizationsDelegate
