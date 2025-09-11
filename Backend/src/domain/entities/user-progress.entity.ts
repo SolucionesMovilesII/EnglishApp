@@ -9,13 +9,9 @@ import {
   JoinColumn,
 } from 'typeorm';
 import { User } from './user.entity';
-import { Chapter } from './chapter.entity';
 
 @Entity('user_progress')
 @Index(['userId'], { unique: false })
-@Index(['chapterId'], { unique: false })
-@Index(['userId', 'chapterId'], { unique: true })
-@Index(['chapterCompleted'])
 export class UserProgress {
   @PrimaryGeneratedColumn('uuid')
   readonly id!: string;
@@ -32,18 +28,6 @@ export class UserProgress {
   @Column({ type: 'timestamptz' })
   lastActivity!: Date;
 
-  @Column({ type: 'boolean', default: false })
-  chapterCompleted!: boolean;
-
-  @Column({ type: 'timestamptz', nullable: true })
-  chapterCompletionDate!: Date | null;
-
-  @Column({ type: 'int', default: 0 })
-  vocabularyItemsLearned!: number;
-
-  @Column({ type: 'int', default: 0 })
-  totalVocabularyItems!: number;
-
   @Column({ type: 'jsonb', nullable: true })
   extraData!: Record<string, any> | null;
 
@@ -51,37 +35,9 @@ export class UserProgress {
   @JoinColumn({ name: 'userId' })
   user!: User;
 
-  @ManyToOne(() => Chapter, { eager: false })
-  @JoinColumn({ name: 'chapterId' })
-  chapter!: Chapter;
-
   @CreateDateColumn({ type: 'timestamptz' })
   readonly createdAt!: Date;
 
   @UpdateDateColumn({ type: 'timestamptz' })
   readonly updatedAt!: Date;
-
-  // Business methods
-  getProgressPercentage(): number {
-    if (this.totalVocabularyItems === 0) return 0;
-    return Math.round((this.vocabularyItemsLearned / this.totalVocabularyItems) * 100);
-  }
-
-  markChapterCompleted(): void {
-    this.chapterCompleted = true;
-    this.chapterCompletionDate = new Date();
-  }
-
-  incrementVocabularyLearned(): void {
-    this.vocabularyItemsLearned++;
-    this.lastActivity = new Date();
-  }
-
-  isChapterInProgress(): boolean {
-    return this.vocabularyItemsLearned > 0 && !this.chapterCompleted;
-  }
-
-  canCompleteChapter(): boolean {
-    return this.vocabularyItemsLearned >= this.totalVocabularyItems && !this.chapterCompleted;
-  }
 }
