@@ -111,5 +111,19 @@
   "nameTooShort": "Имя должно содержать не менее 2 символов",
   "creatingAccount": "Создание вашего аккаунта...",
   "creatingAccountWithGoogle": "Создание аккаунта через Google...",
-  "creatingAccountWithApple": "Создание аккаунта через Apple..."
+  "creatingAccountWithApple": "Создание аккаунта через Apple...",
+  "progress": "Прогресс",
+  "episodeContent": "Содержание эпизода",
+  "episodeContentPlaceholder": "Содержание эпизода будет отображено здесь",
+  "replayEpisode": "Повторить эпизод",
+  "startEpisode": "Начать эпизод",
+  "startingEpisode": "Запуск {episodeTitle}...",
+  "@startingEpisode": {
+    "placeholders": {
+      "episodeTitle": {
+        "type": "String",
+        "example": "Эпизод 1"
+      }
+    }
+  }
 }

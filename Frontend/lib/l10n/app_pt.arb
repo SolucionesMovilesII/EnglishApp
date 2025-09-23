@@ -109,5 +109,19 @@
   "resetLinkSentAgain": "Link de redefinição enviado novamente!",
   "openingEmailApp": "Abrindo aplicativo de email...",
   "forgotPasswordQuestion": "Esqueceu sua senha?",
-  "rememberSession": "Lembrar sessão"
+  "rememberSession": "Lembrar sessão",
+  "progress": "Progresso",
+  "episodeContent": "Conteúdo do Episódio",
+  "episodeContentPlaceholder": "O conteúdo do episódio será exibido aqui",
+  "replayEpisode": "Repetir Episódio",
+  "startEpisode": "Iniciar Episódio",
+  "startingEpisode": "Iniciando {episodeTitle}...",
+  "@startingEpisode": {
+    "placeholders": {
+      "episodeTitle": {
+        "type": "String",
+        "example": "Episódio 1"
+      }
+    }
+  }
 }

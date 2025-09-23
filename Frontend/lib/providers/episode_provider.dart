@@ -60,4 +60,43 @@ class EpisodeProvider with ChangeNotifier {
     // TODO: Implement Update Episode Progress Logic
     notifyListeners();
   }
+
+  void resetChapterForRepetition(int chapterId) {
+    // Reset all episodes to allow repetition without affecting original score
+    // This is a mock implementation - in a real app, this would communicate with backend
+    
+    for (int i = 0; i < _currentChapter.episodes.length; i++) {
+      final episode = _currentChapter.episodes[i];
+      
+      // Reset episode status for repetition
+      // Keep the first episode as current, others as locked
+      if (i == 0) {
+        _currentChapter.episodes[i] = Episode(
+          id: episode.id,
+          title: episode.title,
+          difficulty: episode.difficulty,
+          status: EpisodeStatus.current,
+          description: episode.description,
+          progress: 0.0,
+        );
+      } else {
+        _currentChapter.episodes[i] = Episode(
+          id: episode.id,
+          title: episode.title,
+          difficulty: episode.difficulty,
+          status: EpisodeStatus.locked,
+          description: episode.description,
+          progress: 0.0,
+        );
+      }
+    }
+    
+    // Reset selected episode
+    _selectedEpisodeId = null;
+    
+    // Notify listeners to update UI
+    notifyListeners();
+    
+    debugPrint('Chapter ${_currentChapter.title} reset for repetition');
+  }
 }

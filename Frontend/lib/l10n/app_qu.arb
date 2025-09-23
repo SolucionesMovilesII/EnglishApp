@@ -138,5 +138,19 @@
   "resetLinkSentAgain": "¡Enlace de restablecimiento enviado nuevamente!",
   "openingEmailApp": "Abriendo aplicación de correo...",
   "forgotPasswordQuestion": "¿Olvidaste tu contraseña?",
-  "rememberSession": "Recordar sesión"
+  "rememberSession": "Recordar sesión",
+  "progress": "Ñawpaqman",
+  "episodeContent": "Episodio Contenido",
+  "episodeContentPlaceholder": "Episodio contenido kaypi rikukunqa",
+  "replayEpisode": "Episodio Kutichiy",
+  "startEpisode": "Episodio Qallariy",
+  "startingEpisode": "{episodeTitle} qallarikuspa...",
+  "@startingEpisode": {
+    "placeholders": {
+      "episodeTitle": {
+        "type": "String",
+        "example": "Episodio 1"
+      }
+    }
+  }
 }
