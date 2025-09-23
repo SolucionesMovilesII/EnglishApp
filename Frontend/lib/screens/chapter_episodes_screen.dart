@@ -7,7 +7,9 @@ import '../widgets/app_banner.dart';
 import '../widgets/episode_node.dart';
 import '../widgets/progress_path.dart';
 import '../widgets/episode_progress_indicator.dart';
+import '../widgets/repeat_chapter_dialog.dart';
 import '../l10n/app_localizations.dart';
+import 'episode_screen.dart';
 
 class ChapterEpisodesScreen extends StatefulWidget {
   final String chapterTitle;
@@ -72,9 +74,7 @@ class _ChapterEpisodesScreenState extends State<ChapterEpisodesScreen>
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => EpisodeProvider(),
-      child: Scaffold(
+    return Scaffold(
         backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
         appBar: AppBar(
           toolbarHeight: 0,
@@ -155,10 +155,39 @@ class _ChapterEpisodesScreenState extends State<ChapterEpisodesScreen>
                 );
               },
             ),
+            
+            // Repeat chapter button (only show if chapter is completed)
+            Consumer<EpisodeProvider>(
+              builder: (context, episodeProvider, child) {
+                final chapter = episodeProvider.currentChapter;
+                final isChapterCompleted = chapter.completedEpisodes == chapter.totalEpisodes;
+                
+                if (!isChapterCompleted) return const SizedBox.shrink();
+                
+                return Container(
+                  padding: const EdgeInsets.all(16),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: () => _handleRepeatChapter(episodeProvider),
+                      icon: const Icon(Icons.refresh),
+                      label: Text(AppLocalizations.of(context)!.repeatChapter),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
+                        foregroundColor: Theme.of(context).colorScheme.onSecondaryContainer,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
           ],
         ),
-      ),
-    );
+      );
   }
 
   void _handleEpisodeTap(EpisodeProvider provider, Episode episode) {
@@ -171,15 +200,52 @@ class _ChapterEpisodesScreenState extends State<ChapterEpisodesScreen>
       );
     } else {
       provider.selectEpisode(episode.id);
-      provider.playEpisode(episode.id);
-
-      // Chapter navigation
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(AppLocalizations.of(context)!.playingEpisode(episode.title)),
-          duration: const Duration(seconds: 1),
+      
+      // Navigate to episode screen
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => EpisodeScreen(episode: episode),
         ),
       );
+    }
+  }
+
+  Future<void> _handleRepeatChapter(EpisodeProvider provider) async {
+    final chapter = provider.currentChapter;
+    
+    // Calculate current score (mock calculation based on completed episodes)
+    final currentScore = (chapter.overallProgress * 100).round();
+    
+    final shouldRepeat = await context.showRepeatChapterDialog(
+      chapterTitle: chapter.title,
+      currentScore: currentScore,
+      onConfirm: () {
+        // Analytics or logging could go here
+        print('User confirmed chapter repetition: ${chapter.title}');
+      },
+      onCancel: () {
+        // Analytics or logging could go here
+        print('User cancelled chapter repetition: ${chapter.title}');
+      },
+    );
+
+    if (shouldRepeat == true) {
+      // Reset chapter progress for repetition (without affecting score)
+      provider.resetChapterForRepetition(chapter.id);
+      
+      // Show confirmation message
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              AppLocalizations.of(context)!.chapterResetForRepetition(chapter.title),
+            ),
+            duration: const Duration(seconds: 3),
+            backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+          ),
+        );
+      }
     }
   }
 }
