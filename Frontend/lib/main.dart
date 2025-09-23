@@ -6,6 +6,7 @@ import 'providers/theme_provider.dart';
 import 'providers/locale_provider.dart';
 import 'providers/progress_provider.dart';
 import 'providers/lives_provider.dart';
+import 'providers/episode_provider.dart';
 import 'screens/login_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/loading_screen.dart';
@@ -30,6 +31,7 @@ class EnglishApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => LocaleProvider()),
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => ProgressProvider()),
+        ChangeNotifierProvider(create: (_) => EpisodeProvider()),
         ChangeNotifierProxyProvider<AuthProvider, LivesProvider>(
           create: (context) => LivesProvider(
             Provider.of<AuthProvider>(context, listen: false),
