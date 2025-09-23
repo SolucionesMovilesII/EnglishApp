@@ -15,6 +15,7 @@ import { VocabularyItem } from './domain/entities/vocabulary-item.entity';
 import { AuthModule } from './presentation/modules/auth.module';
 import { ProgressModule } from './presentation/modules/progress.module';
 import { LivesModule } from './presentation/modules/lives.module';
+import { ChaptersModule } from './presentation/modules/chapters.module';
 import { AdminModule } from './presentation/modules/admin.module';
 import { CronModule } from './application/modules/cron.module';
 import { SecurityModule } from './shared/security.module';
@@ -64,6 +65,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
     AuthModule,
     ProgressModule,
     LivesModule,
+    ChaptersModule,
     AdminModule,
     CronModule,
   ],

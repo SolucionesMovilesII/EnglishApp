@@ -29,7 +29,6 @@ class AuthProvider with ChangeNotifier {
   AuthState get authState => _authState;
   UserModel? get user => _user;
   String? get errorMessage => _errorMessage;
-  String? get token => _accessToken;
   bool get isAuthenticated => _authState == AuthState.authenticated;
   bool get isLoading => _authState == AuthState.loading;
   
