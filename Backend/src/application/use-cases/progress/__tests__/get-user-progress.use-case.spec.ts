@@ -4,6 +4,7 @@ import { GetUserProgressUseCase } from '../get-user-progress.use-case';
 import { IUserProgressRepository } from '../../../interfaces/repositories/user-progress-repository.interface';
 import { IUserRepository } from '../../../interfaces/repositories/user-repository.interface';
 import { User } from '../../../../domain/entities/user.entity';
+import { UserProgress } from '../../../../domain/entities/user-progress.entity';
 
 describe('GetUserProgressUseCase', () => {
   let useCase: GetUserProgressUseCase;
@@ -75,14 +76,8 @@ describe('GetUserProgressUseCase', () => {
         extraData: { vocab: { chapter: 1, lastWord: 'apple' } },
         createdAt: new Date('2025-09-08T15:00:00Z'),
         updatedAt: new Date('2025-09-08T17:00:00Z'),
-        user: null,
-        chapter: null,
-        isApproved: jest.fn().mockReturnValue(true),
-        getScorePercentage: jest.fn().mockReturnValue(85.5),
-        updateScore: jest.fn(),
-        markAsCompleted: jest.fn(),
       },
-    ] as any[];
+    ] as UserProgress[];
 
     const mockStats = {
       totalRecords: 1,
