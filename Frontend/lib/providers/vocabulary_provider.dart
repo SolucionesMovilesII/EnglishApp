@@ -138,7 +138,7 @@ class VocabularyProvider with ChangeNotifier {
         _wordsLearned = _currentSession!.studiedWords.length;
       }
     } catch (e) {
-      print('Error creating vocabulary session: $e');
+      debugPrint('Error creating vocabulary session: $e');
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -176,7 +176,7 @@ class VocabularyProvider with ChangeNotifier {
       
       notifyListeners();
     } catch (e) {
-      print('Error studying word: $e');
+      debugPrint('Error studying word: $e');
     }
   }
   
@@ -193,7 +193,7 @@ class VocabularyProvider with ChangeNotifier {
         timeframe: timeframe,
       );
     } catch (e) {
-      print('Error getting vocabulary stats: $e');
+      debugPrint('Error getting vocabulary stats: $e');
       return null;
     }
   }
