@@ -50,6 +50,7 @@ class LoginFormFields extends StatelessWidget {
               ],
             ),
             child: TextFormField(
+              key: const Key('email_field'),
               controller: emailController,
               keyboardType: TextInputType.emailAddress,
               onChanged: onEmailChanged,
@@ -106,6 +107,7 @@ class LoginFormFields extends StatelessWidget {
               ],
             ),
             child: TextFormField(
+              key: const Key('password_field'),
               controller: passwordController,
               obscureText: !isPasswordVisible,
               onChanged: onPasswordChanged,
