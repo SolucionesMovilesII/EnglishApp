@@ -330,7 +330,3 @@ new JwtStrategy({
 });
 ```
 
----
-
-> Este runbook está alineado a tu base NestJS actual y prioriza cambios incrementales seguros. Si quieres, puedo preparar los **diffs/migraciones TypeORM** y los **nuevos endpoints** listos para pegar.
-
