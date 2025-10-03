@@ -1,10 +1,4 @@
-import {
-  Entity,
-  Column,
-  OneToOne,
-  JoinColumn,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Entity, Column, OneToOne, JoinColumn, PrimaryGeneratedColumn } from 'typeorm';
 import { PracticeSession, PracticeType } from './practice-session.entity';
 
 @Entity('quiz_practices')
@@ -31,7 +25,13 @@ export class QuizPractice {
   @Column({ name: 'last_question_index', type: 'int', default: 0 })
   lastQuestionIndex!: number;
 
-  @Column({ name: 'average_time_per_question', type: 'decimal', precision: 8, scale: 2, nullable: true })
+  @Column({
+    name: 'average_time_per_question',
+    type: 'decimal',
+    precision: 8,
+    scale: 2,
+    nullable: true,
+  })
   averageTimePerQuestion?: number;
 
   @Column({ name: 'quiz_category', type: 'varchar', length: 100, nullable: true })
@@ -66,7 +66,12 @@ export class QuizPractice {
     return Math.round((this.questionsAnswered / this.totalQuestions) * 100);
   }
 
-  answerQuestion(questionIndex: number, isCorrect: boolean, timeSpent: number, selectedAnswer?: string): void {
+  answerQuestion(
+    questionIndex: number,
+    isCorrect: boolean,
+    timeSpent: number,
+    selectedAnswer?: string,
+  ): void {
     this.questionsAnswered++;
     this.lastQuestionIndex = questionIndex;
 
@@ -94,7 +99,8 @@ export class QuizPractice {
     });
 
     // Calculate average time
-    this.averageTimePerQuestion = this.timePerQuestion.reduce((a, b) => a + b, 0) / this.timePerQuestion.length;
+    this.averageTimePerQuestion =
+      this.timePerQuestion.reduce((a, b) => a + b, 0) / this.timePerQuestion.length;
 
     // Update practice session score
     this.practiceSession.score = this.getAccuracyPercentage();
@@ -119,10 +125,10 @@ export class QuizPractice {
   }
 
   static createForSession(
-    practiceSession: PracticeSession, 
-    category: string, 
-    difficultyLevel: string, 
-    totalQuestions: number
+    practiceSession: PracticeSession,
+    category: string,
+    difficultyLevel: string,
+    totalQuestions: number,
   ): QuizPractice {
     const quizPractice = new QuizPractice();
     quizPractice.practiceSession = practiceSession;

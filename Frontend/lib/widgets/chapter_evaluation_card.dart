@@ -16,7 +16,7 @@ class ChapterEvaluationCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final dateFormat = DateFormat('dd/MM/yyyy HH:mm');
-    
+
     return Card(
       elevation: 1,
       margin: EdgeInsets.zero,
@@ -82,7 +82,7 @@ class ChapterEvaluationCard extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 16),
-              
+
               // Puntuación y progreso
               Row(
                 children: [
@@ -117,7 +117,8 @@ class ChapterEvaluationCard extends StatelessWidget {
                         const SizedBox(height: 8),
                         LinearProgressIndicator(
                           value: evaluation.percentage / 100,
-                          backgroundColor: theme.colorScheme.surfaceVariant,
+                          backgroundColor:
+                              theme.colorScheme.surfaceContainerHighest,
                           valueColor: AlwaysStoppedAnimation<Color>(
                             evaluation.statusColor,
                           ),
@@ -129,7 +130,7 @@ class ChapterEvaluationCard extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 16),
-              
+
               // Información adicional
               Row(
                 children: [
@@ -161,7 +162,7 @@ class ChapterEvaluationCard extends StatelessWidget {
                   ),
                 ],
               ),
-              
+
               // Indicador de más detalles
               if (onTap != null) ...[
                 const SizedBox(height: 12),
@@ -213,21 +214,14 @@ class _InfoChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 8,
-        vertical: 6,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceVariant.withOpacity(0.5),
+        color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.5),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Column(
         children: [
-          Icon(
-            icon,
-            size: 16,
-            color: theme.colorScheme.onSurfaceVariant,
-          ),
+          Icon(icon, size: 16, color: theme.colorScheme.onSurfaceVariant),
           const SizedBox(height: 2),
           Text(
             label,

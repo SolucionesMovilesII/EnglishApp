@@ -5,9 +5,7 @@ import { AddBookmarkDto } from '../../../dtos/reading-practice.dto';
 
 @Injectable()
 export class AddBookmarkUseCase {
-  constructor(
-    private readonly readingPracticeRepository: IReadingPracticeRepository,
-  ) {}
+  constructor(private readonly readingPracticeRepository: IReadingPracticeRepository) {}
 
   async execute(
     practiceId: string,
@@ -15,7 +13,7 @@ export class AddBookmarkUseCase {
     bookmarkDto: AddBookmarkDto,
   ): Promise<ReadingPractice> {
     const practice = await this.readingPracticeRepository.findById(practiceId);
-    
+
     if (!practice) {
       throw new NotFoundException('Reading practice not found');
     }
@@ -28,15 +26,14 @@ export class AddBookmarkUseCase {
     practice.addBookmark(bookmarkDto.position, bookmarkDto.note);
 
     // Update practice
-    const updateData: any = {};
+    const updateData: Partial<{
+      bookmarks: Array<{ position: number; note?: string | undefined; timestamp: Date }>;
+    }> = {};
     if (practice.bookmarks) {
       updateData.bookmarks = practice.bookmarks;
     }
-    
-    const updatedPractice = await this.readingPracticeRepository.update(
-      practice.id,
-      updateData
-    );
+
+    const updatedPractice = await this.readingPracticeRepository.update(practice.id, updateData);
 
     return updatedPractice;
   }
@@ -47,7 +44,7 @@ export class AddBookmarkUseCase {
     position: number,
   ): Promise<ReadingPractice> {
     const practice = await this.readingPracticeRepository.findById(practiceId);
-    
+
     if (!practice) {
       throw new NotFoundException('Reading practice not found');
     }
@@ -58,21 +55,18 @@ export class AddBookmarkUseCase {
 
     // Remove bookmark
     if (practice.bookmarks) {
-      practice.bookmarks = practice.bookmarks.filter(
-        bookmark => bookmark.position !== position
-      );
+      practice.bookmarks = practice.bookmarks.filter(bookmark => bookmark.position !== position);
     }
 
     // Update practice
-    const updateData: any = {};
+    const updateData: Partial<{
+      bookmarks: Array<{ position: number; note?: string | undefined; timestamp: Date }>;
+    }> = {};
     if (practice.bookmarks) {
       updateData.bookmarks = practice.bookmarks;
     }
-    
-    const updatedPractice = await this.readingPracticeRepository.update(
-      practice.id,
-      updateData
-    );
+
+    const updatedPractice = await this.readingPracticeRepository.update(practice.id, updateData);
 
     return updatedPractice;
   }

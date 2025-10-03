@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import '../models/chapter_evaluation.dart';
 import '../widgets/chapter_evaluation_card.dart';
 import 'evaluation_details_screen.dart';
@@ -30,7 +29,7 @@ class _ChapterResultsScreenState extends State<ChapterResultsScreen> {
 
     // TODO: Implementar carga real de datos desde el backend
     await Future.delayed(const Duration(seconds: 1));
-    
+
     // Datos de ejemplo
     evaluations = [
       ChapterEvaluation(
@@ -75,7 +74,9 @@ class _ChapterResultsScreenState extends State<ChapterResultsScreen> {
 
   List<ChapterEvaluation> get filteredEvaluations {
     if (selectedChapter == null) return evaluations;
-    return evaluations.where((eval) => eval.chapterNumber.toString() == selectedChapter).toList();
+    return evaluations
+        .where((eval) => eval.chapterNumber.toString() == selectedChapter)
+        .toList();
   }
 
   Set<String> get availableChapters {
@@ -104,10 +105,7 @@ class _ChapterResultsScreenState extends State<ChapterResultsScreen> {
               });
             },
             itemBuilder: (context) => [
-              PopupMenuItem(
-                value: 'all',
-                child: Text(l10n.allChapters),
-              ),
+              PopupMenuItem(value: 'all', child: Text(l10n.allChapters)),
               ...availableChapters.map(
                 (chapter) => PopupMenuItem(
                   value: chapter,
@@ -119,9 +117,7 @@ class _ChapterResultsScreenState extends State<ChapterResultsScreen> {
         ],
       ),
       body: isLoading
-          ? const Center(
-              child: CircularProgressIndicator(),
-            )
+          ? const Center(child: CircularProgressIndicator())
           : RefreshIndicator(
               onRefresh: _loadEvaluations,
               child: filteredEvaluations.isEmpty
@@ -146,7 +142,9 @@ class _ChapterResultsScreenState extends State<ChapterResultsScreen> {
                           Text(
                             l10n.completeChaptersToSeeResults,
                             style: theme.textTheme.bodyLarge?.copyWith(
-                              color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                              color: theme.colorScheme.onSurface.withValues(
+                                alpha: 0.7,
+                              ),
                             ),
                             textAlign: TextAlign.center,
                           ),

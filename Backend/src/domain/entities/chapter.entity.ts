@@ -46,7 +46,7 @@ export class Chapter {
   imageUrl!: string | null;
 
   @Column({ type: 'jsonb', nullable: true })
-  metadata!: Record<string, any> | null;
+  metadata!: Record<string, unknown> | null;
 
   // Relations
   @OneToMany(() => VocabularyItem, vocabularyItem => vocabularyItem.chapter, {

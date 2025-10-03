@@ -12,11 +12,20 @@ import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
 import { SecurityConfig } from '../../infrastructure/config/security/security.config';
 
+// Extended request interface with user information
+interface RequestWithUser extends Request {
+  user?: {
+    id: string;
+    email: string;
+  };
+  realIP?: string;
+}
+
 // Rate limit configuration interface
 interface RateLimitConfig {
   windowMs: number;
   max: number;
-  keyGenerator?: (request: Request) => string;
+  keyGenerator?: (request: RequestWithUser) => string;
   skipSuccessfulRequests?: boolean;
   skipFailedRequests?: boolean;
 }
@@ -72,7 +81,7 @@ export class RateLimitGuard implements CanActivate {
   }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const request = context.switchToHttp().getRequest<Request>();
+    const request = context.switchToHttp().getRequest<RequestWithUser>();
 
     // Skip if explicitly marked to skip rate limiting
     const skipRateLimit = this.reflector.getAllAndOverride<boolean>('skipRateLimit', [
@@ -197,7 +206,7 @@ export class RateLimitGuard implements CanActivate {
   /**
    * Apply rate limiting to the request
    */
-  private applyRateLimit(request: Request, config: RateLimitConfig, type: string): boolean {
+  private applyRateLimit(request: RequestWithUser, config: RateLimitConfig, type: string): boolean {
     const key = config.keyGenerator ? config.keyGenerator(request) : this.getIPKey(request, type);
     const now = Date.now();
     const resetTime = now + config.windowMs;
@@ -256,7 +265,7 @@ export class RateLimitGuard implements CanActivate {
   /**
    * Generate IP-based key for rate limiting
    */
-  private getIPKey(request: Request, type: string): string {
+  private getIPKey(request: RequestWithUser, type: string): string {
     const ip = this.getAnonymizedIP(request);
     return `ip:${ip}:${type}`;
   }
@@ -264,10 +273,10 @@ export class RateLimitGuard implements CanActivate {
   /**
    * Generate account-based key for rate limiting
    */
-  private getAccountKey(request: Request, type: string): string {
+  private getAccountKey(request: RequestWithUser, type: string): string {
     // Try to get account identifier from request body or user
-    const email = request.body?.email || (request as any).user?.email;
-    const userId = (request as any).user?.id;
+    const email = request.body?.email || request.user?.email;
+    const userId = request.user?.id;
 
     if (userId) {
       return `user:${userId}:${type}`;
@@ -284,8 +293,8 @@ export class RateLimitGuard implements CanActivate {
   /**
    * Get anonymized IP for privacy preservation
    */
-  private getAnonymizedIP(request: Request): string {
-    const ip = (request as any).realIP || request.ip;
+  private getAnonymizedIP(request: RequestWithUser): string {
+    const ip = request.realIP || request.ip;
 
     if (!ip) {
       return 'unknown';

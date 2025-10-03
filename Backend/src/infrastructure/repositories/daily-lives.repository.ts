@@ -23,7 +23,7 @@ export class DailyLivesRepository implements IDailyLivesRepository {
     return await this.repository.findOne({
       where: {
         userId,
-        lastResetDate: dateString as any,
+        lastResetDate: new Date(dateString),
       },
     });
   }
@@ -109,7 +109,7 @@ export class DailyLivesRepository implements IDailyLivesRepository {
       .update(DailyLives)
       .set({
         currentLives: 5,
-        lastResetDate: todayString as any,
+        lastResetDate: new Date(todayString),
         updatedAt: () => 'CURRENT_TIMESTAMP',
       })
       .where('lastResetDate < :today', { today: todayString })

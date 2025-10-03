@@ -47,7 +47,11 @@ export class ApprovalMetricsRepository implements IApprovalMetricsRepository {
     });
   }
 
-  async findByUserChapterAndType(userId: string, chapterId: string, metricType: string): Promise<ApprovalMetrics[]> {
+  async findByUserChapterAndType(
+    userId: string,
+    chapterId: string,
+    metricType: string,
+  ): Promise<ApprovalMetrics[]> {
     return await this.repository.find({
       where: { userId, chapterId, metricType },
       order: { recordedAt: 'DESC' },
@@ -58,7 +62,8 @@ export class ApprovalMetricsRepository implements IApprovalMetricsRepository {
     const dateThreshold = new Date();
     dateThreshold.setDate(dateThreshold.getDate() - daysBack);
 
-    return await this.repository.createQueryBuilder('metrics')
+    return await this.repository
+      .createQueryBuilder('metrics')
       .where('metrics.userId = :userId', { userId })
       .andWhere('metrics.recordedAt >= :dateThreshold', { dateThreshold })
       .orderBy('metrics.recordedAt', 'DESC')
@@ -80,7 +85,8 @@ export class ApprovalMetricsRepository implements IApprovalMetricsRepository {
   }
 
   async getAverageMetricValue(chapterId: string, metricType: string): Promise<number> {
-    const result = await this.repository.createQueryBuilder('metrics')
+    const result = await this.repository
+      .createQueryBuilder('metrics')
       .select('AVG(metrics.value)', 'average')
       .where('metrics.chapterId = :chapterId', { chapterId })
       .andWhere('metrics.metricType = :metricType', { metricType })
@@ -96,18 +102,20 @@ export class ApprovalMetricsRepository implements IApprovalMetricsRepository {
     totalAttempts: number;
   }> {
     const metrics = await this.findByUserId(userId);
-    
+
     const accuracyMetrics = metrics.filter(m => m.metricType === 'accuracy');
     const speedMetrics = metrics.filter(m => m.metricType === 'speed');
     const attemptMetrics = metrics.filter(m => m.metricType === 'attempts');
 
-    const averageAccuracy = accuracyMetrics.length > 0
-      ? accuracyMetrics.reduce((sum, m) => sum + m.value, 0) / accuracyMetrics.length
-      : 0;
+    const averageAccuracy =
+      accuracyMetrics.length > 0
+        ? accuracyMetrics.reduce((sum, m) => sum + m.value, 0) / accuracyMetrics.length
+        : 0;
 
-    const averageSpeed = speedMetrics.length > 0
-      ? speedMetrics.reduce((sum, m) => sum + m.value, 0) / speedMetrics.length
-      : 0;
+    const averageSpeed =
+      speedMetrics.length > 0
+        ? speedMetrics.reduce((sum, m) => sum + m.value, 0) / speedMetrics.length
+        : 0;
 
     const totalAttempts = attemptMetrics.reduce((sum, m) => sum + m.value, 0);
 
@@ -134,17 +142,20 @@ export class ApprovalMetricsRepository implements IApprovalMetricsRepository {
     const speedMetrics = metrics.filter(m => m.metricType === 'speed');
     const attemptMetrics = metrics.filter(m => m.metricType === 'attempts');
 
-    const averageAccuracy = accuracyMetrics.length > 0
-      ? accuracyMetrics.reduce((sum, m) => sum + m.value, 0) / accuracyMetrics.length
-      : 0;
+    const averageAccuracy =
+      accuracyMetrics.length > 0
+        ? accuracyMetrics.reduce((sum, m) => sum + m.value, 0) / accuracyMetrics.length
+        : 0;
 
-    const averageSpeed = speedMetrics.length > 0
-      ? speedMetrics.reduce((sum, m) => sum + m.value, 0) / speedMetrics.length
-      : 0;
+    const averageSpeed =
+      speedMetrics.length > 0
+        ? speedMetrics.reduce((sum, m) => sum + m.value, 0) / speedMetrics.length
+        : 0;
 
-    const averageAttempts = attemptMetrics.length > 0
-      ? attemptMetrics.reduce((sum, m) => sum + m.value, 0) / attemptMetrics.length
-      : 0;
+    const averageAttempts =
+      attemptMetrics.length > 0
+        ? attemptMetrics.reduce((sum, m) => sum + m.value, 0) / attemptMetrics.length
+        : 0;
 
     return {
       totalUsers: uniqueUsers.size,
@@ -155,13 +166,13 @@ export class ApprovalMetricsRepository implements IApprovalMetricsRepository {
   }
 
   async createBulkMetrics(metrics: Partial<ApprovalMetrics>[]): Promise<ApprovalMetrics[]> {
-    const entities = metrics.map(metric => 
+    const entities = metrics.map(metric =>
       this.repository.create({
         ...metric,
         recordedAt: metric.recordedAt || new Date(),
-      })
+      }),
     );
-    
+
     return await this.repository.save(entities);
   }
 }

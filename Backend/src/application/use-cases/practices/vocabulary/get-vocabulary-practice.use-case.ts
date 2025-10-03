@@ -4,13 +4,11 @@ import { IVocabularyPracticeRepository } from '../../../interfaces/repositories/
 
 @Injectable()
 export class GetVocabularyPracticeUseCase {
-  constructor(
-    private readonly vocabularyPracticeRepository: IVocabularyPracticeRepository,
-  ) {}
+  constructor(private readonly vocabularyPracticeRepository: IVocabularyPracticeRepository) {}
 
   async execute(practiceId: string, userId: string): Promise<VocabularyPractice> {
     const practice = await this.vocabularyPracticeRepository.findById(practiceId);
-    
+
     if (!practice) {
       throw new NotFoundException('Vocabulary practice not found');
     }
@@ -25,7 +23,7 @@ export class GetVocabularyPracticeUseCase {
 
   async getBySessionId(sessionId: string, userId: string): Promise<VocabularyPractice> {
     const practice = await this.vocabularyPracticeRepository.findByPracticeSessionId(sessionId);
-    
+
     if (!practice) {
       throw new NotFoundException('Vocabulary practice not found for this session');
     }

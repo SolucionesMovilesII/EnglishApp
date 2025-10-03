@@ -1,5 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PracticeSession, PracticeType, PracticeStatus } from '../../../../domain/entities/practice-session.entity';
+import {
+  PracticeSession,
+  PracticeType,
+  PracticeStatus,
+} from '../../../../domain/entities/practice-session.entity';
 import { ReadingPractice } from '../../../../domain/entities/reading-practice.entity';
 import { IPracticeSessionRepository } from '../../../interfaces/repositories/practice-session-repository.interface';
 import { IReadingPracticeRepository } from '../../../interfaces/repositories/reading-practice-repository.interface';
@@ -14,12 +18,9 @@ export class CreateReadingPracticeUseCase {
     private readonly chapterRepository: IChapterRepository,
   ) {}
 
-  async execute(
-    userId: string,
-    createDto: CreateReadingPracticeDto,
-  ): Promise<ReadingPractice> {
+  async execute(userId: string, createDto: CreateReadingPracticeDto): Promise<ReadingPractice> {
     let chapter = null;
-    
+
     // Validate chapter exists if chapterId is provided
     if (createDto.chapterId) {
       chapter = await this.chapterRepository.findById(createDto.chapterId);
@@ -53,7 +54,7 @@ export class CreateReadingPracticeUseCase {
       createDto.textTitle || '',
       createDto.totalWords,
       createDto.difficultyLevel || '',
-      createDto.textCategory || ''
+      createDto.textCategory || '',
     );
 
     const savedReadingPractice = await this.readingPracticeRepository.create(readingPractice);

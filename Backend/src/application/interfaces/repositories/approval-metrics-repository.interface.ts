@@ -6,7 +6,11 @@ export interface IApprovalMetricsRepository {
   findByUserId(userId: string): Promise<ApprovalMetrics[]>;
   findByUserAndChapter(userId: string, chapterId: string): Promise<ApprovalMetrics[]>;
   findByMetricType(metricType: string): Promise<ApprovalMetrics[]>;
-  findByUserChapterAndType(userId: string, chapterId: string, metricType: string): Promise<ApprovalMetrics[]>;
+  findByUserChapterAndType(
+    userId: string,
+    chapterId: string,
+    metricType: string,
+  ): Promise<ApprovalMetrics[]>;
   findRecentMetrics(userId: string, daysBack: number): Promise<ApprovalMetrics[]>;
   update(id: string, updateData: Partial<ApprovalMetrics>): Promise<ApprovalMetrics>;
   delete(id: string): Promise<void>;

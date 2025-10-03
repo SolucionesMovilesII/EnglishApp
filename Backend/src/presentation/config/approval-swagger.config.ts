@@ -1,4 +1,4 @@
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { DocumentBuilder, SwaggerModule, OpenAPIObject } from '@nestjs/swagger';
 import { INestApplication } from '@nestjs/common';
 
 /**
@@ -11,7 +11,8 @@ export class ApprovalSwaggerConfig {
   static setup(app: INestApplication): void {
     const config = new DocumentBuilder()
       .setTitle('Motor de Reglas de Aprobación API')
-      .setDescription(`
+      .setDescription(
+        `
         API para el Motor de Reglas de Aprobación del sistema de aprendizaje de inglés.
         
         ## Características principales:
@@ -30,7 +31,8 @@ export class ApprovalSwaggerConfig {
         - **rejected**: Evaluación rechazada
         - **pending**: Evaluación pendiente
         - **requires_review**: Requiere revisión manual
-      `)
+      `,
+      )
       .setVersion('1.0')
       .addTag('approval-evaluation', 'Endpoints para evaluación de aprobación')
       .addTag('approval-rules', 'Endpoints para gestión de reglas de aprobación')
@@ -45,7 +47,7 @@ export class ApprovalSwaggerConfig {
           description: 'Token JWT para autenticación',
           in: 'header',
         },
-        'JWT-auth'
+        'JWT-auth',
       )
       .addServer('http://localhost:3000', 'Servidor de desarrollo')
       .addServer('https://api.englishapp.com', 'Servidor de producción')
@@ -92,19 +94,18 @@ export class ApprovalSwaggerConfig {
         'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui-bundle.min.js',
         'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui-standalone-preset.min.js',
       ],
-      customCssUrl: [
-        'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui.min.css',
-      ],
+      customCssUrl: ['https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui.min.css'],
     });
   }
 
   /**
    * Personaliza el documento de Swagger generado
    */
-  private static customizeDocument(document: any): void {
+  private static customizeDocument(document: OpenAPIObject): void {
     // Agregar ejemplos personalizados
     document.components = document.components || {};
-    document.components.examples = {
+    const components = document.components as Record<string, unknown>;
+    components.examples = {
       EvaluationSuccess: {
         summary: 'Evaluación exitosa',
         description: 'Ejemplo de una evaluación aprobada',
@@ -118,100 +119,110 @@ export class ApprovalSwaggerConfig {
           errors: [],
           evaluatedAt: '2024-01-15T10:30:00Z',
           nextAttemptAllowed: true,
-          remainingAttempts: 2
-        }
+          attemptNumber: 1,
+          maxAttempts: 3,
+          threshold: 80,
+          adjustedScore: 85,
+          errorsCarriedOver: 0,
+        },
       },
-      EvaluationFailure: {
-        summary: 'Evaluación fallida',
-        description: 'Ejemplo de una evaluación rechazada',
+      EvaluationRejected: {
+        summary: 'Evaluación rechazada',
+        description: 'Ejemplo de una evaluación que no cumple el umbral',
         value: {
           id: '123e4567-e89b-12d3-a456-426614174001',
           userId: 1,
           chapterId: 4,
-          score: 75,
+          score: 65,
           status: 'rejected',
           feedback: 'Necesitas mejorar en las siguientes áreas',
           errors: [
             {
               type: 'grammar',
               description: 'Error en tiempo verbal',
-              severity: 'high'
-            }
+              position: 'question_3',
+            },
+            {
+              type: 'vocabulary',
+              description: 'Palabra incorrecta',
+              position: 'question_7',
+            },
           ],
           evaluatedAt: '2024-01-15T10:30:00Z',
           nextAttemptAllowed: true,
-          remainingAttempts: 1
-        }
+          attemptNumber: 1,
+          maxAttempts: 3,
+          threshold: 100,
+          adjustedScore: 65,
+          errorsCarriedOver: 2,
+        },
       },
-      ApprovalRule: {
-        summary: 'Regla de aprobación',
-        description: 'Ejemplo de una regla de aprobación configurada',
+      RuleConfiguration: {
+        summary: 'Configuración de regla',
+        description: 'Ejemplo de configuración de regla de aprobación',
         value: {
-          id: '123e4567-e89b-12d3-a456-426614174002',
+          id: 1,
           chapterId: 4,
           minScoreThreshold: 100,
           maxAttempts: 3,
-          allowErrorCarryover: false,
+          allowErrorCarryover: true,
           isActive: true,
-          specialRequirements: {
-            requiresPerfectGrammar: true,
-            requiresPerfectPronunciation: true
-          },
           description: 'Regla especial para capítulo crítico 4',
           createdAt: '2024-01-15T10:30:00Z',
-          updatedAt: '2024-01-15T10:30:00Z'
-        }
-      }
+          updatedAt: '2024-01-15T10:30:00Z',
+        },
+      },
     };
 
     // Agregar esquemas de error personalizados
-    document.components.schemas = document.components.schemas || {};
-    document.components.schemas.ApprovalError = {
+    components.schemas = (components.schemas as Record<string, unknown>) || {};
+    const schemas = components.schemas as Record<string, unknown>;
+    schemas.ApprovalError = {
       type: 'object',
       properties: {
         statusCode: {
           type: 'number',
-          example: 400
+          example: 400,
         },
         message: {
           type: 'string',
-          example: 'No se cumplen los requisitos de aprobación'
+          example: 'No se cumplen los requisitos de aprobación',
         },
         error: {
           type: 'string',
-          example: 'ApprovalRequirementsNotMetException'
+          example: 'Bad Request',
         },
         timestamp: {
           type: 'string',
           format: 'date-time',
-          example: '2024-01-15T10:30:00Z'
+          example: '2024-01-15T10:30:00Z',
         },
         path: {
           type: 'string',
-          example: '/api/approval/evaluate'
+          example: '/api/approval/evaluate',
         },
         details: {
           type: 'object',
           properties: {
             chapterId: {
               type: 'number',
-              example: 4
+              example: 4,
             },
             requiredScore: {
               type: 'number',
-              example: 100
+              example: 100,
             },
             actualScore: {
               type: 'number',
-              example: 75
-            }
-          }
-        }
-      }
+              example: 75,
+            },
+          },
+        },
+      },
     };
 
     // Agregar información de seguridad
-    document.components.securitySchemes = document.components.securitySchemes || {};
+    components.securitySchemes = (components.securitySchemes as Record<string, unknown>) || {};
     document.security = [{ 'JWT-auth': [] }];
   }
 
@@ -225,33 +236,33 @@ export class ApprovalSwaggerConfig {
         description: 'Operaciones para evaluar aprobación de capítulos',
         externalDocs: {
           description: 'Documentación adicional',
-          url: 'https://docs.englishapp.com/approval-evaluation'
-        }
+          url: 'https://docs.englishapp.com/approval-evaluation',
+        },
       },
       {
         name: 'approval-rules',
         description: 'Gestión de reglas de aprobación por capítulo',
         externalDocs: {
           description: 'Documentación adicional',
-          url: 'https://docs.englishapp.com/approval-rules'
-        }
+          url: 'https://docs.englishapp.com/approval-rules',
+        },
       },
       {
         name: 'approval-metrics',
         description: 'Métricas y estadísticas de aprobación',
         externalDocs: {
           description: 'Documentación adicional',
-          url: 'https://docs.englishapp.com/approval-metrics'
-        }
+          url: 'https://docs.englishapp.com/approval-metrics',
+        },
       },
       {
         name: 'approval-history',
         description: 'Historial de evaluaciones de aprobación',
         externalDocs: {
           description: 'Documentación adicional',
-          url: 'https://docs.englishapp.com/approval-history'
-        }
-      }
+          url: 'https://docs.englishapp.com/approval-history',
+        },
+      },
     ];
   }
 }

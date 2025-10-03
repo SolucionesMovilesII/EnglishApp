@@ -5,20 +5,22 @@ import { GetQuizSessionsDto } from '../../../dtos/quiz-practice.dto';
 
 @Injectable()
 export class GetQuizSessionsUseCase {
-  constructor(
-    private readonly quizPracticeRepository: IQuizPracticeRepository,
-  ) {}
+  constructor(private readonly quizPracticeRepository: IQuizPracticeRepository) {}
 
-  async execute(
-    userId: string,
-    filters?: GetQuizSessionsDto,
-  ): Promise<QuizPractice[]> {
+  async execute(userId: string, filters?: GetQuizSessionsDto): Promise<QuizPractice[]> {
     const limit = filters?.limit || 10;
     const offset = filters?.offset || 0;
     return this.quizPracticeRepository.findByUserId(userId, limit, offset);
   }
 
-  async getStats(userId: string): Promise<any> {
+  async getStats(userId: string): Promise<{
+    totalSessions: number;
+    totalQuestions: number;
+    totalCorrectAnswers: number;
+    averageAccuracy: number;
+    averageTimePerQuestion: number;
+    categoriesPlayed: string[];
+  }> {
     return this.quizPracticeRepository.getStatsByUserId(userId);
   }
 

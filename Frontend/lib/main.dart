@@ -6,9 +6,7 @@ import 'providers/theme_provider.dart';
 import 'providers/locale_provider.dart';
 import 'providers/progress_provider.dart';
 import 'providers/lives_provider.dart';
-import 'providers/evaluation_provider.dart';
 import 'providers/episode_provider.dart';
-
 import 'screens/login_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/loading_screen.dart';
@@ -39,12 +37,6 @@ class EnglishApp extends StatelessWidget {
             Provider.of<AuthProvider>(context, listen: false),
           ),
           update: (context, auth, previous) => previous ?? LivesProvider(auth),
-        ),
-        ChangeNotifierProxyProvider<AuthProvider, EvaluationProvider>(
-          create: (context) => EvaluationProvider(
-            Provider.of<AuthProvider>(context, listen: false),
-          ),
-          update: (context, auth, previous) => previous ?? EvaluationProvider(auth),
         ),
       ],
       child: Consumer2<ThemeProvider, LocaleProvider>(

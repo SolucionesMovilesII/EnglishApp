@@ -1,5 +1,5 @@
 import { BadRequestException, NotFoundException } from '@nestjs/common';
-import { ApprovalController } from './approval.controller';
+import { ApprovalController, AuthenticatedRequest } from './approval.controller';
 import { ApprovalEngineService } from '../../../application/services/approval-engine.service';
 import {
   EvaluateApprovalDto,
@@ -7,15 +7,13 @@ import {
   BatchEvaluateApprovalDto,
   BatchEvaluateApprovalResponseDto,
   ConfigureApprovalRuleDto,
-  ApprovalRuleResponseDto
+  ApprovalRuleResponseDto,
 } from '../../../application/dtos/approval';
 import { EvaluationStatus } from '../../../domain/entities/approval-evaluation.entity';
 
-
-
 describe('ApprovalController', () => {
   let controller: ApprovalController;
-  let approvalEngineService: jest.Mocked<ApprovalEngineService>;
+  let approvalEngineService: Partial<ApprovalEngineService>;
 
   const mockRequest = {
     user: {
@@ -23,7 +21,7 @@ describe('ApprovalController', () => {
       email: 'test@example.com',
       role: 'student',
     },
-  } as any;
+  } as AuthenticatedRequest;
 
   const mockEvaluationResponse: EvaluateApprovalResponseDto = {
     evaluationId: 'eval-123',
@@ -62,9 +60,11 @@ describe('ApprovalController', () => {
       updateRule: jest.fn(),
       deleteRule: jest.fn(),
       canUserAttemptChapter: jest.fn(),
-    } as any;
+      getLatestEvaluation: jest.fn(),
+      getEngineStats: jest.fn(),
+    };
 
-    controller = new ApprovalController(approvalEngineService);
+    controller = new ApprovalController(approvalEngineService as ApprovalEngineService);
   });
 
   it('should be defined', () => {
@@ -81,7 +81,9 @@ describe('ApprovalController', () => {
         additionalData: { timeSpent: 300 },
       };
 
-      approvalEngineService.evaluateApproval.mockResolvedValue(mockEvaluationResponse);
+      (approvalEngineService.evaluateApproval as jest.Mock).mockResolvedValue(
+        mockEvaluationResponse,
+      );
 
       // Act
       const result = await controller.evaluateApproval(dto, mockRequest);
@@ -106,7 +108,7 @@ describe('ApprovalController', () => {
         errorsCarriedOver: 5,
       };
 
-      approvalEngineService.evaluateApproval.mockResolvedValue(rejectedResponse);
+      (approvalEngineService.evaluateApproval as jest.Mock).mockResolvedValue(rejectedResponse);
 
       // Act
       const result = await controller.evaluateApproval(dto, mockRequest);
@@ -124,14 +126,14 @@ describe('ApprovalController', () => {
         score: -5,
       };
 
-      approvalEngineService.evaluateApproval.mockRejectedValue(
-        new BadRequestException('Invalid score')
+      (approvalEngineService.evaluateApproval as jest.Mock).mockRejectedValue(
+        new BadRequestException('Invalid score'),
       );
 
       // Act & Assert
-      await expect(
-        controller.evaluateApproval(dto, mockRequest)
-      ).rejects.toThrow(BadRequestException);
+      await expect(controller.evaluateApproval(dto, mockRequest)).rejects.toThrow(
+        BadRequestException,
+      );
     });
 
     it('should handle NotFoundException', async () => {
@@ -142,14 +144,14 @@ describe('ApprovalController', () => {
         score: 80,
       };
 
-      approvalEngineService.evaluateApproval.mockRejectedValue(
-        new NotFoundException('Chapter not found')
+      (approvalEngineService.evaluateApproval as jest.Mock).mockRejectedValue(
+        new NotFoundException('Chapter not found'),
       );
 
       // Act & Assert
-      await expect(
-        controller.evaluateApproval(dto, mockRequest)
-      ).rejects.toThrow(NotFoundException);
+      await expect(controller.evaluateApproval(dto, mockRequest)).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
@@ -164,13 +166,15 @@ describe('ApprovalController', () => {
       };
       const batchResult: BatchEvaluateApprovalResponseDto = {
         results: [mockEvaluationResponse],
-        errors: [{
-          request: batchRequest.evaluations[1],
-          error: 'Evaluation failed'
-        }],
+        errors: [
+          {
+            request: batchRequest.evaluations[1],
+            error: 'Evaluation failed',
+          },
+        ],
       };
 
-      approvalEngineService.batchEvaluateApproval.mockResolvedValue(batchResult);
+      (approvalEngineService.batchEvaluateApproval as jest.Mock).mockResolvedValue(batchResult);
 
       // Act
       const result = await controller.batchEvaluateApproval(batchRequest, mockRequest);
@@ -230,8 +234,6 @@ describe('ApprovalController', () => {
     });
   });
 
-
-
   describe('error handling', () => {
     it('should handle service errors gracefully', async () => {
       const dto: EvaluateApprovalDto = {
@@ -240,13 +242,13 @@ describe('ApprovalController', () => {
         score: 85,
       };
 
-      jest.spyOn(approvalEngineService, 'evaluateApproval').mockRejectedValue(
-        new Error('Database connection failed')
-      );
+      jest
+        .spyOn(approvalEngineService, 'evaluateApproval')
+        .mockRejectedValue(new Error('Database connection failed'));
 
-      await expect(
-        controller.evaluateApproval(dto, mockRequest)
-      ).rejects.toThrow('Database connection failed');
+      await expect(controller.evaluateApproval(dto, mockRequest)).rejects.toThrow(
+        'Database connection failed',
+      );
     });
 
     it('should handle invalid input data', async () => {
@@ -256,13 +258,13 @@ describe('ApprovalController', () => {
         score: -1,
       };
 
-      jest.spyOn(approvalEngineService, 'evaluateApproval').mockRejectedValue(
-        new Error('Invalid input data')
-      );
+      jest
+        .spyOn(approvalEngineService, 'evaluateApproval')
+        .mockRejectedValue(new Error('Invalid input data'));
 
-      await expect(
-        controller.evaluateApproval(invalidDto, mockRequest)
-      ).rejects.toThrow('Invalid input data');
+      await expect(controller.evaluateApproval(invalidDto, mockRequest)).rejects.toThrow(
+        'Invalid input data',
+      );
     });
   });
 });

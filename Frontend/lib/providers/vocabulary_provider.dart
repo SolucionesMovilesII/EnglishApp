@@ -1,19 +1,48 @@
 import 'package:flutter/material.dart';
-import '../models/vocabulary_word.dart';
-import '../services/vocabulary_practice_service.dart';
 import 'progress_provider.dart';
 
+class VocabularyWord {
+  final String word;
+  final String meaning;
+  final String pronunciation;
+  final List<String> examples;
+  
+  VocabularyWord({
+    required this.word,
+    required this.meaning,
+    required this.pronunciation,
+    required this.examples,
+  });
+}
+
 class VocabularyProvider with ChangeNotifier {
-  final List<VocabularyWord> _words = VocabularyWord.getSampleWords();
   final ProgressProvider? _progressProvider;
-  final VocabularyPracticeService _vocabularyService = VocabularyPracticeService();
   final String _chapterId;
+  
+  final List<VocabularyWord> _words = [
+    VocabularyWord(
+      word: 'Apple',
+      meaning: 'A round fruit with red or green skin',
+      pronunciation: '/ˈæpəl/',
+      examples: ['I ate an apple for breakfast', 'The apple tree is blooming'],
+    ),
+    VocabularyWord(
+      word: 'Book',
+      meaning: 'A written or printed work consisting of pages',
+      pronunciation: '/bʊk/',
+      examples: ['I am reading a good book', 'She bought a new book'],
+    ),
+    VocabularyWord(
+      word: 'House',
+      meaning: 'A building for human habitation',
+      pronunciation: '/haʊs/',
+      examples: ['We live in a big house', 'The house has a garden'],
+    ),
+  ];
   
   int _currentWordIndex = 0;
   int _wordsLearned = 0;
   bool _isStudyMode = true;
-  VocabularyPracticeSession? _currentSession;
-  bool _isLoading = false;
   
   VocabularyProvider({
     ProgressProvider? progressProvider,
@@ -26,11 +55,7 @@ class VocabularyProvider with ChangeNotifier {
   VocabularyWord get currentWord => _words[_currentWordIndex];
   int get currentWordIndex => _currentWordIndex;
   int get wordsLearned => _wordsLearned;
-  bool get hasNextWord => _currentWordIndex < _words.length - 1;
-  bool get hasPreviousWord => _currentWordIndex > 0;
   bool get isStudyMode => _isStudyMode;
-  VocabularyPracticeSession? get currentSession => _currentSession;
-  bool get isLoading => _isLoading;
   bool get isLastWord => _currentWordIndex >= _words.length - 1;
   double get progress => _words.isEmpty ? 0.0 : (_currentWordIndex + 1) / _words.length;
   
@@ -114,87 +139,5 @@ class VocabularyProvider with ChangeNotifier {
   double get completionPercentage {
     if (_words.isEmpty) return 0.0;
     return (_wordsLearned / _words.length) * 100;
-  }
-  
-  // Create a new vocabulary practice session
-  Future<void> createVocabularySession({
-    required String userId,
-    required String token,
-    String? episodeId,
-  }) async {
-    _isLoading = true;
-    notifyListeners();
-    
-    try {
-      _currentSession = await _vocabularyService.createVocabularySession(
-        token: token,
-        userId: userId,
-        chapterId: _chapterId,
-        episodeId: episodeId,
-      );
-      
-      if (_currentSession != null) {
-        // Update local state based on session data
-        _wordsLearned = _currentSession!.studiedWords.length;
-      }
-    } catch (e) {
-      debugPrint('Error creating vocabulary session: $e');
-    } finally {
-      _isLoading = false;
-      notifyListeners();
-    }
-  }
-  
-  // Study a word and update session
-  Future<void> studyWord({
-    required String token,
-    required String word,
-    required String meaning,
-    bool isCorrect = true,
-  }) async {
-    if (_currentSession == null) return;
-    
-    try {
-      _currentSession = await _vocabularyService.studyWord(
-        sessionId: _currentSession!.id,
-        token: token,
-        word: word,
-        meaning: meaning,
-        isCorrect: isCorrect,
-      );
-      
-      if (_currentSession != null) {
-        _wordsLearned = _currentSession!.studiedWords.length;
-        
-        // Auto-save progress
-        _progressProvider?.onVocabularyPracticed(
-          _chapterId,
-          word,
-          _wordsLearned,
-        );
-      }
-      
-      notifyListeners();
-    } catch (e) {
-      debugPrint('Error studying word: $e');
-    }
-  }
-  
-  // Get user vocabulary statistics
-  Future<VocabularyStats?> getUserStats({
-    required String userId,
-    required String token,
-    String? timeframe,
-  }) async {
-    try {
-      return await _vocabularyService.getUserVocabularyStats(
-        userId: userId,
-        token: token,
-        timeframe: timeframe,
-      );
-    } catch (e) {
-      debugPrint('Error getting vocabulary stats: $e');
-      return null;
-    }
   }
 }

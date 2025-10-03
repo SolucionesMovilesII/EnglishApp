@@ -4,13 +4,11 @@ import { IReadingPracticeRepository } from '../../../interfaces/repositories/rea
 
 @Injectable()
 export class GetReadingPracticeUseCase {
-  constructor(
-    private readonly readingPracticeRepository: IReadingPracticeRepository,
-  ) {}
+  constructor(private readonly readingPracticeRepository: IReadingPracticeRepository) {}
 
   async execute(practiceId: string, userId: string): Promise<ReadingPractice> {
     const practice = await this.readingPracticeRepository.findById(practiceId);
-    
+
     if (!practice) {
       throw new NotFoundException('Reading practice not found');
     }
@@ -25,7 +23,7 @@ export class GetReadingPracticeUseCase {
 
   async getBySessionId(sessionId: string, userId: string): Promise<ReadingPractice> {
     const practice = await this.readingPracticeRepository.findByPracticeSessionId(sessionId);
-    
+
     if (!practice) {
       throw new NotFoundException('Reading practice not found for this session');
     }

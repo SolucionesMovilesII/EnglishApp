@@ -1,3 +1,4 @@
+/* eslint-disable */
 import {
   Controller,
   Post,
@@ -13,6 +14,14 @@ import {
   ParseUUIDPipe,
   Query,
 } from '@nestjs/common';
+
+interface AuthenticatedRequest {
+  user: {
+    sub: string;
+    role: string;
+    email?: string;
+  };
+}
 import {
   ApiTags,
   ApiOperation,
@@ -51,9 +60,7 @@ import {
 export class ReadingPracticeController {
   private readonly logger = new Logger(ReadingPracticeController.name);
 
-  constructor(
-    // TODO: Inject use cases when implemented
-  ) {}
+  constructor() {} // TODO: Inject use cases when implemented
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
@@ -77,11 +84,11 @@ export class ReadingPracticeController {
     description: 'User not authenticated',
   })
   async createReadingPractice(
-    @Request() _req: any,
+    @Request() _req: AuthenticatedRequest,
     @Body() _createDto: CreateReadingPracticeDto,
   ): Promise<ReadingPracticeResponseDto> {
     this.logger.log(`Creating reading practice for user: ${_req.user.sub}`);
-    
+
     // TODO: Implement use case
     throw new Error('Not implemented yet');
   }
@@ -113,11 +120,11 @@ export class ReadingPracticeController {
     description: 'User not authenticated',
   })
   async getReadingPractice(
-    @Request() _req: any,
+    @Request() _req: AuthenticatedRequest,
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<ReadingPracticeResponseDto> {
     this.logger.log(`Getting reading practice ${id} for user: ${_req.user.sub}`);
-    
+
     // TODO: Implement use case
     throw new Error('Not implemented yet');
   }
@@ -149,12 +156,12 @@ export class ReadingPracticeController {
     description: 'User not authenticated',
   })
   async updateReadingPractice(
-    @Request() _req: any,
+    @Request() _req: AuthenticatedRequest,
     @Param('id', ParseUUIDPipe) id: string,
     @Body() _updateDto: UpdateReadingPracticeDto,
   ): Promise<ReadingPracticeResponseDto> {
     this.logger.log(`Updating reading practice ${id} for user: ${_req.user.sub}`);
-    
+
     // TODO: Implement use case
     throw new Error('Not implemented yet');
   }
@@ -186,12 +193,12 @@ export class ReadingPracticeController {
     description: 'User not authenticated',
   })
   async updateReadingProgress(
-    @Request() _req: any,
+    @Request() _req: AuthenticatedRequest,
     @Param('id', ParseUUIDPipe) id: string,
     @Body() _progressDto: UpdateReadingProgressDto,
   ): Promise<ReadingPracticeResponseDto> {
     this.logger.log(`Updating reading progress for practice ${id}, user: ${_req.user.sub}`);
-    
+
     // TODO: Implement use case
     throw new Error('Not implemented yet');
   }
@@ -223,12 +230,12 @@ export class ReadingPracticeController {
     description: 'User not authenticated',
   })
   async answerComprehensionQuestion(
-    @Request() _req: any,
+    @Request() _req: AuthenticatedRequest,
     @Param('id', ParseUUIDPipe) id: string,
     @Body() _answerDto: AnswerComprehensionQuestionDto,
   ): Promise<ReadingPracticeResponseDto> {
     this.logger.log(`Recording comprehension answer for practice ${id}, user: ${_req.user.sub}`);
-    
+
     // TODO: Implement use case
     throw new Error('Not implemented yet');
   }
@@ -260,12 +267,12 @@ export class ReadingPracticeController {
     description: 'User not authenticated',
   })
   async addBookmark(
-    @Request() _req: any,
+    @Request() _req: AuthenticatedRequest,
     @Param('id', ParseUUIDPipe) id: string,
     @Body() _bookmarkDto: AddBookmarkDto,
   ): Promise<ReadingPracticeResponseDto> {
     this.logger.log(`Adding bookmark for practice ${id}, user: ${_req.user.sub}`);
-    
+
     // TODO: Implement use case
     throw new Error('Not implemented yet');
   }
@@ -297,12 +304,12 @@ export class ReadingPracticeController {
     description: 'User not authenticated',
   })
   async addVocabularyWord(
-    @Request() _req: any,
+    @Request() _req: AuthenticatedRequest,
     @Param('id', ParseUUIDPipe) id: string,
     @Body() _vocabularyDto: AddVocabularyWordDto,
   ): Promise<ReadingPracticeResponseDto> {
     this.logger.log(`Adding vocabulary word for practice ${id}, user: ${_req.user.sub}`);
-    
+
     // TODO: Implement use case
     throw new Error('Not implemented yet');
   }
@@ -365,7 +372,7 @@ export class ReadingPracticeController {
     description: 'User not authenticated',
   })
   async getUserReadingSessions(
-    @Request() _req: any,
+    @Request() _req: AuthenticatedRequest,
     @Param('userId', ParseUUIDPipe) userId: string,
     @Query('category') _category?: string,
     @Query('difficulty') _difficulty?: string,
@@ -374,7 +381,7 @@ export class ReadingPracticeController {
     @Query('offset') _offset?: number,
   ): Promise<ReadingPracticeResponseDto[]> {
     this.logger.log(`Getting reading sessions for user: ${userId}`);
-    
+
     // TODO: Implement use case
     throw new Error('Not implemented yet');
   }
@@ -409,12 +416,12 @@ export class ReadingPracticeController {
     description: 'User not authenticated',
   })
   async getUserReadingStats(
-    @Request() _req: any,
+    @Request() _req: AuthenticatedRequest,
     @Param('userId', ParseUUIDPipe) userId: string,
     @Query('timeframe') _timeframe?: string,
   ): Promise<ReadingStatsDto> {
     this.logger.log(`Getting reading stats for user: ${userId}`);
-    
+
     // TODO: Implement use case
     throw new Error('Not implemented yet');
   }

@@ -1,10 +1,4 @@
-import {
-  Entity,
-  Column,
-  OneToOne,
-  JoinColumn,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Entity, Column, OneToOne, JoinColumn, PrimaryGeneratedColumn } from 'typeorm';
 import { PracticeSession, PracticeType } from './practice-session.entity';
 
 @Entity('vocabulary_practices')
@@ -90,12 +84,12 @@ export class VocabularyPractice {
     this.currentWordIndex++;
     this.wordsStudied++;
     this.lastWordStudied = wordId;
-    
+
     if (!this.studiedWords) {
       this.studiedWords = [];
     }
     this.studiedWords.push(wordId);
-    
+
     // Update practice session time
     this.practiceSession.timeSpentSeconds += timeSpentSeconds;
   }
@@ -127,7 +121,10 @@ export class VocabularyPractice {
     }
   }
 
-  static createForSession(practiceSession: PracticeSession, difficultyLevel?: string): VocabularyPractice {
+  static createForSession(
+    practiceSession: PracticeSession,
+    difficultyLevel?: string,
+  ): VocabularyPractice {
     const vocabularyPractice = new VocabularyPractice();
     vocabularyPractice.practiceSession = practiceSession;
     vocabularyPractice.practiceSession.practiceType = PracticeType.VOCABULARY;

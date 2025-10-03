@@ -15,15 +15,11 @@ export { ApprovalMetrics } from './approval-metrics.entity';
 // Re-export all practice entities as a collection
 export const PRACTICE_ENTITIES = [
   'PracticeSession',
-  'VocabularyPractice', 
+  'VocabularyPractice',
   'QuizPractice',
   'ReadingPractice',
   'InterviewPractice',
 ];
 
 // Re-export all approval entities as a collection
-export const APPROVAL_ENTITIES = [
-  'ApprovalRule',
-  'ApprovalEvaluation',
-  'ApprovalMetrics',
-];
+export const APPROVAL_ENTITIES = ['ApprovalRule', 'ApprovalEvaluation', 'ApprovalMetrics'];

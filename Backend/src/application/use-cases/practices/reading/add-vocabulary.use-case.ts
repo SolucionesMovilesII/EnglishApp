@@ -5,9 +5,7 @@ import { AddVocabularyDto } from '../../../dtos/reading-practice.dto';
 
 @Injectable()
 export class AddVocabularyUseCase {
-  constructor(
-    private readonly readingPracticeRepository: IReadingPracticeRepository,
-  ) {}
+  constructor(private readonly readingPracticeRepository: IReadingPracticeRepository) {}
 
   async execute(
     practiceId: string,
@@ -15,7 +13,7 @@ export class AddVocabularyUseCase {
     vocabularyDto: AddVocabularyDto,
   ): Promise<ReadingPractice> {
     const practice = await this.readingPracticeRepository.findById(practiceId);
-    
+
     if (!practice) {
       throw new NotFoundException('Reading practice not found');
     }
@@ -33,15 +31,19 @@ export class AddVocabularyUseCase {
     );
 
     // Update practice
-    const updateData: any = {};
+    const updateData: Partial<{
+      vocabularyEncountered: Array<{
+        word: string;
+        definition?: string | undefined;
+        context: string;
+        position: number;
+      }>;
+    }> = {};
     if (practice.vocabularyEncountered) {
       updateData.vocabularyEncountered = practice.vocabularyEncountered;
     }
-    
-    const updatedPractice = await this.readingPracticeRepository.update(
-      practice.id,
-      updateData
-    );
+
+    const updatedPractice = await this.readingPracticeRepository.update(practice.id, updateData);
 
     return updatedPractice;
   }
@@ -52,7 +54,7 @@ export class AddVocabularyUseCase {
     word: string,
   ): Promise<ReadingPractice> {
     const practice = await this.readingPracticeRepository.findById(practiceId);
-    
+
     if (!practice) {
       throw new NotFoundException('Reading practice not found');
     }
@@ -64,20 +66,24 @@ export class AddVocabularyUseCase {
     // Remove vocabulary word
     if (practice.vocabularyEncountered) {
       practice.vocabularyEncountered = practice.vocabularyEncountered.filter(
-        vocab => vocab.word !== word
+        vocab => vocab.word !== word,
       );
     }
 
     // Update practice
-    const updateData: any = {};
+    const updateData: Partial<{
+      vocabularyEncountered: Array<{
+        word: string;
+        definition?: string | undefined;
+        context: string;
+        position: number;
+      }>;
+    }> = {};
     if (practice.vocabularyEncountered) {
       updateData.vocabularyEncountered = practice.vocabularyEncountered;
     }
-    
-    const updatedPractice = await this.readingPracticeRepository.update(
-      practice.id,
-      updateData
-    );
+
+    const updatedPractice = await this.readingPracticeRepository.update(practice.id, updateData);
 
     return updatedPractice;
   }

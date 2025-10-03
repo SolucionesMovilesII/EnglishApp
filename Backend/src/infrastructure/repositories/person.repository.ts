@@ -33,7 +33,7 @@ export class PersonRepository implements IPersonRepository {
   }
 
   async update(id: string, updatePersonDto: UpdatePersonDto): Promise<Person | null> {
-    const updateData: any = {
+    const updateData: Partial<Person> = {
       ...updatePersonDto,
     };
 

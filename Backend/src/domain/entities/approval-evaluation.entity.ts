@@ -60,7 +60,7 @@ export class ApprovalEvaluation {
   feedback!: string | null;
 
   @Column({ type: 'jsonb', nullable: true })
-  evaluationData!: Record<string, any> | null;
+  evaluationData!: Record<string, unknown> | null;
 
   @Column({ type: 'timestamptz' })
   evaluatedAt!: Date;

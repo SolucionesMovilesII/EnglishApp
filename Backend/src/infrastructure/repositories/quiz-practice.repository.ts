@@ -40,15 +40,15 @@ export class QuizPracticeRepository implements IQuizPracticeRepository {
   }
 
   async findByUserIdAndCategory(
-    userId: string, 
-    category: string, 
-    limit = 10, 
-    offset = 0
+    userId: string,
+    category: string,
+    limit = 10,
+    offset = 0,
   ): Promise<QuizPractice[]> {
     return await this.repository.find({
-      where: { 
+      where: {
         practiceSession: { userId },
-        quizCategory: category 
+        quizCategory: category,
       },
       relations: ['practiceSession', 'practiceSession.chapter'],
       order: { practiceSession: { createdAt: 'DESC' } },
@@ -58,15 +58,15 @@ export class QuizPracticeRepository implements IQuizPracticeRepository {
   }
 
   async findByUserIdAndDifficulty(
-    userId: string, 
-    difficulty: string, 
-    limit = 10, 
-    offset = 0
+    userId: string,
+    difficulty: string,
+    limit = 10,
+    offset = 0,
   ): Promise<QuizPractice[]> {
     return await this.repository.find({
-      where: { 
+      where: {
         practiceSession: { userId },
-        difficultyLevel: difficulty 
+        difficultyLevel: difficulty,
       },
       relations: ['practiceSession', 'practiceSession.chapter'],
       order: { practiceSession: { createdAt: 'DESC' } },
@@ -76,12 +76,13 @@ export class QuizPracticeRepository implements IQuizPracticeRepository {
   }
 
   async update(id: string, updates: Partial<QuizPractice>): Promise<QuizPractice> {
-    await this.repository.update(id, updates);
-    const updated = await this.findById(id);
-    if (!updated) {
-      throw new Error('Quiz practice not found after update');
+    const existing = await this.repository.findOne({ where: { id } });
+    if (!existing) {
+      throw new Error('Quiz practice not found');
     }
-    return updated;
+
+    const updated = this.repository.merge(existing, updates);
+    return await this.repository.save(updated);
   }
 
   async delete(id: string): Promise<void> {
@@ -115,12 +116,19 @@ export class QuizPracticeRepository implements IQuizPracticeRepository {
     const totalSessions = practices.length;
     const totalQuestions = practices.reduce((sum, p) => sum + p.questionsAnswered, 0);
     const totalCorrectAnswers = practices.reduce((sum, p) => sum + p.correctAnswers, 0);
-    const averageAccuracy = totalQuestions > 0 ? Math.round((totalCorrectAnswers / totalQuestions) * 100) : 0;
-    
+    const averageAccuracy =
+      totalQuestions > 0 ? Math.round((totalCorrectAnswers / totalQuestions) * 100) : 0;
+
     const totalTimeSpent = practices.reduce((sum, p) => sum + (p.averageTimePerQuestion || 0), 0);
     const averageTimePerQuestion = practices.length > 0 ? totalTimeSpent / practices.length : 0;
-    
-    const categoriesPlayed = [...new Set(practices.map(p => p.quizCategory).filter((category): category is string => Boolean(category)))];
+
+    const categoriesPlayed = [
+      ...new Set(
+        practices
+          .map(p => p.quizCategory)
+          .filter((category): category is string => Boolean(category)),
+      ),
+    ];
 
     return {
       totalSessions,
@@ -132,12 +140,14 @@ export class QuizPracticeRepository implements IQuizPracticeRepository {
     };
   }
 
-  async getAvailableCategories(): Promise<Array<{
-    category: string;
-    displayName: string;
-    description: string;
-    totalQuizzes: number;
-  }>> {
+  async getAvailableCategories(): Promise<
+    Array<{
+      category: string;
+      displayName: string;
+      description: string;
+      totalQuizzes: number;
+    }>
+  > {
     // This would typically come from a categories table or configuration
     // For now, we'll return some predefined categories
     const categories = [

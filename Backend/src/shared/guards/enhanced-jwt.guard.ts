@@ -10,6 +10,18 @@ import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
 import { JwtService, JwtPayload } from '../services/jwt.service';
 
+interface RequestWithRealIP extends Request {
+  realIP?: string;
+  user?: {
+    id: string;
+    role: string;
+    email?: string;
+    tokenId: string;
+    issuedAt: Date;
+    expiresAt: Date;
+  };
+}
+
 interface ExtendedJwtPayload extends JwtPayload {
   nbf?: number; // Not before claim
 }
@@ -40,13 +52,13 @@ export class EnhancedJwtGuard implements CanActivate {
       return true;
     }
 
-    const request = context.switchToHttp().getRequest<Request>();
+    const request = context.switchToHttp().getRequest<RequestWithRealIP>();
 
     // Extract and validate JWT token
     const token = this.extractTokenFromHeader(request);
     if (!token) {
       this.logger.warn('JWT validation failed: No token provided', {
-        ip: (request as any).realIP || request.ip,
+        ip: request.realIP || request.ip,
         method: request.method,
         path: request.path,
         userAgent: request.headers['user-agent'],
@@ -68,7 +80,7 @@ export class EnhancedJwtGuard implements CanActivate {
         this.logger.warn('JWT validation failed: Invalid token type', {
           tokenType: payload.type,
           userId: payload.sub,
-          ip: (request as any).realIP || request.ip,
+          ip: request.realIP || request.ip,
         });
 
         throw new UnauthorizedException({
@@ -83,7 +95,7 @@ export class EnhancedJwtGuard implements CanActivate {
         this.logger.warn('JWT validation failed: Invalid token claims', {
           userId: payload.sub,
           tokenId: payload.jti,
-          ip: (request as any).realIP || request.ip,
+          ip: request.realIP || request.ip,
         });
 
         throw new UnauthorizedException({
@@ -105,7 +117,7 @@ export class EnhancedJwtGuard implements CanActivate {
           userRole: payload.role,
           requiredRoles,
           path: request.path,
-          ip: (request as any).realIP || request.ip,
+          ip: request.realIP || request.ip,
         });
 
         throw new UnauthorizedException({
@@ -116,10 +128,10 @@ export class EnhancedJwtGuard implements CanActivate {
       }
 
       // Store user information in request for downstream use
-      (request as any).user = {
+      request.user = {
         id: payload.sub,
         role: payload.role,
-        email: payload.email,
+        ...(payload.email && { email: payload.email }),
         tokenId: payload.jti,
         issuedAt: new Date(payload.iat * 1000),
         expiresAt: new Date(payload.exp * 1000),
@@ -141,7 +153,7 @@ export class EnhancedJwtGuard implements CanActivate {
 
       this.logger.warn('JWT validation failed: Token verification error', {
         error: error instanceof Error ? error.message : 'Unknown error',
-        ip: (request as any).realIP || request.ip,
+        ip: request.realIP || request.ip,
         method: request.method,
         path: request.path,
         userAgent: request.headers['user-agent'],
@@ -184,7 +196,7 @@ export class EnhancedJwtGuard implements CanActivate {
   /**
    * Extract Bearer token from Authorization header
    */
-  private extractTokenFromHeader(request: Request): string | undefined {
+  private extractTokenFromHeader(request: RequestWithRealIP): string | undefined {
     const authHeader = request.headers.authorization;
     if (!authHeader) {
       return undefined;

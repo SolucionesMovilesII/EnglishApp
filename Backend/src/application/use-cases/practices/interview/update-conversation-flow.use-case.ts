@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException, BadRequestException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { InterviewPractice } from '../../../../domain/entities/interview-practice.entity';
 import { PracticeStatus } from '../../../../domain/entities/practice-session.entity';
 import { IInterviewPracticeRepository } from '../../../interfaces/repositories/interview-practice-repository.interface';
@@ -6,9 +11,7 @@ import { UpdateConversationFlowDto } from '../../../dtos/interview-practice.dto'
 
 @Injectable()
 export class UpdateConversationFlowUseCase {
-  constructor(
-    private readonly interviewPracticeRepository: IInterviewPracticeRepository,
-  ) {}
+  constructor(private readonly interviewPracticeRepository: IInterviewPracticeRepository) {}
 
   async execute(
     practiceId: string,
@@ -16,7 +19,7 @@ export class UpdateConversationFlowUseCase {
     _flowDto: UpdateConversationFlowDto,
   ): Promise<InterviewPractice> {
     const practice = await this.interviewPracticeRepository.findById(practiceId);
-    
+
     if (!practice) {
       throw new NotFoundException('Interview practice not found');
     }
@@ -31,10 +34,10 @@ export class UpdateConversationFlowUseCase {
 
     // Note: Conversation flow is updated through answerQuestion method
     // This method could be used for updating specific flow properties if needed
-    
+
     // Update practice (no changes needed for now)
     const updatedPractice = await this.interviewPracticeRepository.findById(practice.id);
-    
+
     if (!updatedPractice) {
       throw new NotFoundException('Practice not found after update');
     }
@@ -48,7 +51,7 @@ export class UpdateConversationFlowUseCase {
     area: string,
   ): Promise<InterviewPractice> {
     const practice = await this.interviewPracticeRepository.findById(practiceId);
-    
+
     if (!practice) {
       throw new NotFoundException('Interview practice not found');
     }
@@ -61,12 +64,9 @@ export class UpdateConversationFlowUseCase {
     practice.addAreaForImprovement(area);
 
     // Update practice
-    const updatedPractice = await this.interviewPracticeRepository.update(
-      practice.id,
-      {
-        ...(practice.areasForImprovement && { areasForImprovement: practice.areasForImprovement }),
-      }
-    );
+    const updatedPractice = await this.interviewPracticeRepository.update(practice.id, {
+      ...(practice.areasForImprovement && { areasForImprovement: practice.areasForImprovement }),
+    });
 
     return updatedPractice;
   }
@@ -77,7 +77,7 @@ export class UpdateConversationFlowUseCase {
     strength: string,
   ): Promise<InterviewPractice> {
     const practice = await this.interviewPracticeRepository.findById(practiceId);
-    
+
     if (!practice) {
       throw new NotFoundException('Interview practice not found');
     }
@@ -90,12 +90,9 @@ export class UpdateConversationFlowUseCase {
     practice.addStrength(strength);
 
     // Update practice
-    const updatedPractice = await this.interviewPracticeRepository.update(
-      practice.id,
-      {
-        ...(practice.strengthsIdentified && { strengthsIdentified: practice.strengthsIdentified }),
-      }
-    );
+    const updatedPractice = await this.interviewPracticeRepository.update(practice.id, {
+      ...(practice.strengthsIdentified && { strengthsIdentified: practice.strengthsIdentified }),
+    });
 
     return updatedPractice;
   }

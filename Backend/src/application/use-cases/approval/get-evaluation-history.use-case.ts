@@ -1,6 +1,9 @@
 import { Injectable, Inject, Logger } from '@nestjs/common';
 import { IApprovalEvaluationRepository } from '../../interfaces/repositories/approval-evaluation-repository.interface';
-import { ApprovalEvaluation, EvaluationStatus } from '../../../domain/entities/approval-evaluation.entity';
+import {
+  ApprovalEvaluation,
+  EvaluationStatus,
+} from '../../../domain/entities/approval-evaluation.entity';
 
 export interface GetEvaluationHistoryRequest {
   userId: string;
@@ -20,7 +23,7 @@ export interface EvaluationHistoryItem {
   errorsFromPreviousAttempts: number;
   feedback?: string;
   evaluatedAt: Date;
-  evaluationData?: Record<string, any>;
+  evaluationData?: Record<string, unknown>;
 }
 
 export interface GetEvaluationHistoryResponse {
@@ -38,7 +41,9 @@ export class GetEvaluationHistoryUseCase {
     private readonly approvalEvaluationRepository: IApprovalEvaluationRepository,
   ) {}
 
-  async execute(evaluationRequest: GetEvaluationHistoryRequest): Promise<GetEvaluationHistoryResponse> {
+  async execute(
+    evaluationRequest: GetEvaluationHistoryRequest,
+  ): Promise<GetEvaluationHistoryResponse> {
     this.logger.log(`Getting evaluation history for user: ${evaluationRequest.userId}`);
 
     const limit = Math.min(evaluationRequest.limit || 10, 100); // Cap at 100
@@ -78,7 +83,9 @@ export class GetEvaluationHistoryUseCase {
         evaluationRequest.userId,
         evaluationRequest.chapterId,
       );
-      return allEvaluations.filter(evaluation => evaluation.userId === evaluationRequest.userId).slice(offset, offset + limit);
+      return allEvaluations
+        .filter(evaluation => evaluation.userId === evaluationRequest.userId)
+        .slice(offset, offset + limit);
     } else if (evaluationRequest.status) {
       // Filter by status only
       const allEvaluations = await this.approvalEvaluationRepository.findByStatus(
@@ -100,7 +107,8 @@ export class GetEvaluationHistoryUseCase {
         evaluationRequest.userId,
         evaluationRequest.chapterId,
       );
-      return evaluations.filter(evaluation => evaluation.status === evaluationRequest.status).length;
+      return evaluations.filter(evaluation => evaluation.status === evaluationRequest.status)
+        .length;
     } else if (evaluationRequest.chapterId) {
       const evaluations = await this.approvalEvaluationRepository.findByUserAndChapter(
         evaluationRequest.userId,
@@ -111,7 +119,8 @@ export class GetEvaluationHistoryUseCase {
       const evaluations = await this.approvalEvaluationRepository.findByStatus(
         evaluationRequest.status,
       );
-      return evaluations.filter(evaluation => evaluation.userId === evaluationRequest.userId).length;
+      return evaluations.filter(evaluation => evaluation.userId === evaluationRequest.userId)
+        .length;
     } else {
       const evaluations = await this.approvalEvaluationRepository.findByUserId(
         evaluationRequest.userId,
@@ -145,14 +154,20 @@ export class GetChapterEvaluationStatsUseCase {
     private readonly approvalEvaluationRepository: IApprovalEvaluationRepository,
   ) {}
 
-  async execute(chapterId: string): Promise<any> {
+  async execute(chapterId: string): Promise<{
+    totalEvaluations: number;
+    approvedCount: number;
+    rejectedCount: number;
+    averageScore: number;
+    averageAttempts: number;
+  }> {
     this.logger.log(`Getting evaluation stats for chapter: ${chapterId}`);
 
     try {
       const stats = await this.approvalEvaluationRepository.getChapterEvaluationStats(chapterId);
-      
+
       this.logger.log(`Retrieved stats for chapter: ${chapterId}`);
-      
+
       return stats;
     } catch (error) {
       this.logger.error(
@@ -173,9 +188,7 @@ export class GetLatestEvaluationUseCase {
   ) {}
 
   async execute(userId: string, chapterId: string): Promise<EvaluationHistoryItem | null> {
-    this.logger.log(
-      `Getting latest evaluation for user: ${userId}, chapter: ${chapterId}`,
-    );
+    this.logger.log(`Getting latest evaluation for user: ${userId}, chapter: ${chapterId}`);
 
     try {
       const evaluation = await this.approvalEvaluationRepository.findLatestByUserAndChapter(

@@ -1,5 +1,5 @@
 import { Logger } from '@nestjs/common';
-import { Request } from 'express';
+import { Request, Response } from 'express';
 
 /**
  * Base controller with common utilities for authentication controllers
@@ -90,14 +90,14 @@ export abstract class BaseAuthController {
   /**
    * Set refresh token cookie in response
    */
-  protected setRefreshTokenCookie(response: any, refreshToken: string): void {
+  protected setRefreshTokenCookie(response: Response, refreshToken: string): void {
     response.cookie('refreshToken', refreshToken, this.REFRESH_TOKEN_COOKIE_OPTIONS);
   }
 
   /**
    * Clear refresh token cookie
    */
-  protected clearRefreshTokenCookie(response: any): void {
+  protected clearRefreshTokenCookie(response: Response): void {
     response.clearCookie('refreshToken', {
       path: this.REFRESH_TOKEN_COOKIE_OPTIONS.path,
     });

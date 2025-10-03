@@ -40,15 +40,15 @@ export class ReadingPracticeRepository implements IReadingPracticeRepository {
   }
 
   async findByUserIdAndCategory(
-    userId: string, 
-    category: string, 
-    limit = 10, 
-    offset = 0
+    userId: string,
+    category: string,
+    limit = 10,
+    offset = 0,
   ): Promise<ReadingPractice[]> {
     return await this.repository.find({
-      where: { 
+      where: {
         practiceSession: { userId },
-        textCategory: category 
+        textCategory: category,
       },
       relations: ['practiceSession', 'practiceSession.chapter'],
       order: { practiceSession: { createdAt: 'DESC' } },
@@ -58,15 +58,15 @@ export class ReadingPracticeRepository implements IReadingPracticeRepository {
   }
 
   async findByUserIdAndDifficulty(
-    userId: string, 
-    difficulty: string, 
-    limit = 10, 
-    offset = 0
+    userId: string,
+    difficulty: string,
+    limit = 10,
+    offset = 0,
   ): Promise<ReadingPractice[]> {
     return await this.repository.find({
-      where: { 
+      where: {
         practiceSession: { userId },
-        difficultyLevel: difficulty 
+        difficultyLevel: difficulty,
       },
       relations: ['practiceSession', 'practiceSession.chapter'],
       order: { practiceSession: { createdAt: 'DESC' } },
@@ -76,12 +76,13 @@ export class ReadingPracticeRepository implements IReadingPracticeRepository {
   }
 
   async findCompletedByUserId(
-    userId: string, 
-    completed: boolean, 
-    limit = 10, 
-    offset = 0
+    userId: string,
+    completed: boolean,
+    limit = 10,
+    offset = 0,
   ): Promise<ReadingPractice[]> {
-    const queryBuilder = this.repository.createQueryBuilder('reading')
+    const queryBuilder = this.repository
+      .createQueryBuilder('reading')
       .leftJoinAndSelect('reading.practiceSession', 'session')
       .leftJoinAndSelect('session.chapter', 'chapter')
       .where('session.userId = :userId', { userId });
@@ -100,12 +101,13 @@ export class ReadingPracticeRepository implements IReadingPracticeRepository {
   }
 
   async update(id: string, updates: Partial<ReadingPractice>): Promise<ReadingPractice> {
-    await this.repository.update(id, updates);
-    const updated = await this.findById(id);
-    if (!updated) {
-      throw new Error('Reading practice not found after update');
+    const existing = await this.repository.findOne({ where: { id } });
+    if (!existing) {
+      throw new Error('Reading practice not found');
     }
-    return updated;
+
+    const updated = this.repository.merge(existing, updates);
+    return await this.repository.save(updated);
   }
 
   async delete(id: string): Promise<void> {
@@ -143,20 +145,33 @@ export class ReadingPracticeRepository implements IReadingPracticeRepository {
     const totalSessions = practices.length;
     const totalWordsRead = practices.reduce((sum, p) => sum + p.wordsRead, 0);
     const totalReadingTime = practices.reduce((sum, p) => sum + p.readingTimeSeconds, 0);
-    
+
     const practicesWithSpeed = practices.filter(p => p.readingSpeedWpm && p.readingSpeedWpm > 0);
-    const averageReadingSpeed = practicesWithSpeed.length > 0 
-      ? practicesWithSpeed.reduce((sum, p) => sum + (p.readingSpeedWpm || 0), 0) / practicesWithSpeed.length 
-      : 0;
+    const averageReadingSpeed =
+      practicesWithSpeed.length > 0
+        ? practicesWithSpeed.reduce((sum, p) => sum + (p.readingSpeedWpm || 0), 0) /
+          practicesWithSpeed.length
+        : 0;
 
     const practicesWithQuestions = practices.filter(p => p.comprehensionQuestionsTotal > 0);
-    const averageComprehensionScore = practicesWithQuestions.length > 0
-      ? practicesWithQuestions.reduce((sum, p) => sum + p.getComprehensionScore(), 0) / practicesWithQuestions.length
-      : 0;
+    const averageComprehensionScore =
+      practicesWithQuestions.length > 0
+        ? practicesWithQuestions.reduce((sum, p) => sum + p.getComprehensionScore(), 0) /
+          practicesWithQuestions.length
+        : 0;
 
-    const categoriesRead = [...new Set(practices.map(p => p.textCategory).filter((category): category is string => Boolean(category)))];
-    
-    const vocabularyEncountered = practices.reduce((sum, p) => sum + (p.vocabularyEncountered?.length || 0), 0);
+    const categoriesRead = [
+      ...new Set(
+        practices
+          .map(p => p.textCategory)
+          .filter((category): category is string => Boolean(category)),
+      ),
+    ];
+
+    const vocabularyEncountered = practices.reduce(
+      (sum, p) => sum + (p.vocabularyEncountered?.length || 0),
+      0,
+    );
     const bookmarksCreated = practices.reduce((sum, p) => sum + (p.bookmarks?.length || 0), 0);
 
     return {

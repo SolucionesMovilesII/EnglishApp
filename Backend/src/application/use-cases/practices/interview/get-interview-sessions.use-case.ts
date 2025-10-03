@@ -1,20 +1,29 @@
 import { Injectable } from '@nestjs/common';
-import { InterviewPractice, InterviewType } from '../../../../domain/entities/interview-practice.entity';
+import {
+  InterviewPractice,
+  InterviewType,
+} from '../../../../domain/entities/interview-practice.entity';
 import { PracticeType, PracticeStatus } from '../../../../domain/entities/practice-session.entity';
 import { IInterviewPracticeRepository } from '../../../interfaces/repositories/interview-practice-repository.interface';
 import { GetInterviewSessionsDto } from '../../../dtos/interview-practice.dto';
 
+interface QueryOptions {
+  userId: string;
+  practiceType: PracticeType;
+  chapterId?: string;
+  interviewType?: InterviewType;
+  status?: PracticeStatus | PracticeStatus[];
+}
+
 @Injectable()
 export class GetInterviewSessionsUseCase {
-  constructor(
-    private readonly interviewPracticeRepository: IInterviewPracticeRepository,
-  ) {}
+  constructor(private readonly interviewPracticeRepository: IInterviewPracticeRepository) {}
 
   async execute(
     userId: string,
     filters: GetInterviewSessionsDto,
   ): Promise<{ sessions: InterviewPractice[]; total: number }> {
-    const queryOptions: any = {
+    const queryOptions: QueryOptions = {
       userId,
       practiceType: PracticeType.INTERVIEW,
     };
@@ -29,8 +38,8 @@ export class GetInterviewSessionsUseCase {
     }
 
     if (filters.completed !== undefined) {
-      queryOptions.status = filters.completed 
-        ? PracticeStatus.COMPLETED 
+      queryOptions.status = filters.completed
+        ? PracticeStatus.COMPLETED
         : [PracticeStatus.STARTED, PracticeStatus.IN_PROGRESS];
     }
 
@@ -38,7 +47,7 @@ export class GetInterviewSessionsUseCase {
     const sessions = await this.interviewPracticeRepository.findByUserId(
       userId,
       filters.limit || 10,
-      filters.offset || 0
+      filters.offset || 0,
     );
     const total = sessions.length;
 
@@ -65,8 +74,10 @@ export class GetInterviewSessionsUseCase {
   }> {
     // TODO: Implement getUserStats method in repository
     const sessions = await this.interviewPracticeRepository.findByUserId(userId, 100, 0);
-    const completedSessions = sessions.filter(s => s.practiceSession.status === PracticeStatus.COMPLETED);
-    
+    const completedSessions = sessions.filter(
+      s => s.practiceSession.status === PracticeStatus.COMPLETED,
+    );
+
     return {
       totalSessions: sessions.length,
       completedSessions: completedSessions.length,
@@ -78,7 +89,12 @@ export class GetInterviewSessionsUseCase {
       totalQuestionsAnswered: 0,
       averageResponseTime: 0,
       totalTimeSpent: 0,
-      interviewTypeStats: {} as any,
+      interviewTypeStats: {} as {
+        [key in InterviewType]: {
+          sessions: number;
+          averageScore: number;
+        };
+      },
     };
   }
 
@@ -100,17 +116,15 @@ export class GetInterviewSessionsUseCase {
     return this.execute(userId, { interviewType, limit, offset });
   }
 
-  async getInProgressSessions(
-    userId: string,
-  ): Promise<InterviewPractice[]> {
-    const { sessions } = await this.execute(userId, { 
+  async getInProgressSessions(userId: string): Promise<InterviewPractice[]> {
+    const { sessions } = await this.execute(userId, {
       completed: false,
       limit: 50,
       offset: 0,
     });
 
-    return sessions.filter(session => 
-      session.practiceSession.status === PracticeStatus.IN_PROGRESS
+    return sessions.filter(
+      session => session.practiceSession.status === PracticeStatus.IN_PROGRESS,
     );
   }
 }

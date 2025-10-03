@@ -388,173 +388,95 @@ class AppLocalizationsEs extends AppLocalizations {
   String get noLivesRemaining => 'No lives remaining!';
 
   @override
-  String get livesResetTomorrow => 'Lives reset tomorrow';
+  String get livesResetTomorrow => 'Las vidas se reinician mañana';
 
   @override
-  String get nextResetTomorrow => 'Next reset tomorrow';
+  String get nextResetTomorrow => 'Próximo reinicio mañana';
 
   @override
-  String get refresh => 'Refresh';
+  String get refresh => 'Actualizar';
 
   @override
-  String get vocabularyChaptersTitle => 'Capítulos de Vocabulario';
+  String get repeatChapterTitle => 'Repetir Capítulo';
 
   @override
-  String get loadingVocabularyChapters =>
-      'Cargando capítulos de vocabulario...';
+  String get repeatChapterWarning =>
+      'Ya has completado este capítulo. Repetirlo no afectará tu puntuación actual, ¡pero es una excelente manera de reforzar tu aprendizaje!';
 
   @override
-  String get errorLoadingChapters => 'Error al cargar capítulos';
+  String currentScore(int score) {
+    return 'Puntuación Actual: $score puntos';
+  }
 
   @override
-  String get unknownError => 'Ocurrió un error desconocido';
+  String get repeatChapterBenefit =>
+      '¡La práctica perfecta hace la perfección! Usa esta oportunidad para fortalecer tu conocimiento.';
 
   @override
-  String get dismiss => 'Descartar';
+  String get repeatChapter => 'Repetir Capítulo';
 
   @override
-  String get tryAgain => 'Intentar de nuevo';
-
-  @override
-  String get noChaptersAvailable => 'No hay capítulos disponibles';
-
-  @override
-  String get noChaptersDescription =>
-      'Vuelve más tarde para ver nuevos capítulos de vocabulario';
-
-  @override
-  String get yourProgress => 'Tu Progreso';
-
-  @override
-  String get chaptersCompleted => 'Capítulos Completados';
-
-  @override
-  String get unlocked => 'Desbloqueado';
-
-  @override
-  String get locked => 'Bloqueado';
+  String chapterResetForRepetition(String chapterTitle) {
+    return 'El capítulo \'$chapterTitle\' ha sido reiniciado para repetición. ¡Tu puntuación original se mantiene!';
+  }
 
   @override
   String get progress => 'Progreso';
 
   @override
-  String get completed => 'Completado';
+  String get episodeContent => 'Contenido del Episodio';
 
   @override
-  String get continue_ => 'Continuar';
+  String get episodeContentPlaceholder =>
+      'El contenido del episodio se mostrará aquí';
 
   @override
-  String get start => 'Comenzar';
+  String get replayEpisode => 'Repetir Episodio';
 
   @override
-  String get chapterLocked => 'Capítulo Bloqueado';
+  String get startEpisode => 'Iniciar Episodio';
 
   @override
-  String chapterLockedDescription(int previousChapter) {
-    return 'Completa el capítulo $previousChapter para desbloquear este capítulo';
+  String startingEpisode(String episodeTitle) {
+    return 'Iniciando $episodeTitle...';
   }
 
   @override
-  String get understood => 'Entendido';
+  String get evaluationDetails => 'Evaluation Details';
 
   @override
-  String get chapterCompleted => 'Capítulo Completado';
+  String get completedDate => 'Completed Date';
 
   @override
-  String get chapterCompletedDescription =>
-      'Ya completaste este capítulo. Puedes repasarlo cuando quieras.';
+  String get attempts => 'Attempts';
 
   @override
-  String completedOn(DateTime date) {
-    final intl.DateFormat dateDateFormat = intl.DateFormat.yMd(localeName);
-    final String dateString = dateDateFormat.format(date);
-
-    return 'Completado el $dateString';
-  }
+  String get timeSpent => 'Time Spent';
 
   @override
-  String get close => 'Cerrar';
+  String get skillBreakdown => 'Skill Breakdown';
 
   @override
-  String get reviewChapter => 'Repasar Capítulo';
+  String get feedback => 'Feedback';
 
   @override
-  String get noLivesTitle => 'Sin Vidas Disponibles';
+  String get featureComingSoon => 'This feature is coming soon!';
 
   @override
-  String get noLivesMessage =>
-      'Necesitas al menos una vida para comenzar un capítulo. Las vidas se reinician diariamente.';
+  String get chapter => 'Chapter';
 
   @override
-  String nextResetAt(String time) {
-    return 'Próximo reinicio a las $time';
-  }
+  String get evaluationInfo => 'Evaluation Information';
 
   @override
-  String get repeatChapterWarning =>
-      '¿Estás seguro de que quieres repetir este capítulo? Tu progreso actual se guardará.';
+  String get chapterResults => 'Chapter Results';
 
   @override
-  String get evaluationHistory => 'Ve tu historial de evaluaciones y progreso';
+  String get allChapters => 'All Chapters';
 
   @override
-  String get currentScore => 'Puntuación Actual';
+  String get noEvaluationsFound => 'No evaluations found';
 
   @override
-  String get viewProgress => 'Ver Progreso';
-
-  @override
-  String get benefits => 'Beneficios de repetir:';
-
-  @override
-  String get improveScore => '• Mejorar tu puntuación';
-
-  @override
-  String get reinforceLearning => '• Reforzar el aprendizaje';
-
-  @override
-  String get betterUnderstanding => '• Mejor comprensión';
-
-  @override
-  String get confirm => 'Confirmar';
-
-  @override
-  String get chapterResults => 'Resultados por Capítulo';
-
-  @override
-  String get allChapters => 'Todos los Capítulos';
-
-  @override
-  String get chapter => 'Capítulo';
-
-  @override
-  String get noEvaluationsFound => 'No se encontraron evaluaciones';
-
-  @override
-  String get completeChaptersToSeeResults =>
-      'Completa capítulos para ver tus resultados aquí';
-
-  @override
-  String get evaluationInfo => 'Información de la Evaluación';
-
-  @override
-  String get completedDate => 'Fecha de Finalización';
-
-  @override
-  String get attempts => 'Intentos';
-
-  @override
-  String get timeSpent => 'Tiempo Empleado';
-
-  @override
-  String get skillBreakdown => 'Desglose por Habilidades';
-
-  @override
-  String get feedback => 'Retroalimentación';
-
-  @override
-  String get featureComingSoon => 'Función próximamente disponible';
-
-  @override
-  String get repeatChapter => 'Repetir Capítulo';
+  String get completeChaptersToSeeResults => 'Complete chapters to see results';
 }

@@ -33,7 +33,6 @@ export class GetLivesStatusUseCase {
 
       this.logger.log(`Lives status retrieved for user ${userId}: ${dailyLives.currentLives}/5`);
       return response;
-
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
       this.logger.error(`Error getting lives status for user ${userId}: ${errorMessage}`);

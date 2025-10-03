@@ -11,6 +11,10 @@ import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
 import { SecurityConfig } from '../../infrastructure/config/security/security.config';
 
+interface RequestWithRealIP extends Request {
+  realIP?: string;
+}
+
 // Decorator to skip origin validation
 export const SkipOriginValidation = () => SetMetadata('skipOriginValidation', true);
 
@@ -57,7 +61,7 @@ export class OriginValidationGuard implements CanActivate {
   /**
    * Validate the request origin
    */
-  private validateOrigin(context: ExecutionContext, request: Request): boolean {
+  private validateOrigin(context: ExecutionContext, request: RequestWithRealIP): boolean {
     const origin = request.headers.origin as string;
     const referer = request.headers.referer as string;
     const { originValidation } = this.securityConfig;
@@ -74,7 +78,7 @@ export class OriginValidationGuard implements CanActivate {
     if (originValidation.requireOriginHeader || origin) {
       if (!origin) {
         this.logger.warn('Origin validation failed: Missing Origin header', {
-          ip: (request as any).realIP || request.ip,
+          ip: request.realIP || request.ip,
           method: request.method,
           path: request.path,
           userAgent: request.headers['user-agent'],
@@ -91,7 +95,7 @@ export class OriginValidationGuard implements CanActivate {
         this.logger.warn('Origin validation failed: Origin not allowed', {
           origin,
           allowedOrigins: this.sanitizeOriginsForLogging(allowedOrigins),
-          ip: (request as any).realIP || request.ip,
+          ip: request.realIP || request.ip,
           method: request.method,
           path: request.path,
           userAgent: request.headers['user-agent'],
@@ -109,7 +113,7 @@ export class OriginValidationGuard implements CanActivate {
     if (originValidation.requireRefererHeader) {
       if (!referer) {
         this.logger.warn('Origin validation failed: Missing Referer header', {
-          ip: (request as any).realIP || request.ip,
+          ip: request.realIP || request.ip,
           method: request.method,
           path: request.path,
           userAgent: request.headers['user-agent'],
@@ -129,7 +133,7 @@ export class OriginValidationGuard implements CanActivate {
             referer,
             refererOrigin,
             allowedOrigins: this.sanitizeOriginsForLogging(allowedOrigins),
-            ip: (request as any).realIP || request.ip,
+            ip: request.realIP || request.ip,
             method: request.method,
             path: request.path,
             userAgent: request.headers['user-agent'],
@@ -146,7 +150,7 @@ export class OriginValidationGuard implements CanActivate {
         this.logger.warn('Origin validation failed: Invalid Referer format', {
           referer,
           error: errorMessage,
-          ip: (request as any).realIP || request.ip,
+          ip: request.realIP || request.ip,
           method: request.method,
           path: request.path,
           userAgent: request.headers['user-agent'],
@@ -190,7 +194,7 @@ export class OriginValidationGuard implements CanActivate {
   /**
    * Check if the request is same-origin
    */
-  private isSameOrigin(origin: string, request: Request): boolean {
+  private isSameOrigin(origin: string, request: RequestWithRealIP): boolean {
     try {
       const requestUrl = new URL(`${request.protocol}://${request.get('host')}`);
       const originUrl = new URL(origin);
@@ -204,7 +208,7 @@ export class OriginValidationGuard implements CanActivate {
   /**
    * Perform additional security checks for cross-origin requests
    */
-  private performCrossOriginSecurityChecks(request: Request, origin: string): void {
+  private performCrossOriginSecurityChecks(request: RequestWithRealIP, origin: string): void {
     // Check for suspicious patterns in cross-origin requests
     const userAgent = request.headers['user-agent'] as string;
     const contentType = request.headers['content-type'] as string;
@@ -212,7 +216,7 @@ export class OriginValidationGuard implements CanActivate {
     // Log cross-origin requests for monitoring
     this.logger.log('Cross-origin request detected', {
       origin,
-      ip: (request as any).realIP || request.ip,
+      ip: request.realIP || request.ip,
       method: request.method,
       path: request.path,
       userAgent,

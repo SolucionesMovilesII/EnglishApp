@@ -6,9 +6,7 @@ import { GetReadingSessionsDto } from '../../../dtos/reading-practice.dto';
 
 @Injectable()
 export class GetReadingSessionsUseCase {
-  constructor(
-    private readonly readingPracticeRepository: IReadingPracticeRepository,
-  ) {}
+  constructor(private readonly readingPracticeRepository: IReadingPracticeRepository) {}
 
   async execute(
     userId: string,
@@ -21,37 +19,33 @@ export class GetReadingSessionsUseCase {
     // Apply filters using available repository methods
     if (filters.textCategory) {
       sessions = await this.readingPracticeRepository.findByUserIdAndCategory(
-        userId, 
-        filters.textCategory, 
-        limit, 
-        offset
+        userId,
+        filters.textCategory,
+        limit,
+        offset,
       );
     } else if (filters.difficultyLevel) {
       sessions = await this.readingPracticeRepository.findByUserIdAndDifficulty(
-        userId, 
-        filters.difficultyLevel, 
-        limit, 
-        offset
+        userId,
+        filters.difficultyLevel,
+        limit,
+        offset,
       );
     } else if (filters.completed !== undefined) {
       sessions = await this.readingPracticeRepository.findCompletedByUserId(
-        userId, 
-        filters.completed, 
-        limit, 
-        offset
+        userId,
+        filters.completed,
+        limit,
+        offset,
       );
     } else {
-      sessions = await this.readingPracticeRepository.findByUserId(
-        userId, 
-        limit, 
-        offset
-      );
+      sessions = await this.readingPracticeRepository.findByUserId(userId, limit, offset);
     }
 
     // Filter by chapter if specified
     if (filters.chapterId) {
-      sessions = sessions.filter(session => 
-        session.practiceSession.chapterId === filters.chapterId
+      sessions = sessions.filter(
+        session => session.practiceSession.chapterId === filters.chapterId,
       );
     }
 
@@ -66,8 +60,11 @@ export class GetReadingSessionsUseCase {
     totalTimeSpent: number;
   }> {
     const stats = await this.readingPracticeRepository.getStatsByUserId(userId);
-    const completedSessions = await this.readingPracticeRepository.findCompletedByUserId(userId, true);
-    
+    const completedSessions = await this.readingPracticeRepository.findCompletedByUserId(
+      userId,
+      true,
+    );
+
     return {
       totalSessions: stats.totalSessions,
       completedSessions: completedSessions.length,
@@ -86,17 +83,15 @@ export class GetReadingSessionsUseCase {
     return this.execute(userId, { chapterId, limit, offset });
   }
 
-  async getInProgressSessions(
-    userId: string,
-  ): Promise<ReadingPractice[]> {
-    const { sessions } = await this.execute(userId, { 
+  async getInProgressSessions(userId: string): Promise<ReadingPractice[]> {
+    const { sessions } = await this.execute(userId, {
       completed: false,
       limit: 50,
       offset: 0,
     });
 
-    return sessions.filter(session => 
-      session.practiceSession.status === PracticeStatus.IN_PROGRESS
+    return sessions.filter(
+      session => session.practiceSession.status === PracticeStatus.IN_PROGRESS,
     );
   }
 }

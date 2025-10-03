@@ -7,7 +7,10 @@ export interface IChapterRepository {
   findByOrder(order: number): Promise<Chapter | null>;
   findAllOrderedByLevel(): Promise<Chapter[]>;
   findUnlockedForUser(userId: string): Promise<Chapter[]>;
-  getChapterWithProgress(chapterId: string, userId: string): Promise<{
+  getChapterWithProgress(
+    chapterId: string,
+    userId: string,
+  ): Promise<{
     chapter: Chapter;
     userProgress: UserProgress | null;
     isUnlocked: boolean;
@@ -23,6 +26,10 @@ export interface IChapterRepository {
   }>;
   unlockNextChapter(userId: string, completedChapterOrder: number): Promise<boolean>;
   getNextChapterToUnlock(completedOrder: number): Promise<Chapter | null>;
-  createInitialProgress(userId: string, chapterId: string, totalVocabularyItems: number): Promise<UserProgress>;
+  createInitialProgress(
+    userId: string,
+    chapterId: string,
+    totalVocabularyItems: number,
+  ): Promise<UserProgress>;
   markChapterCompleted(userId: string, chapterId: string): Promise<UserProgress>;
 }

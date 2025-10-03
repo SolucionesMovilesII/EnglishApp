@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException, BadRequestException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { ReadingPractice } from '../../../../domain/entities/reading-practice.entity';
 import { PracticeStatus } from '../../../../domain/entities/practice-session.entity';
 import { IReadingPracticeRepository } from '../../../interfaces/repositories/reading-practice-repository.interface';
@@ -18,7 +23,7 @@ export class UpdateReadingProgressUseCase {
     progressDto: UpdateReadingProgressDto,
   ): Promise<ReadingPractice> {
     const practice = await this.readingPracticeRepository.findById(practiceId);
-    
+
     if (!practice) {
       throw new NotFoundException('Reading practice not found');
     }
@@ -40,15 +45,12 @@ export class UpdateReadingProgressUseCase {
       readingTimeSeconds: practice.readingTimeSeconds,
       lastPosition: practice.lastPosition,
     };
-    
+
     if (practice.readingSpeedWpm !== undefined) {
       updateData.readingSpeedWpm = practice.readingSpeedWpm;
     }
-    
-    const updatedPractice = await this.readingPracticeRepository.update(
-      practice.id,
-      updateData
-    );
+
+    const updatedPractice = await this.readingPracticeRepository.update(practice.id, updateData);
 
     // Update session progress and time
     const newProgress = practice.getReadingProgress();

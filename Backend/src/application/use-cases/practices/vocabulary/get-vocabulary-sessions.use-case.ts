@@ -5,20 +5,21 @@ import { GetVocabularySessionsDto } from '../../../dtos/vocabulary-practice.dto'
 
 @Injectable()
 export class GetVocabularySessionsUseCase {
-  constructor(
-    private readonly vocabularyPracticeRepository: IVocabularyPracticeRepository,
-  ) {}
+  constructor(private readonly vocabularyPracticeRepository: IVocabularyPracticeRepository) {}
 
-  async execute(
-    userId: string,
-    filters?: GetVocabularySessionsDto,
-  ): Promise<VocabularyPractice[]> {
+  async execute(userId: string, filters?: GetVocabularySessionsDto): Promise<VocabularyPractice[]> {
     const limit = filters?.limit || 10;
     const offset = filters?.offset || 0;
     return this.vocabularyPracticeRepository.findByUserId(userId, limit, offset);
   }
 
-  async getStats(userId: string): Promise<any> {
+  async getStats(userId: string): Promise<{
+    totalSessions: number;
+    totalWordsStudied: number;
+    totalWordsLearned: number;
+    averageAccuracy: number;
+    currentStreak: number;
+  }> {
     return this.vocabularyPracticeRepository.getStatsByUserId(userId);
   }
 

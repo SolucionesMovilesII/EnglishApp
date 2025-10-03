@@ -75,7 +75,7 @@ export class VocabularyItem {
   tags!: string[] | null;
 
   @Column({ type: 'jsonb', nullable: true })
-  metadata!: Record<string, any> | null;
+  metadata!: Record<string, unknown> | null;
 
   @Column({ type: 'boolean', default: true })
   isActive!: boolean;

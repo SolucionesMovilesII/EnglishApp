@@ -40,15 +40,15 @@ export class InterviewPracticeRepository implements IInterviewPracticeRepository
   }
 
   async findByUserIdAndType(
-    userId: string, 
-    interviewType: InterviewType, 
-    limit = 10, 
-    offset = 0
+    userId: string,
+    interviewType: InterviewType,
+    limit = 10,
+    offset = 0,
   ): Promise<InterviewPractice[]> {
     return await this.repository.find({
-      where: { 
+      where: {
         practiceSession: { userId },
-        interviewType 
+        interviewType,
       },
       relations: ['practiceSession', 'practiceSession.chapter'],
       order: { practiceSession: { createdAt: 'DESC' } },
@@ -58,12 +58,13 @@ export class InterviewPracticeRepository implements IInterviewPracticeRepository
   }
 
   async update(id: string, updates: Partial<InterviewPractice>): Promise<InterviewPractice> {
-    await this.repository.update(id, updates);
-    const updated = await this.findById(id);
-    if (!updated) {
-      throw new Error('Interview practice not found after update');
+    const existing = await this.repository.findOne({ where: { id } });
+    if (!existing) {
+      throw new Error('Interview practice not found');
     }
-    return updated;
+
+    const updated = this.repository.merge(existing, updates);
+    return await this.repository.save(updated);
   }
 
   async delete(id: string): Promise<void> {
@@ -104,23 +105,31 @@ export class InterviewPracticeRepository implements IInterviewPracticeRepository
 
     const totalSessions = practices.length;
     const totalQuestionsAnswered = practices.reduce((sum, p) => sum + p.questionsAnswered, 0);
-    
-    const averageFluencyScore = practices.reduce((sum, p) => sum + p.fluencyScore, 0) / practices.length;
-    const averagePronunciationScore = practices.reduce((sum, p) => sum + p.pronunciationScore, 0) / practices.length;
-    const averageGrammarScore = practices.reduce((sum, p) => sum + p.grammarScore, 0) / practices.length;
-    const averageVocabularyScore = practices.reduce((sum, p) => sum + p.vocabularyScore, 0) / practices.length;
-    
-    const practicesWithResponseTime = practices.filter(p => p.averageResponseTime && p.averageResponseTime > 0);
-    const averageResponseTime = practicesWithResponseTime.length > 0
-      ? practicesWithResponseTime.reduce((sum, p) => sum + (p.averageResponseTime || 0), 0) / practicesWithResponseTime.length
-      : 0;
+
+    const averageFluencyScore =
+      practices.reduce((sum, p) => sum + p.fluencyScore, 0) / practices.length;
+    const averagePronunciationScore =
+      practices.reduce((sum, p) => sum + p.pronunciationScore, 0) / practices.length;
+    const averageGrammarScore =
+      practices.reduce((sum, p) => sum + p.grammarScore, 0) / practices.length;
+    const averageVocabularyScore =
+      practices.reduce((sum, p) => sum + p.vocabularyScore, 0) / practices.length;
+
+    const practicesWithResponseTime = practices.filter(
+      p => p.averageResponseTime && p.averageResponseTime > 0,
+    );
+    const averageResponseTime =
+      practicesWithResponseTime.length > 0
+        ? practicesWithResponseTime.reduce((sum, p) => sum + (p.averageResponseTime || 0), 0) /
+          practicesWithResponseTime.length
+        : 0;
 
     const interviewTypesCompleted = [...new Set(practices.map(p => p.interviewType))];
-    
+
     // Collect all areas for improvement and strengths
     const allAreasForImprovement = practices.flatMap(p => p.areasForImprovement || []);
     const allStrengthsIdentified = practices.flatMap(p => p.strengthsIdentified || []);
-    
+
     // Get unique areas and strengths
     const areasForImprovement = [...new Set(allAreasForImprovement)];
     const strengthsIdentified = [...new Set(allStrengthsIdentified)];

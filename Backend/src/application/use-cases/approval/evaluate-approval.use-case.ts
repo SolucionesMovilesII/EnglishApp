@@ -3,7 +3,10 @@ import { IApprovalRuleRepository } from '../../interfaces/repositories/approval-
 import { IApprovalEvaluationRepository } from '../../interfaces/repositories/approval-evaluation-repository.interface';
 import { IApprovalMetricsRepository } from '../../interfaces/repositories/approval-metrics-repository.interface';
 import { IUserRepository } from '../../interfaces/repositories/user-repository.interface';
-import { ApprovalEvaluation, EvaluationStatus } from '../../../domain/entities/approval-evaluation.entity';
+import {
+  ApprovalEvaluation,
+  EvaluationStatus,
+} from '../../../domain/entities/approval-evaluation.entity';
 import { ApprovalRule } from '../../../domain/entities/approval-rule.entity';
 import { ApprovalMetrics } from '../../../domain/entities/approval-metrics.entity';
 
@@ -12,7 +15,7 @@ export interface EvaluateApprovalRequest {
   chapterId: string;
   score: number;
   timeSpent?: number;
-  additionalData?: Record<string, any>;
+  additionalData?: Record<string, unknown>;
 }
 
 export interface EvaluateApprovalResponse {
@@ -84,7 +87,8 @@ export class EvaluateApprovalUseCase {
       const threshold = this.getThresholdForChapter(request.chapterId, rule);
 
       // Evaluate approval
-      const status = adjustedScore >= threshold ? EvaluationStatus.APPROVED : EvaluationStatus.REJECTED;
+      const status =
+        adjustedScore >= threshold ? EvaluationStatus.APPROVED : EvaluationStatus.REJECTED;
 
       // Create evaluation record
       const evaluation = await this.createEvaluation({
@@ -100,7 +104,13 @@ export class EvaluateApprovalUseCase {
       });
 
       // Generate feedback
-      const feedback = this.generateFeedback(status, adjustedScore, threshold, attemptNumber, errorsFromPreviousAttempts);
+      const feedback = this.generateFeedback(
+        status,
+        adjustedScore,
+        threshold,
+        attemptNumber,
+        errorsFromPreviousAttempts,
+      );
 
       // Update evaluation with feedback
       await this.approvalEvaluationRepository.update(evaluation.id, { feedback });
@@ -109,7 +119,8 @@ export class EvaluateApprovalUseCase {
       await this.recordMetrics(request, attemptNumber);
 
       // Check if user can retry
-      const canRetry = status === EvaluationStatus.REJECTED && rule.canRetryAfterFailure(attemptNumber);
+      const canRetry =
+        status === EvaluationStatus.REJECTED && rule.canRetryAfterFailure(attemptNumber);
 
       this.logger.log(
         `Evaluation completed for user: ${request.userId}, status: ${status}, attempt: ${attemptNumber}`,
@@ -161,7 +172,11 @@ export class EvaluateApprovalUseCase {
     return attemptCount + 1;
   }
 
-  private async calculateErrorCarryover(userId: string, chapterId: string, currentAttempt: number): Promise<number> {
+  private async calculateErrorCarryover(
+    userId: string,
+    chapterId: string,
+    currentAttempt: number,
+  ): Promise<number> {
     if (currentAttempt === 1) {
       return 0; // No previous attempts
     }
@@ -176,8 +191,9 @@ export class EvaluateApprovalUseCase {
     let totalErrors = 0;
     for (const attempt of previousAttempts) {
       if (attempt.status === EvaluationStatus.REJECTED) {
+        // FIXED: Use original score instead of adjustedScore to avoid double penalization
         // Each failed attempt adds penalty based on how far below threshold they were
-        const deficit = Math.max(0, attempt.threshold - attempt.getAdjustedScore());
+        const deficit = Math.max(0, attempt.threshold - attempt.score);
         totalErrors += Math.ceil(deficit / 10); // 10 points deficit = 1 error point
       }
     }
@@ -217,25 +233,30 @@ export class EvaluateApprovalUseCase {
       }
     } else {
       let feedback = `No has alcanzado el puntaje requerido. Obtuviste ${adjustedScore}% y necesitas ${threshold}%.`;
-      
+
       if (errorsCarriedOver > 0) {
         feedback += ` Se aplicó una penalización de ${errorsCarriedOver} puntos por intentos anteriores.`;
       }
-      
+
       feedback += ` Este es tu intento número ${attemptNumber}.`;
-      
+
       return feedback;
     }
   }
 
-  private async recordMetrics(request: EvaluateApprovalRequest, attemptNumber: number): Promise<void> {
+  private async recordMetrics(
+    request: EvaluateApprovalRequest,
+    attemptNumber: number,
+  ): Promise<void> {
     const metrics: Partial<ApprovalMetrics>[] = [
       ApprovalMetrics.createAccuracyMetric(request.userId, request.chapterId, request.score),
       ApprovalMetrics.createAttemptMetric(request.userId, request.chapterId, attemptNumber),
     ];
 
     if (request.timeSpent) {
-      metrics.push(ApprovalMetrics.createSpeedMetric(request.userId, request.chapterId, request.timeSpent));
+      metrics.push(
+        ApprovalMetrics.createSpeedMetric(request.userId, request.chapterId, request.timeSpent),
+      );
     }
 
     await this.approvalMetricsRepository.createBulkMetrics(metrics);
