@@ -19,9 +19,6 @@
   "home": "Home",
   "documents": "Documents",
   "book": "Book",
-  "@book": {
-    "description": "Book section title"
-  },
   "help": "Help",
   "settings": "Settings",
   "theme": "Theme",
@@ -49,31 +46,19 @@
   "initializingExperience": "Initializing your learning experience...",
   "or": "OR",
   "user": "User",
-
-  "livesRemaining": "{lives} lives remaining",
-  "@livesRemaining": {
-    "placeholders": {
-      "lives": {
-        "type": "int",
-        "example": 3
-      }
-    }
-  },
-
-  "chapterProgress": "Chapter 4/5",
+  "livesRemaining": "5/5",
+  "chapterProgress": "Cap 4/5",
   "software": "Software",
   "databases": "Databases",
-
   "navigatingToSection": "Navigating to {section} section...",
   "@navigatingToSection": {
     "placeholders": {
       "section": {
         "type": "String",
-        "example": "Vocabulary"
+        "example": "vocabulary"
       }
     }
   },
-
   "emailPasswordRequired": "Email and password are required",
   "invalidCredentials": "Invalid credentials. Please check your email and password.",
   "googleSignInFailed": "Google sign in failed",
@@ -82,7 +67,6 @@
   "errorCheckingAuth": "Error checking authentication status",
   "errorInMockLogin": "Error in mock login",
   "comingSoon": "Coming Soon",
-
   "sectionTitle": "{title} Section",
   "@sectionTitle": {
     "placeholders": {
@@ -92,26 +76,22 @@
       }
     }
   },
-
   "selectCustomColor": "Select Custom Color",
   "hue": "Hue",
   "saturation": "Saturation",
   "lightness": "Lightness",
   "quickColors": "Quick Colors",
   "selectColor": "Select Color",
-
   "quiz": "Quiz",
   "question": "Question",
   "submit": "Submit",
   "nextQuestion": "Next Question",
   "score": "Score",
   "points": "points",
-
   "completeePreviousEpisode": "Complete the previous episode to unlock this one",
   "episodeCompleted": "Episode completed - Tap to replay",
   "continueEpisode": "Continue episode",
   "completePreviousEpisode": "Complete previous episode to unlock",
-
   "playingEpisode": "Playing {episodeTitle}",
   "@playingEpisode": {
     "placeholders": {
@@ -121,7 +101,6 @@
       }
     }
   },
-
   "dontHaveAccount": "Don't have an account?",
   "signUp": "Sign Up",
   "createAccount": "Create Account",
@@ -143,7 +122,6 @@
   "signUpWithApple": "Sign up with Apple",
   "creatingAccountWithGoogle": "Creating account with Google...",
   "creatingAccountWithApple": "Creating account with Apple...",
-
   "forgotPassword": "Forgot Password?",
   "checkYourEmail": "Check Your Email",
   "forgotPasswordSubtitle": "Don't worry! Enter your email address and we'll send you a link to reset your password.",
@@ -161,61 +139,29 @@
   "openingEmailApp": "Opening email app...",
   "forgotPasswordQuestion": "Forgot your password?",
   "rememberSession": "Remember session",
-
   "folders": "Folders",
   "@folders": {
     "description": "Folders section title"
   },
-
+  "book": "Book",
+  "@book": {
+    "description": "Book section title"
+  },
   "errorLoadingLives": "Error loading lives",
   "retry": "Retry",
   "noLivesRemaining": "No lives remaining!",
+  "livesRemaining": "{lives} lives remaining",
+  "@livesRemaining": {
+    "placeholders": {
+      "lives": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
   "livesResetTomorrow": "Lives reset tomorrow",
   "nextResetTomorrow": "Next reset tomorrow",
   "refresh": "Refresh",
-
-  "repeatChapterTitle": "Repeat Chapter",
-  "repeatChapterWarning": "You've already completed this chapter. Repeating it won't affect your current score, but it's a great way to reinforce your learning.",
-
-  "currentScore": "Current score: {score} points",
-  "@currentScore": {
-    "placeholders": {
-      "score": {
-        "type": "int",
-        "example": 85
-      }
-    }
-  },
-
-  "repeatChapterBenefit": "Practice makes perfect! Use this opportunity to strengthen your knowledge.",
-  "repeatChapter": "Repeat Chapter",
-
-  "chapterResetForRepetition": "Chapter '{chapterTitle}' has been reset for repetition. Your original score is preserved!",
-  "@chapterResetForRepetition": {
-    "placeholders": {
-      "chapterTitle": {
-        "type": "String",
-        "example": "English Basics"
-      }
-    }
-  },
-
-  "progress": "Progress",
-  "episodeContent": "Episode Content",
-  "episodeContentPlaceholder": "Episode content will be displayed here",
-  "replayEpisode": "Replay Episode",
-  "startEpisode": "Start Episode",
-
-  "startingEpisode": "Starting {episodeTitle}...",
-  "@startingEpisode": {
-    "placeholders": {
-      "episodeTitle": {
-        "type": "String",
-        "example": "Episode 1"
-      }
-    }
-  },
-
   "vocabularyChaptersTitle": "Vocabulary Chapters",
   "loadingVocabularyChapters": "Loading vocabulary chapters...",
   "errorLoadingChapters": "Error loading chapters",
@@ -228,6 +174,7 @@
   "chaptersCompleted": "Chapters Completed",
   "unlocked": "Unlocked",
   "locked": "Locked",
+  "progress": "Progress",
   "completed": "Completed",
   "continue_": "Continue",
   "start": "Start",
@@ -236,8 +183,7 @@
   "@chapterLockedDescription": {
     "placeholders": {
       "previousChapter": {
-        "type": "int",
-        "example": 3
+        "type": "int"
       }
     }
   },
@@ -248,8 +194,8 @@
   "@completedOn": {
     "placeholders": {
       "date": {
-        "type": "String",
-        "example": "12/31/2025"
+        "type": "DateTime",
+        "format": "yMd"
       }
     }
   },
@@ -261,23 +207,31 @@
   "@nextResetAt": {
     "placeholders": {
       "time": {
-        "type": "String",
-        "example": "08:00"
+        "type": "String"
       }
     }
   },
-
-  "evaluationDetails": "Evaluation Details",
+  "repeatChapterWarning": "Are you sure you want to repeat this chapter? Your current progress will be saved.",
+  "evaluationHistory": "View your evaluation history and progress",
+  "currentScore": "Current Score",
+  "home": "Home",
+  "viewProgress": "View Progress",
+  "benefits": "Benefits of repeating:",
+  "improveScore": "• Improve your score",
+  "reinforceLearning": "• Reinforce learning",
+  "betterUnderstanding": "• Better understanding",
+  "confirm": "Confirm",
+  "chapterResults": "Chapter Results",
+  "allChapters": "All Chapters",
+  "chapter": "Chapter",
+  "noEvaluationsFound": "No evaluations found",
+  "completeChaptersToSeeResults": "Complete chapters to see your results here",
+  "evaluationInfo": "Evaluation Information",
   "completedDate": "Completed Date",
   "attempts": "Attempts",
   "timeSpent": "Time Spent",
   "skillBreakdown": "Skill Breakdown",
   "feedback": "Feedback",
-  "featureComingSoon": "This feature is coming soon!",
-  "chapter": "Chapter",
-  "evaluationInfo": "Evaluation Information",
-  "chapterResults": "Chapter Results",
-  "allChapters": "All Chapters",
-  "noEvaluationsFound": "No evaluations found",
-  "completeChaptersToSeeResults": "Complete chapters to see results"
+  "featureComingSoon": "Feature coming soon",
+  "repeatChapter": "Repeat Chapter"
 }

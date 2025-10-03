@@ -8,8 +8,6 @@ import 'app_localizations.dart';
 class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
-  // ======================= Common / Auth =======================
-
   @override
   String get appTitle => 'Language Learning App';
 
@@ -49,8 +47,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get continueText => 'Continue';
 
-  // ======================= Main Sections =======================
-
   @override
   String get vocabulary => 'Vocabulary';
 
@@ -66,7 +62,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get documents => 'Documents';
 
-  /// Book section title
   @override
   String get book => 'Book';
 
@@ -94,8 +89,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get system => 'System';
 
-  // ======================= Notifications =======================
-
   @override
   String get notifications => 'Notifications';
 
@@ -104,8 +97,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get notificationsDisabled => 'Notifications disabled';
-
-  // ======================= Session / UI =======================
 
   @override
   String get logout => 'Logout';
@@ -120,7 +111,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get confirmLogout => 'Confirm Logout';
 
   @override
-  String get logoutConfirmation => 'Are you sure you want to log out?';
+  String get logoutConfirmation => 'Are you sure you want to logout?';
 
   @override
   String get cancel => 'Cancel';
@@ -147,7 +138,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get loadingExperience => 'Loading your learning experience...';
 
   @override
-  String get initializingExperience => 'Initializing your learning experience...';
+  String get initializingExperience =>
+      'Initializing your learning experience...';
 
   @override
   String get or => 'OR';
@@ -155,25 +147,25 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get user => 'User';
 
-  // Lives / Progress snippets
   @override
-  String livesRemaining(int lives) => '$lives lives remaining';
+  String livesRemaining(int lives) {
+    return '$lives lives remaining';
+  }
 
   @override
-  String get chapterProgress => 'Chapter 4/5';
+  String get chapterProgress => 'Cap 4/5';
 
-  // Tech topics
   @override
   String get software => 'Software';
 
   @override
   String get databases => 'Databases';
 
-  // Navigation helper
   @override
-  String navigatingToSection(String section) => 'Navigating to $section section...';
+  String navigatingToSection(String section) {
+    return 'Navigating to $section section...';
+  }
 
-  // Auth errors
   @override
   String get emailPasswordRequired => 'Email and password are required';
 
@@ -199,11 +191,11 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get comingSoon => 'Coming Soon';
 
-  // Generic section title
   @override
-  String sectionTitle(String title) => '$title Section';
+  String sectionTitle(String title) {
+    return '$title Section';
+  }
 
-  // Color picker
   @override
   String get selectCustomColor => 'Select Custom Color';
 
@@ -222,7 +214,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get selectColor => 'Select Color';
 
-  // Quiz
   @override
   String get quiz => 'Quiz';
 
@@ -241,7 +232,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get points => 'points';
 
-  // Episodes
   @override
   String get completeePreviousEpisode =>
       'Complete the previous episode to unlock this one';
@@ -256,9 +246,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get completePreviousEpisode => 'Complete previous episode to unlock';
 
   @override
-  String playingEpisode(String episodeTitle) => 'Playing $episodeTitle';
+  String playingEpisode(String episodeTitle) {
+    return 'Playing $episodeTitle';
+  }
 
-  // Account / Register
   @override
   String get dontHaveAccount => 'Don\'t have an account?';
 
@@ -322,7 +313,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get creatingAccountWithApple => 'Creating account with Apple...';
 
-  // Forgot password
   @override
   String get forgotPassword => 'Forgot Password?';
 
@@ -373,11 +363,9 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get forgotPasswordQuestion => 'Forgot your password?';
 
-  // Misc
   @override
   String get rememberSession => 'Remember session';
 
-  /// Folders section title
   @override
   String get folders => 'Folders';
 
@@ -398,50 +386,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get refresh => 'Refresh';
-
-  // ======================= Repeat Chapter =======================
-
-  @override
-  String get repeatChapterTitle => 'Repeat Chapter';
-
-  @override
-  String get repeatChapterWarning =>
-      'You\'ve already completed this chapter. Repeating it won\'t affect your current score, but it\'s a great way to reinforce your learning!';
-
-  @override
-  String currentScore(int score) => 'Current score: $score points';
-
-  @override
-  String get repeatChapterBenefit =>
-      'Practice makes perfect! Use this opportunity to strengthen your knowledge.';
-
-  @override
-  String get repeatChapter => 'Repeat Chapter';
-
-  @override
-  String chapterResetForRepetition(String chapterTitle) =>
-      'Chapter "$chapterTitle" has been reset for repetition. Your original score is preserved!';
-
-  // These appear in some locales together with repeat chapter:
-  @override
-  String get progress => 'Progress';
-
-  @override
-  String get episodeContent => 'Episode Content';
-
-  @override
-  String get episodeContentPlaceholder => 'Episode content will be displayed here';
-
-  @override
-  String get replayEpisode => 'Replay Episode';
-
-  @override
-  String get startEpisode => 'Start Episode';
-
-  @override
-  String startingEpisode(String episodeTitle) => 'Starting $episodeTitle...';
-
-  // ======================= Vocabulary Chapters =======================
 
   @override
   String get vocabularyChaptersTitle => 'Vocabulary Chapters';
@@ -465,7 +409,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noChaptersAvailable => 'No chapters available';
 
   @override
-  String get noChaptersDescription => 'Check back later for new vocabulary chapters';
+  String get noChaptersDescription =>
+      'Check back later for new vocabulary chapters';
 
   @override
   String get yourProgress => 'Your Progress';
@@ -480,6 +425,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get locked => 'Locked';
 
   @override
+  String get progress => 'Progress';
+
+  @override
   String get completed => 'Completed';
 
   @override
@@ -492,8 +440,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get chapterLocked => 'Chapter Locked';
 
   @override
-  String chapterLockedDescription(int previousChapter) =>
-      'Complete chapter $previousChapter to unlock this chapter';
+  String chapterLockedDescription(int previousChapter) {
+    return 'Complete chapter $previousChapter to unlock this chapter';
+  }
 
   @override
   String get understood => 'Understood';
@@ -503,12 +452,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get chapterCompletedDescription =>
-      'You have already completed this chapter. You can review it anytime.'
+      'You have already completed this chapter. You can review it anytime.';
 
   @override
   String completedOn(DateTime date) {
     final intl.DateFormat dateDateFormat = intl.DateFormat.yMd(localeName);
     final String dateString = dateDateFormat.format(date);
+
     return 'Completed on $dateString';
   }
 
@@ -526,12 +476,56 @@ class AppLocalizationsEn extends AppLocalizations {
       'You need at least one life to start a chapter. Lives reset daily.';
 
   @override
-  String nextResetAt(String time) => 'Next reset at $time';
-
-  // ======================= Evaluation (hu-006-1) =======================
+  String nextResetAt(String time) {
+    return 'Next reset at $time';
+  }
 
   @override
-  String get evaluationDetails => 'Evaluation Details';
+  String get repeatChapterWarning =>
+      'Are you sure you want to repeat this chapter? Your current progress will be saved.';
+
+  @override
+  String get evaluationHistory => 'View your evaluation history and progress';
+
+  @override
+  String get currentScore => 'Current Score';
+
+  @override
+  String get viewProgress => 'View Progress';
+
+  @override
+  String get benefits => 'Benefits of repeating:';
+
+  @override
+  String get improveScore => '• Improve your score';
+
+  @override
+  String get reinforceLearning => '• Reinforce learning';
+
+  @override
+  String get betterUnderstanding => '• Better understanding';
+
+  @override
+  String get confirm => 'Confirm';
+
+  @override
+  String get chapterResults => 'Chapter Results';
+
+  @override
+  String get allChapters => 'All Chapters';
+
+  @override
+  String get chapter => 'Chapter';
+
+  @override
+  String get noEvaluationsFound => 'No evaluations found';
+
+  @override
+  String get completeChaptersToSeeResults =>
+      'Complete chapters to see your results here';
+
+  @override
+  String get evaluationInfo => 'Evaluation Information';
 
   @override
   String get completedDate => 'Completed Date';
@@ -549,23 +543,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get feedback => 'Feedback';
 
   @override
-  String get featureComingSoon => 'This feature is coming soon!';
+  String get featureComingSoon => 'Feature coming soon';
 
   @override
-  String get chapter => 'Chapter';
-
-  @override
-  String get evaluationInfo => 'Evaluation Information';
-
-  @override
-  String get chapterResults => 'Chapter Results';
-
-  @override
-  String get allChapters => 'All Chapters';
-
-  @override
-  String get noEvaluationsFound => 'No evaluations found';
-
-  @override
-  String get completeChaptersToSeeResults => 'Complete chapters to see results';
+  String get repeatChapter => 'Repeat Chapter';
 }
