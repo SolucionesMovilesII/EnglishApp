@@ -1,12 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-enum EvaluationStatus {
-  excellent,
-  passed,
-  needsImprovement,
-  failed,
-}
+enum EvaluationStatus { excellent, passed, needsImprovement, failed }
 
 class ChapterEvaluation {
   final String id;

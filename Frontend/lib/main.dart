@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+
 import 'providers/auth_provider.dart';
 import 'providers/theme_provider.dart';
 import 'providers/locale_provider.dart';
@@ -18,7 +19,7 @@ import 'utils/environment_config.dart';
 void main() {
   // Log environment configuration in development mode
   EnvironmentConfig.logConfiguration();
-  
+
   runApp(const EnglishApp());
 }
 
@@ -33,7 +34,6 @@ class EnglishApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => LocaleProvider()),
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => ProgressProvider()),
-        ChangeNotifierProvider(create: (_) => EpisodeProvider()),
         ChangeNotifierProxyProvider<AuthProvider, LivesProvider>(
           create: (context) => LivesProvider(
             Provider.of<AuthProvider>(context, listen: false),
@@ -44,8 +44,11 @@ class EnglishApp extends StatelessWidget {
           create: (context) => EvaluationProvider(
             Provider.of<AuthProvider>(context, listen: false),
           ),
-          update: (context, auth, previous) => previous ?? EvaluationProvider(auth),
+          update: (context, auth, previous) =>
+              previous ?? EvaluationProvider(auth),
         ),
+        // Si necesitas EpisodeProvider como ChangeNotifier:
+        // ChangeNotifierProvider(create: (_) => EpisodeProvider()),
       ],
       child: Consumer2<ThemeProvider, LocaleProvider>(
         builder: (context, themeProvider, localeProvider, child) {
@@ -62,16 +65,16 @@ class EnglishApp extends StatelessWidget {
               ),
             );
           }
-          
+
           return MaterialApp(
             title: 'EnglishApp',
             debugShowCheckedModeBanner: false,
-            
+
             // Theme Configuration
             theme: themeProvider.lightTheme,
             darkTheme: themeProvider.darkTheme,
             themeMode: themeProvider.themeMode,
-            
+
             // Localization Configuration
             locale: localeProvider.locale,
             localizationsDelegates: const [
@@ -81,7 +84,7 @@ class EnglishApp extends StatelessWidget {
               GlobalCupertinoLocalizations.delegate,
             ],
             supportedLocales: AppLocalizations.supportedLocales,
-            
+
             // Initial Route
             home: Consumer<AuthProvider>(
               builder: (context, authProvider, child) {

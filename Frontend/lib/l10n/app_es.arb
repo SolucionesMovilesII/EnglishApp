@@ -1,6 +1,6 @@
 {
   "@@locale": "es",
-  "appTitle": "App de Aprendizaje de English",
+  "appTitle": "App de Aprendizaje de Inglés",
   "login": "Iniciar Sesión",
   "email": "Correo electrónico",
   "password": "Contraseña",
@@ -46,19 +46,25 @@
   "initializingExperience": "Inicializando tu experiencia de aprendizaje...",
   "or": "O",
   "user": "Usuario",
-  "livesRemaining": "5/5",
+
+  "livesRemaining": "{lives}/5",
+  "@livesRemaining": {
+    "placeholders": {
+      "lives": { "type": "int", "example": 3 }
+    }
+  },
+
   "chapterProgress": "Cap 4/5",
   "software": "Software",
   "databases": "Bases de Datos",
+
   "navigatingToSection": "Navegando a la sección {section}...",
   "@navigatingToSection": {
     "placeholders": {
-      "section": {
-        "type": "String",
-        "example": "vocabulario"
-      }
+      "section": { "type": "String", "example": "Vocabulario" }
     }
   },
+
   "emailPasswordRequired": "El correo y la contraseña son requeridos",
   "invalidCredentials": "Credenciales inválidas. Verifica tu correo y contraseña.",
   "googleSignInFailed": "Error al iniciar sesión con Google",
@@ -67,42 +73,41 @@
   "errorCheckingAuth": "Error al verificar el estado de autenticación",
   "errorInMockLogin": "Error en el inicio de sesión de prueba",
   "folders": "Carpetas",
-  "book": "Libro",
   "comingSoon": "Próximamente",
+
   "sectionTitle": "Sección {title}",
   "@sectionTitle": {
     "placeholders": {
-      "title": {
-        "type": "String",
-        "example": "Vocabulario"
-      }
+      "title": { "type": "String", "example": "Vocabulario" }
     }
   },
+
   "selectCustomColor": "Seleccionar Color Personalizado",
   "hue": "Matiz",
   "saturation": "Saturación",
   "lightness": "Luminosidad",
   "quickColors": "Colores Rápidos",
   "selectColor": "Seleccionar Color",
+
   "quiz": "Quiz",
   "question": "Pregunta",
   "submit": "Enviar",
   "nextQuestion": "Siguiente Pregunta",
   "score": "Puntuación",
   "points": "puntos",
+
   "completeePreviousEpisode": "Completa el episodio anterior para desbloquear este",
   "episodeCompleted": "Episodio completado - Toca para repetir",
   "continueEpisode": "Continuar episodio",
   "completePreviousEpisode": "Completa el episodio anterior para desbloquear",
+
   "playingEpisode": "Reproduciendo {episodeTitle}",
   "@playingEpisode": {
     "placeholders": {
-      "episodeTitle": {
-        "type": "String",
-        "example": "Episodio 1"
-      }
+      "episodeTitle": { "type": "String", "example": "Episodio 1" }
     }
   },
+
   "dontHaveAccount": "¿No tienes una cuenta?",
   "signUp": "Registrarse",
   "createAccount": "Crear Cuenta",
@@ -124,6 +129,7 @@
   "signUpWithApple": "Registrarse con Apple",
   "creatingAccountWithGoogle": "Creando cuenta con Google...",
   "creatingAccountWithApple": "Creando cuenta con Apple...",
+
   "forgotPassword": "¿Olvidaste tu contraseña?",
   "checkYourEmail": "Revisa tu correo",
   "forgotPasswordSubtitle": "¡No te preocupes! Ingresa tu dirección de correo y te enviaremos un enlace para restablecer tu contraseña.",
@@ -141,6 +147,44 @@
   "openingEmailApp": "Abriendo aplicación de correo...",
   "forgotPasswordQuestion": "¿Olvidaste tu contraseña?",
   "rememberSession": "Recordar sesión",
+
+  "livesResetTomorrow": "Las vidas se reinician mañana",
+  "nextResetTomorrow": "Próximo reinicio mañana",
+  "refresh": "Actualizar",
+
+  "repeatChapterTitle": "Repetir Capítulo",
+  "repeatChapterWarning": "Ya has completado este capítulo. Repetirlo no afectará tu puntuación actual, ¡pero es una excelente manera de reforzar tu aprendizaje!",
+
+  "currentScore": "Puntuación actual: {score} puntos",
+  "@currentScore": {
+    "placeholders": {
+      "score": { "type": "int", "example": 42 }
+    }
+  },
+
+  "repeatChapterBenefit": "¡La práctica lleva a la perfección! Aprovecha esta oportunidad para fortalecer tu conocimiento.",
+  "repeatChapter": "Repetir Capítulo",
+
+  "chapterResetForRepetition": "El capítulo '{chapterTitle}' ha sido reiniciado para repetición. ¡Tu puntuación original se mantiene!",
+  "@chapterResetForRepetition": {
+    "placeholders": {
+      "chapterTitle": { "type": "String", "example": "Fundamentos de Inglés" }
+    }
+  },
+
+  "progress": "Progreso",
+  "episodeContent": "Contenido del Episodio",
+  "episodeContentPlaceholder": "El contenido del episodio se mostrará aquí",
+  "replayEpisode": "Repetir Episodio",
+  "startEpisode": "Iniciar Episodio",
+
+  "startingEpisode": "Iniciando {episodeTitle}...",
+  "@startingEpisode": {
+    "placeholders": {
+      "episodeTitle": { "type": "String", "example": "Episodio 2" }
+    }
+  },
+
   "vocabularyChaptersTitle": "Capítulos de Vocabulario",
   "loadingVocabularyChapters": "Cargando capítulos de vocabulario...",
   "errorLoadingChapters": "Error al cargar capítulos",
@@ -153,41 +197,51 @@
   "chaptersCompleted": "Capítulos Completados",
   "unlocked": "Desbloqueado",
   "locked": "Bloqueado",
-  "progress": "Progreso",
   "completed": "Completado",
   "continue_": "Continuar",
   "start": "Comenzar",
   "chapterLocked": "Capítulo Bloqueado",
+
   "chapterLockedDescription": "Completa el capítulo {previousChapter} para desbloquear este capítulo",
+  "@chapterLockedDescription": {
+    "placeholders": {
+      "previousChapter": { "type": "int", "example": 3 }
+    }
+  },
+
   "understood": "Entendido",
   "chapterCompleted": "Capítulo Completado",
   "chapterCompletedDescription": "Ya completaste este capítulo. Puedes repasarlo cuando quieras.",
+
   "completedOn": "Completado el {date}",
+  "@completedOn": {
+    "placeholders": {
+      "date": { "type": "String", "example": "31/12/2025" }
+    }
+  },
+
   "close": "Cerrar",
   "reviewChapter": "Repasar Capítulo",
   "noLivesTitle": "Sin Vidas Disponibles",
   "noLivesMessage": "Necesitas al menos una vida para comenzar un capítulo. Las vidas se reinician diariamente.",
   "nextResetAt": "Próximo reinicio a las {time}",
-  "repeatChapterWarning": "¿Estás seguro de que quieres repetir este capítulo? Tu progreso actual se guardará.",
-  "evaluationHistory": "Ve tu historial de evaluaciones y progreso",
-  "currentScore": "Puntuación Actual",
-  "viewProgress": "Ver Progreso",
-  "benefits": "Beneficios de repetir:",
-  "improveScore": "• Mejorar tu puntuación",
-  "reinforceLearning": "• Reforzar el aprendizaje",
-  "betterUnderstanding": "• Mejor comprensión",
-  "confirm": "Confirmar",
-  "chapterResults": "Resultados por Capítulo",
-  "allChapters": "Todos los Capítulos",
-  "chapter": "Capítulo",
-  "noEvaluationsFound": "No se encontraron evaluaciones",
-  "completeChaptersToSeeResults": "Completa capítulos para ver tus resultados aquí",
-  "evaluationInfo": "Información de la Evaluación",
+  "@nextResetAt": {
+    "placeholders": {
+      "time": { "type": "String", "example": "08:00" }
+    }
+  },
+
+  "evaluationDetails": "Detalles de la Evaluación",
   "completedDate": "Fecha de Finalización",
   "attempts": "Intentos",
   "timeSpent": "Tiempo Empleado",
   "skillBreakdown": "Desglose por Habilidades",
   "feedback": "Retroalimentación",
   "featureComingSoon": "Función próximamente disponible",
-  "repeatChapter": "Repetir Capítulo"
+  "chapter": "Capítulo",
+  "evaluationInfo": "Información de la Evaluación",
+  "chapterResults": "Resultados por Capítulo",
+  "allChapters": "Todos los Capítulos",
+  "noEvaluationsFound": "No se encontraron evaluaciones",
+  "completeChaptersToSeeResults": "Completa capítulos para ver resultados"
 }

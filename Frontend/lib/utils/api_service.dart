@@ -163,42 +163,6 @@ class ApiService {
     }
   }
   
-  // DELETE request method
-  Future<ApiResponse> delete(
-    String endpoint, {
-    String? token,
-  }) async {
-    try {
-      final url = Uri.parse(endpoint);
-      _logRequest('DELETE', endpoint, null);
-      
-      final response = await http.delete(
-        url,
-        headers: _getHeaders(token: token),
-      ).timeout(EnvironmentConfig.apiTimeout);
-      
-      _logResponse(response);
-      
-      return ApiResponse(
-        statusCode: response.statusCode,
-        data: _parseResponse(response.body),
-        success: response.statusCode >= 200 && response.statusCode < 300,
-        message: _extractMessage(response.body, response.statusCode),
-      );
-    } catch (e) {
-      if (EnvironmentConfig.enableLogging && EnvironmentConfig.isDevelopment) {
-        // ignore: avoid_print
-        print('❌ API Error: $e');
-      }
-      return ApiResponse(
-        statusCode: 0,
-        data: null,
-        success: false,
-        message: _handleError(e),
-      );
-    }
-  }
-  
   // Helper method to parse JSON response
   dynamic _parseResponse(String responseBody) {
     try {
