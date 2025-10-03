@@ -254,83 +254,172 @@ abstract class AppLocalizations {
   String get nextResetTomorrow;
   String get refresh;
 
-  /// No description provided for @repeatChapterTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Repeat Chapter'**
+  // ======================= Repeat Chapter (hu-005-02) =======================
+
   String get repeatChapterTitle;
+  String get repeatChapterWarning;
+  String currentScore(int score);
+  String get repeatChapterBenefit;
+  String get repeatChapter;
+  String chapterResetForRepetition(String chapterTitle);
+
+  // These appear in some locales together with repeat chapter:
+  String get progress; // generic progress label
+  String get episodeContent;
+  String get episodeContentPlaceholder;
+  String get replayEpisode;
+  String get startEpisode;
+  String startingEpisode(String episodeTitle);
+
+  // ======================= Evaluation (hu-006-1) =======================
+
+  /// 'Evaluation Details'
+  String get evaluationDetails;
+  /// 'Completed Date'
+  String get completedDate;
+  /// 'Attempts'
+  String get attempts;
+  /// 'Time Spent'
+  String get timeSpent;
+  /// 'Skill Breakdown'
+  String get skillBreakdown;
+  /// 'Feedback'
+  String get feedback;
+  /// 'This feature is coming soon!'
+  String get featureComingSoon;
+  /// 'Chapter'
+  String get chapter;
+  /// 'Evaluation Information'
+  String get evaluationInfo;
+  /// 'Chapter Results'
+  String get chapterResults;
+  /// 'All Chapters'
+  String get allChapters;
+  /// 'No evaluations found'
+  String get noEvaluationsFound;
+  /// 'Complete chapters to see results'
+  String get completeChaptersToSeeResults;
+
+  // ======================= Vocabulary Chapters (main) =======================
+
+  String get vocabularyChaptersTitle;
+  String get loadingVocabularyChapters;
+  String get errorLoadingChapters;
+  String get unknownError;
+  String get dismiss;
+  String get tryAgain;
+  String get noChaptersAvailable;
+  String get noChaptersDescription;
+  String get yourProgress;
+  String get chaptersCompleted;
+  String get unlocked;
+  String get locked;
+
+  // Shared CTAs / states used alongside vocabulary chapters
+  String get completed;
+  String get continue_;
+  String get start;
+  String get chapterLocked;
+  String chapterLockedDescription(int previousChapter);
+  String get understood;
+  String get chapterCompleted;
+  String get chapterCompletedDescription;
+  String completedOn(DateTime date);
+  String get close;
+  String get reviewChapter;
+  String get noLivesTitle;
+  String get noLivesMessage;
+  String nextResetAt(String time);
 
   /// No description provided for @repeatChapterWarning.
   ///
   /// In en, this message translates to:
-  /// **'You\'ve already completed this chapter. Repeating it won\'t affect your current score, but it\'s a great way to reinforce your learning!'**
+  /// **'Are you sure you want to repeat this chapter? Your current progress will be saved.'**
   String get repeatChapterWarning;
+
+  /// No description provided for @evaluationHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'View your evaluation history and progress'**
+  String get evaluationHistory;
 
   /// No description provided for @currentScore.
   ///
   /// In en, this message translates to:
-  /// **'Current Score: {score} points'**
-  String currentScore(int score);
+  /// **'Current Score'**
+  String get currentScore;
 
-  /// No description provided for @repeatChapterBenefit.
+  /// No description provided for @viewProgress.
   ///
   /// In en, this message translates to:
-  /// **'Perfect practice makes perfect! Use this opportunity to strengthen your knowledge.'**
-  String get repeatChapterBenefit;
+  /// **'View Progress'**
+  String get viewProgress;
 
-  /// No description provided for @repeatChapter.
+  /// No description provided for @benefits.
   ///
   /// In en, this message translates to:
-  /// **'Repeat Chapter'**
-  String get repeatChapter;
+  /// **'Benefits of repeating:'**
+  String get benefits;
 
-  /// No description provided for @chapterResetForRepetition.
+  /// No description provided for @improveScore.
   ///
   /// In en, this message translates to:
-  /// **'Chapter \'{chapterTitle}\' has been reset for repetition. Your original score is preserved!'**
-  String chapterResetForRepetition(String chapterTitle);
+  /// **'• Improve your score'**
+  String get improveScore;
 
-  /// No description provided for @progress.
+  /// No description provided for @reinforceLearning.
   ///
   /// In en, this message translates to:
-  /// **'Progress'**
-  String get progress;
+  /// **'• Reinforce learning'**
+  String get reinforceLearning;
 
-  /// No description provided for @episodeContent.
+  /// No description provided for @betterUnderstanding.
   ///
   /// In en, this message translates to:
-  /// **'Episode Content'**
-  String get episodeContent;
+  /// **'• Better understanding'**
+  String get betterUnderstanding;
 
-  /// No description provided for @episodeContentPlaceholder.
+  /// No description provided for @confirm.
   ///
   /// In en, this message translates to:
-  /// **'Episode content will be displayed here'**
-  String get episodeContentPlaceholder;
+  /// **'Confirm'**
+  String get confirm;
 
-  /// No description provided for @replayEpisode.
+  /// No description provided for @chapterResults.
   ///
   /// In en, this message translates to:
-  /// **'Replay Episode'**
-  String get replayEpisode;
+  /// **'Chapter Results'**
+  String get chapterResults;
 
-  /// No description provided for @startEpisode.
+  /// No description provided for @allChapters.
   ///
   /// In en, this message translates to:
-  /// **'Start Episode'**
-  String get startEpisode;
+  /// **'All Chapters'**
+  String get allChapters;
 
-  /// No description provided for @startingEpisode.
+  /// No description provided for @chapter.
   ///
   /// In en, this message translates to:
-  /// **'Starting {episodeTitle}...'**
-  String startingEpisode(String episodeTitle);
+  /// **'Chapter'**
+  String get chapter;
 
-  /// No description provided for @evaluationDetails.
+  /// No description provided for @noEvaluationsFound.
   ///
   /// In en, this message translates to:
-  /// **'Evaluation Details'**
-  String get evaluationDetails;
+  /// **'No evaluations found'**
+  String get noEvaluationsFound;
+
+  /// No description provided for @completeChaptersToSeeResults.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete chapters to see your results here'**
+  String get completeChaptersToSeeResults;
+
+  /// No description provided for @evaluationInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Evaluation Information'**
+  String get evaluationInfo;
 
   /// No description provided for @completedDate.
   ///
@@ -365,44 +454,14 @@ abstract class AppLocalizations {
   /// No description provided for @featureComingSoon.
   ///
   /// In en, this message translates to:
-  /// **'This feature is coming soon!'**
+  /// **'Feature coming soon'**
   String get featureComingSoon;
 
-  /// No description provided for @chapter.
+  /// No description provided for @repeatChapter.
   ///
   /// In en, this message translates to:
-  /// **'Chapter'**
-  String get chapter;
-
-  /// No description provided for @evaluationInfo.
-  ///
-  /// In en, this message translates to:
-  /// **'Evaluation Information'**
-  String get evaluationInfo;
-
-  /// No description provided for @chapterResults.
-  ///
-  /// In en, this message translates to:
-  /// **'Chapter Results'**
-  String get chapterResults;
-
-  /// No description provided for @allChapters.
-  ///
-  /// In en, this message translates to:
-  /// **'All Chapters'**
-  String get allChapters;
-
-  /// No description provided for @noEvaluationsFound.
-  ///
-  /// In en, this message translates to:
-  /// **'No evaluations found'**
-  String get noEvaluationsFound;
-
-  /// No description provided for @completeChaptersToSeeResults.
-  ///
-  /// In en, this message translates to:
-  /// **'Complete chapters to see results'**
-  String get completeChaptersToSeeResults;
+  /// **'Repeat Chapter'**
+  String get repeatChapter;
 }
 
 class _AppLocalizationsDelegate

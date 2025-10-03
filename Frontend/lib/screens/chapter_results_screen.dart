@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
-import '../models/chapter_evaluation.dart';
+import 'package:provider/provider.dart';
+
+import '../models/chapter_evaluation.dart' as chapter;
+import '../models/approval_evaluation.dart' as approval;
+
 import '../widgets/chapter_evaluation_card.dart';
 import 'evaluation_details_screen.dart';
 import '../l10n/app_localizations.dart';
-import '../providers/evaluation_provider.dart';
+import '../providers/approval_provider.dart';
 
 class ChapterResultsScreen extends StatefulWidget {
   const ChapterResultsScreen({super.key});
@@ -14,7 +18,7 @@ class ChapterResultsScreen extends StatefulWidget {
 
 class _ChapterResultsScreenState extends State<ChapterResultsScreen> {
   // Campos del branch main (se conservan por compatibilidad; el flujo usa Provider)
-  List<ChapterEvaluation> evaluations = [];
+  List<chapter.ChapterEvaluation> evaluations = [];
   bool isLoading = true;
 
   String? selectedChapter;
@@ -22,72 +26,56 @@ class _ChapterResultsScreenState extends State<ChapterResultsScreen> {
   @override
   void initState() {
     super.initState();
-    // Cargamos tras primer frame usando Provider
+    // Carga tras el primer frame usando Provider
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadEvaluations();
     });
   }
 
   Future<void> _loadEvaluations() async {
-    setState(() {
-      isLoading = true;
-    });
-
-    // TODO: Implementar carga real de datos desde el backend
-    await Future.delayed(const Duration(seconds: 1));
-
-    // Datos de ejemplo
-    evaluations = [
-      ChapterEvaluation(
-        id: '1',
-        chapterNumber: 1,
-        chapterTitle: 'Basic Greetings',
-        score: 85,
-        maxScore: 100,
-        completedAt: DateTime.now().subtract(const Duration(days: 2)),
-        status: EvaluationStatus.passed,
-        attempts: 1,
-        timeSpent: const Duration(minutes: 15),
-      ),
-      ChapterEvaluation(
-        id: '2',
-        chapterNumber: 2,
-        chapterTitle: 'Introducing Yourself',
-        score: 72,
-        maxScore: 100,
-        completedAt: DateTime.now().subtract(const Duration(days: 1)),
-        status: EvaluationStatus.needsImprovement,
-        attempts: 2,
-        timeSpent: const Duration(minutes: 22),
-      ),
-      ChapterEvaluation(
-        id: '3',
-        chapterNumber: 3,
-        chapterTitle: 'Daily Conversations',
-        score: 95,
-        maxScore: 100,
-        completedAt: DateTime.now(),
-        status: EvaluationStatus.excellent,
-        attempts: 1,
-        timeSpent: const Duration(minutes: 18),
-      ),
-    ];
-
-    setState(() {
-      isLoading = false;
-    });
+    final approvalProvider =
+        Provider.of<ApprovalProvider>(context, listen: false);
+    await approvalProvider.initializeApprovalData();
   }
 
-  List<ChapterEvaluation> _getFilteredEvaluations(
-      List<ChapterEvaluation> evaluations) {
+  List<chapter.ChapterEvaluation> _getFilteredEvaluations(
+      List<chapter.ChapterEvaluation> evaluations) {
     if (selectedChapter == null) return evaluations;
     return evaluations
         .where((eval) => eval.chapterNumber.toString() == selectedChapter)
         .toList();
   }
 
-  Set<String> _getAvailableChapters(List<ChapterEvaluation> evaluations) {
+  Set<String> _getAvailableChapters(
+      List<chapter.ChapterEvaluation> evaluations) {
     return evaluations.map((eval) => eval.chapterNumber.toString()).toSet();
+  }
+
+  List<chapter.ChapterEvaluation> _convertApprovalToChapterEvaluations(
+      List<approval.ApprovalEvaluation> approvalEvaluations) {
+    return approvalEvaluations
+        .map(
+          (approvalEval) => chapter.ChapterEvaluation(
+            id: approvalEval.id,
+            chapterNumber: int.tryParse(approvalEval.chapterId) ?? 1,
+            // Título por defecto, ApprovalEvaluation no lo trae
+            chapterTitle: 'Chapter ${approvalEval.chapterId}',
+            score: approvalEval.score.round(),
+            // Máximo por defecto (ApprovalEvaluation no lo trae)
+            maxScore: 100,
+            completedAt: approvalEval.evaluatedAt,
+            status: approvalEval.status == approval.EvaluationStatus.approved
+                ? chapter.EvaluationStatus.passed
+                : chapter.EvaluationStatus.failed,
+            attempts: approvalEval.attemptNumber,
+            // Duración por defecto (ApprovalEvaluation no lo trae)
+            timeSpent: const Duration(minutes: 0),
+            // Sin desglose de habilidades en ApprovalEvaluation
+            skillBreakdown: const [],
+            feedback: approvalEval.feedback,
+          ),
+        )
+        .toList();
   }
 
   @override
@@ -95,39 +83,49 @@ class _ChapterResultsScreenState extends State<ChapterResultsScreen> {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
 
-    return Scaffold(
-      backgroundColor: theme.colorScheme.surfaceContainer,
-      appBar: AppBar(
-        title: Text(l10n.chapterResults),
-        backgroundColor: theme.colorScheme.primary,
-        foregroundColor: theme.colorScheme.onPrimary,
-        elevation: 0,
-        centerTitle: true,
-        actions: [
-          PopupMenuButton<String>(
-            icon: const Icon(Icons.filter_list),
-            onSelected: (value) {
-              setState(() {
-                selectedChapter = value == 'all' ? null : value;
-              });
-            },
-            itemBuilder: (context) => [
-              PopupMenuItem(value: 'all', child: Text(l10n.allChapters)),
-              ...availableChapters.map(
-                (chapter) => PopupMenuItem(
-                  value: chapter,
-                  child: Text('${l10n.chapter} $chapter'),
-                ),
+    return Consumer<ApprovalProvider>(
+      builder: (context, approvalProvider, child) {
+        final approvalEvaluations = approvalProvider.userEvaluations;
+        final evaluations =
+            _convertApprovalToChapterEvaluations(approvalEvaluations);
+        final filteredEvaluations = _getFilteredEvaluations(evaluations);
+        final availableChapters = _getAvailableChapters(evaluations);
+        final isLoading = approvalProvider.isLoading;
+
+        return Scaffold(
+          backgroundColor: theme.colorScheme.surfaceContainer,
+          appBar: AppBar(
+            title: Text(l10n.chapterResults),
+            backgroundColor: theme.colorScheme.primary,
+            foregroundColor: theme.colorScheme.onPrimary,
+            elevation: 0,
+            centerTitle: true,
+            actions: [
+              PopupMenuButton<String>(
+                icon: const Icon(Icons.filter_list),
+                onSelected: (value) {
+                  setState(() {
+                    selectedChapter = value == 'all' ? null : value;
+                  });
+                },
+                itemBuilder: (context) => [
+                  PopupMenuItem(
+                    value: 'all',
+                    child: Text(l10n.allChapters),
+                  ),
+                  ...availableChapters.map(
+                    (chapterNum) => PopupMenuItem(
+                      value: chapterNum,
+                      child: Text('${l10n.chapter} $chapterNum'),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
-        ],
-      ),
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : RefreshIndicator(
-              onRefresh: _loadEvaluations,
-              child: filteredEvaluations.isEmpty
+          body: isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : approvalProvider.errorMessage != null
                   ? Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -139,7 +137,7 @@ class _ChapterResultsScreenState extends State<ChapterResultsScreen> {
                           ),
                           const SizedBox(height: 16),
                           Text(
-                            l10n.unknownError,
+                            'Error loading results',
                             style: theme.textTheme.headlineSmall?.copyWith(
                               color:
                                   theme.colorScheme.onSurface.withOpacity(0.7),
@@ -147,27 +145,24 @@ class _ChapterResultsScreenState extends State<ChapterResultsScreen> {
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            l10n.completeChaptersToSeeResults,
-                            style: theme.textTheme.bodyLarge?.copyWith(
-                              color: theme.colorScheme.onSurface.withValues(
-                                alpha: 0.7,
-                              ),
+                            approvalProvider.errorMessage!,
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: theme.colorScheme.error.withOpacity(0.8),
                             ),
                             textAlign: TextAlign.center,
                           ),
                           const SizedBox(height: 24),
                           ElevatedButton.icon(
                             onPressed: () =>
-                                evaluationProvider.getChapterEvaluations(),
+                                approvalProvider.initializeApprovalData(),
                             icon: const Icon(Icons.refresh),
-                            label: Text(l10n.tryAgain),
+                            label: Text(l10n.retry),
                           ),
                         ],
                       ),
                     )
                   : RefreshIndicator(
-                      onRefresh: () =>
-                          evaluationProvider.refreshEvaluations(),
+                      onRefresh: () => approvalProvider.refreshApprovalData(),
                       child: filteredEvaluations.isEmpty
                           ? Center(
                               child: Column(

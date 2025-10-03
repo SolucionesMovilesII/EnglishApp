@@ -9,9 +9,9 @@ class TestConfig {
   static const Duration animationTimeout = Duration(milliseconds: 500);
   
   // Test data
-  static const String validEmail = 'test@example.com';
+  static const String validEmail = 'testuser9@example.com';
   static const String invalidEmail = 'invalid-email';
-  static const String validPassword = 'password123';
+  static const String validPassword = 'password123456';
   static const String shortPassword = 'short';
   
   // Expected error messages
