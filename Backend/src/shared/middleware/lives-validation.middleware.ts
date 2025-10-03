@@ -23,15 +23,15 @@ export class LivesValidationMiddleware implements NestMiddleware {
   async use(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     // Only validate on critical requests that consume learning actions
     const criticalRoutes = [
-      '/api/v1/progress',  // When submitting progress
-      '/api/v1/quiz/',     // Quiz attempts (future)
+      '/api/v1/progress', // When submitting progress
+      '/api/v1/quiz/', // Quiz attempts (future)
       '/api/v1/exercise/', // Exercise attempts (future)
       '/api/v1/assessment/', // Assessment attempts (future)
     ];
 
     // Skip validation for non-critical routes
-    const isCriticalRoute = criticalRoutes.some(route => 
-      req.path.startsWith(route) && req.method === 'POST'
+    const isCriticalRoute = criticalRoutes.some(
+      route => req.path.startsWith(route) && req.method === 'POST',
     );
 
     if (!isCriticalRoute) {
@@ -53,26 +53,29 @@ export class LivesValidationMiddleware implements NestMiddleware {
 
       // Check if user has lives available
       if (dailyLives.currentLives <= 0) {
-        this.logger.warn(`AUDIT: User ${userId} blocked - no lives remaining for ${req.method} ${req.path}`);
-        
+        this.logger.warn(
+          `AUDIT: User ${userId} blocked - no lives remaining for ${req.method} ${req.path}`,
+        );
+
         const nextReset = this.getNextResetTime();
         const error = new NoLivesError(
           'You have no lives remaining. Try again tomorrow.',
           nextReset.toISOString(),
-          0
+          0,
         );
 
         return res.status(error.getStatus()).json(error.getResponse());
       }
 
       // Lives available, continue
-      this.logger.log(`Lives validation passed for user ${userId}. Lives available: ${dailyLives.currentLives}`);
+      this.logger.log(
+        `Lives validation passed for user ${userId}. Lives available: ${dailyLives.currentLives}`,
+      );
       next();
-
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
       this.logger.error(`Error validating lives for user ${userId}: ${errorMessage}`);
-      
+
       // On validation error, log but allow request to continue
       // This ensures the system doesn't break if lives validation fails
       this.logger.warn(`Lives validation failed, allowing request to continue`);

@@ -8,7 +8,7 @@ export interface SecurityEventDetails {
   context?: string;
   revokedTokens?: number;
   timestamp?: string;
-  [key: string]: any;
+  [key: string]: string | number | boolean | undefined;
 }
 
 @Injectable()

@@ -1,10 +1,4 @@
-import {
-  Entity,
-  Column,
-  OneToOne,
-  JoinColumn,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Entity, Column, OneToOne, JoinColumn, PrimaryGeneratedColumn } from 'typeorm';
 import { PracticeSession, PracticeType } from './practice-session.entity';
 
 @Entity('reading_practices')
@@ -76,7 +70,9 @@ export class ReadingPractice {
     if (this.comprehensionQuestionsTotal === 0) {
       return 0;
     }
-    return Math.round((this.comprehensionQuestionsCorrect / this.comprehensionQuestionsTotal) * 100);
+    return Math.round(
+      (this.comprehensionQuestionsCorrect / this.comprehensionQuestionsTotal) * 100,
+    );
   }
 
   updateReadingProgress(wordsRead: number, timeSpentSeconds: number): void {
@@ -139,12 +135,12 @@ export class ReadingPractice {
   }
 
   static createForSession(
-    practiceSession: PracticeSession, 
-    textId: string, 
-    textTitle: string, 
-    totalWords: number, 
-    difficultyLevel: string, 
-    textCategory: string
+    practiceSession: PracticeSession,
+    textId: string,
+    textTitle: string,
+    totalWords: number,
+    difficultyLevel: string,
+    textCategory: string,
   ): ReadingPractice {
     const readingPractice = new ReadingPractice();
     readingPractice.practiceSession = practiceSession;

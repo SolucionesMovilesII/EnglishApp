@@ -1,7 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { PracticeSession, PracticeType, PracticeStatus } from '../../domain/entities/practice-session.entity';
+import {
+  PracticeSession,
+  PracticeType,
+  PracticeStatus,
+} from '../../domain/entities/practice-session.entity';
 import { IPracticeSessionRepository } from '../../application/interfaces/repositories/practice-session-repository.interface';
 
 @Injectable()
@@ -33,10 +37,10 @@ export class PracticeSessionRepository implements IPracticeSessionRepository {
   }
 
   async findByUserIdAndType(
-    userId: string, 
-    practiceType: PracticeType, 
-    limit = 10, 
-    offset = 0
+    userId: string,
+    practiceType: PracticeType,
+    limit = 10,
+    offset = 0,
   ): Promise<PracticeSession[]> {
     return await this.repository.find({
       where: { userId, practiceType },
@@ -48,11 +52,14 @@ export class PracticeSessionRepository implements IPracticeSessionRepository {
   }
 
   async findByUserIdAndChapter(
-    userId: string, 
-    chapterId: string, 
-    practiceType?: PracticeType
+    userId: string,
+    chapterId: string,
+    practiceType?: PracticeType,
   ): Promise<PracticeSession[]> {
-    const where: any = { userId, chapterId };
+    const where: { userId: string; chapterId: string; practiceType?: PracticeType } = {
+      userId,
+      chapterId,
+    };
     if (practiceType) {
       where.practiceType = practiceType;
     }
@@ -65,12 +72,13 @@ export class PracticeSessionRepository implements IPracticeSessionRepository {
   }
 
   async update(id: string, updates: Partial<PracticeSession>): Promise<PracticeSession> {
-    await this.repository.update(id, updates);
-    const updated = await this.findById(id);
-    if (!updated) {
-      throw new Error('Practice session not found after update');
+    const existing = await this.repository.findOne({ where: { id } });
+    if (!existing) {
+      throw new Error('Practice session not found');
     }
-    return updated;
+
+    const updated = this.repository.merge(existing, updates);
+    return await this.repository.save(updated);
   }
 
   async delete(id: string): Promise<void> {
@@ -79,9 +87,9 @@ export class PracticeSessionRepository implements IPracticeSessionRepository {
 
   async findActiveSessionsByUser(userId: string): Promise<PracticeSession[]> {
     return await this.repository.find({
-      where: { 
-        userId, 
-        status: PracticeStatus.IN_PROGRESS 
+      where: {
+        userId,
+        status: PracticeStatus.IN_PROGRESS,
       },
       relations: ['chapter'],
       order: { createdAt: 'DESC' },

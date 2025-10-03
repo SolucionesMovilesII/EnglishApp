@@ -15,10 +15,6 @@ import { GetLivesStatusUseCase } from '../use-cases/daily-lives/get-lives-status
     ConsumeLifeUseCase,
     GetLivesStatusUseCase,
   ],
-  exports: [
-    'IDailyLivesRepository',
-    ConsumeLifeUseCase,
-    GetLivesStatusUseCase,
-  ],
+  exports: ['IDailyLivesRepository', ConsumeLifeUseCase, GetLivesStatusUseCase],
 })
 export class DailyLivesModule {}

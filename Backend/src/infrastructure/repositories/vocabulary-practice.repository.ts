@@ -40,12 +40,13 @@ export class VocabularyPracticeRepository implements IVocabularyPracticeReposito
   }
 
   async update(id: string, updates: Partial<VocabularyPractice>): Promise<VocabularyPractice> {
-    await this.repository.update(id, updates);
-    const updated = await this.findById(id);
-    if (!updated) {
-      throw new Error('Vocabulary practice not found after update');
+    const existing = await this.repository.findOne({ where: { id } });
+    if (!existing) {
+      throw new Error('Vocabulary practice not found');
     }
-    return updated;
+
+    const updated = this.repository.merge(existing, updates);
+    return await this.repository.save(updated);
   }
 
   async delete(id: string): Promise<void> {
@@ -79,12 +80,15 @@ export class VocabularyPracticeRepository implements IVocabularyPracticeReposito
     const totalWordsLearned = practices.reduce((sum, p) => sum + p.wordsLearned, 0);
     const totalAttempts = practices.reduce((sum, p) => sum + p.totalAttempts, 0);
     const totalCorrectAnswers = practices.reduce((sum, p) => sum + p.correctAnswers, 0);
-    
-    const averageAccuracy = totalAttempts > 0 ? Math.round((totalCorrectAnswers / totalAttempts) * 100) : 0;
-    
+
+    const averageAccuracy =
+      totalAttempts > 0 ? Math.round((totalCorrectAnswers / totalAttempts) * 100) : 0;
+
     // Get current streak from the most recent practice
-    const mostRecentPractice = practices.sort((a, b) => 
-      new Date(b.practiceSession.createdAt).getTime() - new Date(a.practiceSession.createdAt).getTime()
+    const mostRecentPractice = practices.sort(
+      (a, b) =>
+        new Date(b.practiceSession.createdAt).getTime() -
+        new Date(a.practiceSession.createdAt).getTime(),
     )[0];
     const currentStreak = mostRecentPractice?.streakCount || 0;
 

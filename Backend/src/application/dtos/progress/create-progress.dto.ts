@@ -34,5 +34,5 @@ export class CreateProgressDto {
   })
   @IsOptional()
   @IsObject({ message: 'Extra data must be an object' })
-  readonly extraData?: Record<string, any>;
+  readonly extraData?: Record<string, unknown>;
 }

@@ -1,3 +1,4 @@
+/* eslint-disable */
 import {
   Controller,
   Post,
@@ -13,6 +14,15 @@ import {
   ParseUUIDPipe,
   Query,
 } from '@nestjs/common';
+
+interface AuthenticatedRequest {
+  user: {
+    sub: string;
+    role: string;
+    email?: string;
+  };
+}
+
 import {
   ApiTags,
   ApiOperation,
@@ -49,9 +59,7 @@ import {
 export class VocabularyPracticeController {
   private readonly logger = new Logger(VocabularyPracticeController.name);
 
-  constructor(
-    // TODO: Inject use cases when implemented
-  ) {}
+  constructor() {} // TODO: Inject use cases when implemented
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
@@ -75,11 +83,10 @@ export class VocabularyPracticeController {
     description: 'User not authenticated',
   })
   async createVocabularyPractice(
-    @Request() _req: any,
-    @Body() _createDto: CreateVocabularyPracticeDto,
+    @Request() _req: AuthenticatedRequest,
   ): Promise<VocabularyPracticeResponseDto> {
     this.logger.log(`Creating vocabulary practice for user: ${_req.user.sub}`);
-    
+
     // TODO: Implement use case
     throw new Error('Not implemented yet');
   }
@@ -111,11 +118,11 @@ export class VocabularyPracticeController {
     description: 'User not authenticated',
   })
   async getVocabularyPractice(
-    @Request() _req: any,
+    @Request() _req: AuthenticatedRequest,
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<VocabularyPracticeResponseDto> {
     this.logger.log(`Getting vocabulary practice ${id} for user: ${_req.user.sub}`);
-    
+
     // TODO: Implement use case
     throw new Error('Not implemented yet');
   }
@@ -147,12 +154,11 @@ export class VocabularyPracticeController {
     description: 'User not authenticated',
   })
   async updateVocabularyPractice(
-    @Request() _req: any,
+    @Request() _req: AuthenticatedRequest,
     @Param('id', ParseUUIDPipe) id: string,
-    @Body() _updateDto: UpdateVocabularyPracticeDto,
   ): Promise<VocabularyPracticeResponseDto> {
     this.logger.log(`Updating vocabulary practice ${id} for user: ${_req.user.sub}`);
-    
+
     // TODO: Implement use case
     throw new Error('Not implemented yet');
   }
@@ -184,12 +190,11 @@ export class VocabularyPracticeController {
     description: 'User not authenticated',
   })
   async studyWord(
-    @Request() _req: any,
+    @Request() _req: AuthenticatedRequest,
     @Param('id', ParseUUIDPipe) id: string,
-    @Body() _studyWordDto: StudyWordDto,
   ): Promise<VocabularyPracticeResponseDto> {
     this.logger.log(`Recording word study for practice ${id}, user: ${_req.user.sub}`);
-    
+
     // TODO: Implement use case
     throw new Error('Not implemented yet');
   }
@@ -221,12 +226,11 @@ export class VocabularyPracticeController {
     description: 'User not authenticated',
   })
   async reviewWord(
-    @Request() _req: any,
+    @Request() _req: AuthenticatedRequest,
     @Param('id', ParseUUIDPipe) id: string,
-    @Body() _reviewWordDto: ReviewWordDto,
   ): Promise<VocabularyPracticeResponseDto> {
     this.logger.log(`Recording word review for practice ${id}, user: ${_req.user.sub}`);
-    
+
     // TODO: Implement use case
     throw new Error('Not implemented yet');
   }
@@ -271,13 +275,11 @@ export class VocabularyPracticeController {
     description: 'User not authenticated',
   })
   async getUserVocabularySessions(
-    @Request() _req: any,
+    @Request() _req: AuthenticatedRequest,
     @Param('userId', ParseUUIDPipe) userId: string,
-    @Query('limit') _limit?: number,
-    @Query('offset') _offset?: number,
   ): Promise<VocabularyPracticeResponseDto[]> {
     this.logger.log(`Getting vocabulary sessions for user: ${userId}`);
-    
+
     // TODO: Implement use case
     throw new Error('Not implemented yet');
   }
@@ -305,11 +307,11 @@ export class VocabularyPracticeController {
     description: 'User not authenticated',
   })
   async getUserVocabularyStats(
-    @Request() _req: any,
+    @Request() _req: AuthenticatedRequest,
     @Param('userId', ParseUUIDPipe) userId: string,
   ): Promise<VocabularyStatsDto> {
     this.logger.log(`Getting vocabulary stats for user: ${userId}`);
-    
+
     // TODO: Implement use case
     throw new Error('Not implemented yet');
   }

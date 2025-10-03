@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { UserService } from '@/application/implementations/user.service';
 import { UpdateUserDto } from '@/application/dtos/user/update-user.dto';
 import { UserResponseDto } from '@/application/dtos/user/user-response.dto';
+import { UpdatePersonDto } from '@/application/dtos/person/update-person.dto';
 
 @Injectable()
 export class UpdateUserUseCase {
@@ -132,66 +133,14 @@ export class UpdateUserUseCase {
     }
   }
 
-  private validatePersonData(person: any): void {
-    if (person.firstName !== undefined) {
-      if (person.firstName.trim().length < 2) {
-        throw new Error('First name must be at least 2 characters long');
+  private validatePersonData(person: UpdatePersonDto): void {
+    if (person.fullName !== undefined) {
+      if (person.fullName.trim().length < 2) {
+        throw new Error('Full name must be at least 2 characters long');
       }
-    }
-
-    if (person.lastName !== undefined) {
-      if (person.lastName.trim().length < 2) {
-        throw new Error('Last name must be at least 2 characters long');
+      if (person.fullName.trim().length > 100) {
+        throw new Error('Full name must not exceed 100 characters');
       }
-    }
-
-    if (person.email !== undefined) {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(person.email)) {
-        throw new Error('Invalid email format in person data');
-      }
-    }
-
-    if (person.phone !== undefined && person.phone !== null) {
-      if (!this.isValidPhone(person.phone)) {
-        throw new Error('Invalid phone number format');
-      }
-    }
-
-    if (person.document !== undefined && person.document !== null) {
-      if (person.document.trim().length < 3) {
-        throw new Error('Document number must be at least 3 characters long');
-      }
-    }
-
-    if (person.birthDate !== undefined && person.birthDate !== null) {
-      const birthDate = new Date(person.birthDate);
-      const today = new Date();
-      const age = today.getFullYear() - birthDate.getFullYear();
-
-      if (age < 13 || age > 120) {
-        throw new Error('Person must be between 13 and 120 years old');
-      }
-    }
-
-    if (person.profileImageUrl !== undefined && person.profileImageUrl !== null) {
-      if (!this.isValidUrl(person.profileImageUrl)) {
-        throw new Error('Invalid profile image URL format');
-      }
-    }
-  }
-
-  private isValidPhone(phone: string): boolean {
-    const phoneRegex = /^\+?[1-9]\d{1,14}$/;
-    return phoneRegex.test(phone.replace(/[\s\-\(\)]/g, ''));
-  }
-
-  private isValidUrl(url: string): boolean {
-    try {
-      new URL(url);
-      return true;
-    } catch {
-      return false;
     }
   }
 }

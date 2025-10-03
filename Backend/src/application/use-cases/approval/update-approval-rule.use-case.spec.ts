@@ -5,28 +5,35 @@ import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { ApprovalRule } from '../../../domain/entities/approval-rule.entity';
 import { UpdateApprovalRuleDto } from '../../dtos/approval/configure-approval-rule.dto';
 
+// Helper function for creating mock objects
+function createMockApprovalRule(overrides: Partial<ApprovalRule> = {}): ApprovalRule {
+  return {
+    id: 'rule-123',
+    name: 'Test Rule',
+    description: null,
+    chapterId: null,
+    minScoreThreshold: 80,
+    maxAttempts: 3,
+    allowErrorCarryover: false,
+    isActive: true,
+    metadata: null,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    isApplicableToChapter: () => true,
+    canRetryAfterFailure: () => true,
+    ...overrides,
+  } as ApprovalRule;
+}
+
 describe('UpdateApprovalRuleUseCase', () => {
   let useCase: UpdateApprovalRuleUseCase;
   let approvalRuleRepository: jest.Mocked<IApprovalRuleRepository>;
 
-  const mockApprovalRule: ApprovalRule = {
-    id: 'rule-123',
-    name: 'Test Rule',
+  const mockApprovalRule = createMockApprovalRule({
     chapterId: '1',
-    minScoreThreshold: 80,
-    maxAttempts: 3,
     allowErrorCarryover: true,
-    isActive: true,
     description: 'Test rule',
-    metadata: null,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    isApplicableToChapter: jest.fn(),
-    isScoreApproved: jest.fn(),
-    hasSpecialRequirements: jest.fn(),
-    getThresholdPercentage: jest.fn(),
-    canRetryAfterFailure: jest.fn()
-  } as ApprovalRule;
+  });
 
   beforeEach(async () => {
     const mockRepository = {
@@ -62,16 +69,13 @@ describe('UpdateApprovalRuleUseCase', () => {
       };
 
       approvalRuleRepository.findById.mockResolvedValue(mockApprovalRule);
-      approvalRuleRepository.update.mockResolvedValue({
-        ...mockApprovalRule,
-        ...dto,
-        updatedAt: new Date(),
-        isApplicableToChapter: jest.fn(),
-        isScoreApproved: jest.fn(),
-        hasSpecialRequirements: jest.fn(),
-        getThresholdPercentage: jest.fn(),
-        canRetryAfterFailure: jest.fn()
-      } as ApprovalRule);
+      approvalRuleRepository.update.mockResolvedValue(
+        createMockApprovalRule({
+          ...mockApprovalRule,
+          ...dto,
+          updatedAt: new Date(),
+        }),
+      );
 
       // Act
       const result = await useCase.execute('rule-123', dto);
@@ -93,9 +97,7 @@ describe('UpdateApprovalRuleUseCase', () => {
       approvalRuleRepository.findById.mockResolvedValue(null);
 
       // Act & Assert
-      await expect(
-        useCase.execute('non-existent-rule', dto)
-      ).rejects.toThrow(NotFoundException);
+      await expect(useCase.execute('non-existent-rule', dto)).rejects.toThrow(NotFoundException);
     });
 
     it('should validate threshold range', async () => {
@@ -107,9 +109,7 @@ describe('UpdateApprovalRuleUseCase', () => {
       approvalRuleRepository.findById.mockResolvedValue(mockApprovalRule);
 
       // Act & Assert
-      await expect(
-        useCase.execute('rule-123', dto)
-      ).rejects.toThrow(BadRequestException);
+      await expect(useCase.execute('rule-123', dto)).rejects.toThrow(BadRequestException);
     });
 
     it('should validate max attempts range', async () => {
@@ -121,9 +121,7 @@ describe('UpdateApprovalRuleUseCase', () => {
       approvalRuleRepository.findById.mockResolvedValue(mockApprovalRule);
 
       // Act & Assert
-      await expect(
-        useCase.execute('rule-123', dto)
-      ).rejects.toThrow(BadRequestException);
+      await expect(useCase.execute('rule-123', dto)).rejects.toThrow(BadRequestException);
     });
 
     it('should handle partial updates', async () => {
@@ -133,16 +131,13 @@ describe('UpdateApprovalRuleUseCase', () => {
       };
 
       approvalRuleRepository.findById.mockResolvedValue(mockApprovalRule);
-      approvalRuleRepository.update.mockResolvedValue({
-        ...mockApprovalRule,
-        description: 'Only description updated',
-        updatedAt: new Date(),
-        isApplicableToChapter: jest.fn(),
-        isScoreApproved: jest.fn(),
-        hasSpecialRequirements: jest.fn(),
-        getThresholdPercentage: jest.fn(),
-        canRetryAfterFailure: jest.fn()
-      } as ApprovalRule);
+      approvalRuleRepository.update.mockResolvedValue(
+        createMockApprovalRule({
+          ...mockApprovalRule,
+          description: 'Only description updated',
+          updatedAt: new Date(),
+        }),
+      );
 
       // Act
       const result = await useCase.execute('rule-123', dto);

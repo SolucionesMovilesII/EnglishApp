@@ -17,10 +17,6 @@ import { CompleteChapterUseCase } from '../use-cases/chapters/complete-chapter.u
     GetChaptersStatusUseCase,
     CompleteChapterUseCase,
   ],
-  exports: [
-    'IChapterRepository',
-    GetChaptersStatusUseCase,
-    CompleteChapterUseCase,
-  ],
+  exports: ['IChapterRepository', GetChaptersStatusUseCase, CompleteChapterUseCase],
 })
 export class ChaptersModule {}

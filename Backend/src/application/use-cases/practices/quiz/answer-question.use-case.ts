@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException, BadRequestException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { QuizPractice } from '../../../../domain/entities/quiz-practice.entity';
 import { PracticeStatus } from '../../../../domain/entities/practice-session.entity';
 import { IQuizPracticeRepository } from '../../../interfaces/repositories/quiz-practice-repository.interface';
@@ -18,7 +23,7 @@ export class AnswerQuestionUseCase {
     answerDto: AnswerQuizQuestionDto,
   ): Promise<QuizPractice> {
     const practice = await this.quizPracticeRepository.findById(practiceId);
-    
+
     if (!practice) {
       throw new NotFoundException('Quiz practice not found');
     }
@@ -37,22 +42,21 @@ export class AnswerQuestionUseCase {
       parseInt(answerDto.questionId),
       isCorrect,
       answerDto.timeSpentSeconds,
-      answerDto.selectedAnswer
+      answerDto.selectedAnswer,
     );
 
     // Update practice
-    const updatedPractice = await this.quizPracticeRepository.update(
-      practice.id,
-      {
-        questionsAnswered: practice.questionsAnswered,
-        correctAnswers: practice.correctAnswers,
-        wrongAnswers: practice.wrongAnswers,
-        lastQuestionIndex: practice.lastQuestionIndex,
-        ...(practice.timePerQuestion && { timePerQuestion: practice.timePerQuestion }),
-        ...(practice.questionResults && { questionResults: practice.questionResults }),
-        ...(practice.averageTimePerQuestion !== undefined && { averageTimePerQuestion: practice.averageTimePerQuestion }),
-      }
-    );
+    const updatedPractice = await this.quizPracticeRepository.update(practice.id, {
+      questionsAnswered: practice.questionsAnswered,
+      correctAnswers: practice.correctAnswers,
+      wrongAnswers: practice.wrongAnswers,
+      lastQuestionIndex: practice.lastQuestionIndex,
+      ...(practice.timePerQuestion && { timePerQuestion: practice.timePerQuestion }),
+      ...(practice.questionResults && { questionResults: practice.questionResults }),
+      ...(practice.averageTimePerQuestion !== undefined && {
+        averageTimePerQuestion: practice.averageTimePerQuestion,
+      }),
+    });
 
     // Update session progress, score and time
     const newProgress = practice.getCompletionPercentage();

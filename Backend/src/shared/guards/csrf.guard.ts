@@ -12,6 +12,10 @@ import { Request, Response } from 'express';
 import * as crypto from 'crypto';
 import { SecurityConfig } from '../../infrastructure/config/security/security.config';
 
+interface RequestWithRealIP extends Request {
+  realIP?: string;
+}
+
 // Decorator to skip CSRF protection
 export const SkipCSRF = () => SetMetadata('skipCSRF', true);
 
@@ -59,14 +63,14 @@ export class CSRFGuard implements CanActivate {
   /**
    * Validate CSRF token for state-changing requests
    */
-  private validateCSRFToken(request: Request, response: Response): boolean {
+  private validateCSRFToken(request: RequestWithRealIP, response: Response): boolean {
     const { csrf } = this.securityConfig;
 
     // Check for X-Requested-With header (AJAX indicator)
     const requestedWith = request.headers['x-requested-with'];
     if (!requestedWith || requestedWith !== 'XMLHttpRequest') {
       this.logger.warn('CSRF validation failed: Missing or invalid X-Requested-With header', {
-        ip: (request as any).realIP || request.ip,
+        ip: request.realIP || request.ip,
         method: request.method,
         path: request.path,
         userAgent: request.headers['user-agent'],
@@ -102,7 +106,7 @@ export class CSRFGuard implements CanActivate {
     // Validate the token
     if (!csrfToken || !this.isValidCSRFToken(csrfCookie, csrfToken)) {
       this.logger.warn('CSRF validation failed: Invalid token', {
-        ip: (request as any).realIP || request.ip,
+        ip: request.realIP || request.ip,
         method: request.method,
         path: request.path,
         hasToken: !!csrfToken,

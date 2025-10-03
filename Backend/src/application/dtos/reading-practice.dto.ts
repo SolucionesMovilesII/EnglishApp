@@ -1,6 +1,10 @@
 import { IsOptional, IsNumber, IsString, Min, IsBoolean, IsDate, IsEnum } from 'class-validator';
 import { Type } from 'class-transformer';
-import { CreatePracticeSessionDto, UpdatePracticeSessionDto, PracticeSessionResponseDto } from './practice-session.dto';
+import {
+  CreatePracticeSessionDto,
+  UpdatePracticeSessionDto,
+  PracticeSessionResponseDto,
+} from './practice-session.dto';
 import { VocabularyDifficulty } from '../../domain/entities/vocabulary-item.entity';
 
 export class CreateReadingPracticeDto extends CreatePracticeSessionDto {

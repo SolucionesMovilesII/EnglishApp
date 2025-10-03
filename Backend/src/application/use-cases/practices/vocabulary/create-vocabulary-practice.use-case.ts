@@ -1,5 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PracticeSession, PracticeType, PracticeStatus } from '../../../../domain/entities/practice-session.entity';
+import {
+  PracticeSession,
+  PracticeType,
+  PracticeStatus,
+} from '../../../../domain/entities/practice-session.entity';
 import { VocabularyPractice } from '../../../../domain/entities/vocabulary-practice.entity';
 import { IPracticeSessionRepository } from '../../../interfaces/repositories/practice-session-repository.interface';
 import { IVocabularyPracticeRepository } from '../../../interfaces/repositories/vocabulary-practice-repository.interface';
@@ -19,7 +23,7 @@ export class CreateVocabularyPracticeUseCase {
     createDto: CreateVocabularyPracticeDto,
   ): Promise<VocabularyPractice> {
     let chapter = null;
-    
+
     // Validate chapter exists if chapterId is provided
     if (createDto.chapterId) {
       chapter = await this.chapterRepository.findById(createDto.chapterId);
@@ -49,10 +53,11 @@ export class CreateVocabularyPracticeUseCase {
     // Create vocabulary practice
     const vocabularyPractice = VocabularyPractice.createForSession(
       savedSession,
-      createDto.difficultyLevel
+      createDto.difficultyLevel,
     );
 
-    const savedVocabularyPractice = await this.vocabularyPracticeRepository.create(vocabularyPractice);
+    const savedVocabularyPractice =
+      await this.vocabularyPracticeRepository.create(vocabularyPractice);
 
     // Update session status to in progress
     await this.practiceSessionRepository.update(savedSession.id, {

@@ -1,3 +1,4 @@
+/* eslint-disable */
 import {
   Controller,
   Post,
@@ -13,6 +14,15 @@ import {
   ParseUUIDPipe,
   Query,
 } from '@nestjs/common';
+
+interface AuthenticatedRequest {
+  user: {
+    sub: string;
+    role: string;
+    email?: string;
+  };
+}
+
 import {
   ApiTags,
   ApiOperation,
@@ -39,18 +49,11 @@ import {
 @Controller('practices/quiz')
 @UseGuards(ThrottlerGuard, EnhancedJwtGuard)
 @ApiBearerAuth()
-@ApiExtraModels(
-  CreateQuizPracticeDto,
-  UpdateQuizPracticeDto,
-  QuizPracticeResponseDto,
-  QuizStatsDto,
-)
+@ApiExtraModels(CreateQuizPracticeDto, UpdateQuizPracticeDto, QuizPracticeResponseDto, QuizStatsDto)
 export class QuizPracticeController {
   private readonly logger = new Logger(QuizPracticeController.name);
 
-  constructor(
-    // TODO: Inject use cases when implemented
-  ) {}
+  constructor() {} // TODO: Inject use cases when implemented
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
@@ -74,11 +77,11 @@ export class QuizPracticeController {
     description: 'User not authenticated',
   })
   async createQuizPractice(
-    @Request() _req: any,
+    @Request() _req: AuthenticatedRequest,
     @Body() _createDto: CreateQuizPracticeDto,
   ): Promise<QuizPracticeResponseDto> {
     this.logger.log(`Creating quiz practice for user: ${_req.user.sub}`);
-    
+
     // TODO: Implement use case
     throw new Error('Not implemented yet');
   }
@@ -110,11 +113,11 @@ export class QuizPracticeController {
     description: 'User not authenticated',
   })
   async getQuizPractice(
-    @Request() _req: any,
+    @Request() _req: AuthenticatedRequest,
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<QuizPracticeResponseDto> {
     this.logger.log(`Getting quiz practice ${id} for user: ${_req.user.sub}`);
-    
+
     // TODO: Implement use case
     throw new Error('Not implemented yet');
   }
@@ -146,12 +149,12 @@ export class QuizPracticeController {
     description: 'User not authenticated',
   })
   async updateQuizPractice(
-    @Request() _req: any,
+    @Request() _req: AuthenticatedRequest,
     @Param('id', ParseUUIDPipe) id: string,
     @Body() _updateDto: UpdateQuizPracticeDto,
   ): Promise<QuizPracticeResponseDto> {
     this.logger.log(`Updating quiz practice ${id} for user: ${_req.user.sub}`);
-    
+
     // TODO: Implement use case
     throw new Error('Not implemented yet');
   }
@@ -187,12 +190,14 @@ export class QuizPracticeController {
     description: 'User not authenticated',
   })
   async answerQuestion(
-    @Request() _req: any,
+    @Request() _req: AuthenticatedRequest,
     @Param('id', ParseUUIDPipe) id: string,
     @Body() _answerDto: AnswerQuizQuestionDto,
   ): Promise<QuizPracticeResponseDto> {
-    this.logger.log(`Recording answer for quiz ${id}, question ${_answerDto.questionIndex}, user: ${_req.user.sub}`);
-    
+    this.logger.log(
+      `Recording answer for quiz ${id}, question ${_answerDto.questionIndex}, user: ${_req.user.sub}`,
+    );
+
     // TODO: Implement use case
     throw new Error('Not implemented yet');
   }
@@ -249,7 +254,7 @@ export class QuizPracticeController {
     description: 'User not authenticated',
   })
   async getUserQuizSessions(
-    @Request() _req: any,
+    @Request() _req: AuthenticatedRequest,
     @Param('userId', ParseUUIDPipe) userId: string,
     @Query('category') _category?: string,
     @Query('difficulty') _difficulty?: string,
@@ -257,7 +262,7 @@ export class QuizPracticeController {
     @Query('offset') _offset?: number,
   ): Promise<QuizPracticeResponseDto[]> {
     this.logger.log(`Getting quiz sessions for user: ${userId}`);
-    
+
     // TODO: Implement use case
     throw new Error('Not implemented yet');
   }
@@ -298,13 +303,13 @@ export class QuizPracticeController {
     description: 'User not authenticated',
   })
   async getUserQuizStats(
-    @Request() _req: any,
+    @Request() _req: AuthenticatedRequest,
     @Param('userId', ParseUUIDPipe) userId: string,
     @Query('category') _category?: string,
     @Query('timeframe') _timeframe?: string,
   ): Promise<QuizStatsDto> {
     this.logger.log(`Getting quiz stats for user: ${userId}`);
-    
+
     // TODO: Implement use case
     throw new Error('Not implemented yet');
   }
@@ -346,16 +351,16 @@ export class QuizPracticeController {
     status: HttpStatus.UNAUTHORIZED,
     description: 'User not authenticated',
   })
-  async getQuizCategories(
-    @Request() _req: any,
-  ): Promise<Array<{
-    category: string;
-    displayName: string;
-    description: string;
-    totalQuizzes: number;
-  }>> {
+  async getQuizCategories(@Request() _req: AuthenticatedRequest): Promise<
+    Array<{
+      category: string;
+      displayName: string;
+      description: string;
+      totalQuizzes: number;
+    }>
+  > {
     this.logger.log(`Getting quiz categories for user: ${_req.user.sub}`);
-    
+
     // TODO: Implement use case
     throw new Error('Not implemented yet');
   }

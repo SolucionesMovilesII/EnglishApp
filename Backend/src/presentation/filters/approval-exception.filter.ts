@@ -1,10 +1,4 @@
-import {
-  ExceptionFilter,
-  Catch,
-  ArgumentsHost,
-  HttpException,
-  Logger,
-} from '@nestjs/common';
+import { ExceptionFilter, Catch, ArgumentsHost, HttpException, Logger } from '@nestjs/common';
 import { Response } from 'express';
 import {
   ApprovalException,
@@ -34,16 +28,13 @@ export class ApprovalExceptionFilter implements ExceptionFilter {
     const message = exception.message;
 
     // Log de la excepción para auditoría
-    this.logger.error(
-      `Approval Exception: ${exception.constructor.name} - ${message}`,
-      {
-        url: request.url,
-        method: request.method,
-        userId: request.user?.userId,
-        timestamp: new Date().toISOString(),
-        stack: exception.stack,
-      },
-    );
+    this.logger.error(`Approval Exception: ${exception.constructor.name} - ${message}`, {
+      url: request.url,
+      method: request.method,
+      userId: request.user?.userId,
+      timestamp: new Date().toISOString(),
+      stack: exception.stack,
+    });
 
     // Respuesta personalizada según el tipo de excepción
     const errorResponse = this.buildErrorResponse(exception, request);
@@ -59,7 +50,8 @@ export class ApprovalExceptionFilter implements ExceptionFilter {
     });
   }
 
-  private buildErrorResponse(exception: ApprovalException, _request: any) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  private buildErrorResponse(exception: ApprovalException, _request: Request) {
     const baseResponse = {
       success: false,
       data: null,
@@ -129,10 +121,7 @@ export class ApprovalExceptionFilter implements ExceptionFilter {
           ...baseResponse,
           errorType: 'ERROR_CARRY_OVER_FAILED',
           canRetry: true,
-          suggestions: [
-            'Try the evaluation again',
-            'Contact support if the problem persists',
-          ],
+          suggestions: ['Try the evaluation again', 'Contact support if the problem persists'],
         };
 
       case MaxAttemptsExceededException:
@@ -163,10 +152,7 @@ export class ApprovalExceptionFilter implements ExceptionFilter {
           ...baseResponse,
           errorType: 'UNKNOWN_APPROVAL_ERROR',
           canRetry: true,
-          suggestions: [
-            'Try the request again',
-            'Contact support if the problem persists',
-          ],
+          suggestions: ['Try the request again', 'Contact support if the problem persists'],
         };
     }
   }
@@ -192,16 +178,13 @@ export class ApprovalHttpExceptionFilter implements ExceptionFilter {
       throw exception; // Re-lanzar para que sea manejada por otros filtros
     }
 
-    this.logger.error(
-      `HTTP Exception in Approval context: ${exception.message}`,
-      {
-        url: request.url,
-        method: request.method,
-        userId: request.user?.userId,
-        status,
-        response: exceptionResponse,
-      },
-    );
+    this.logger.error(`HTTP Exception in Approval context: ${exception.message}`, {
+      url: request.url,
+      method: request.method,
+      userId: request.user?.userId,
+      status,
+      response: exceptionResponse,
+    });
 
     response.status(status).json({
       statusCode: status,
@@ -212,7 +195,8 @@ export class ApprovalHttpExceptionFilter implements ExceptionFilter {
       message: exception.message,
       success: false,
       data: null,
-      details: typeof exceptionResponse === 'object' ? exceptionResponse : { message: exceptionResponse },
+      details:
+        typeof exceptionResponse === 'object' ? exceptionResponse : { message: exceptionResponse },
     });
   }
 

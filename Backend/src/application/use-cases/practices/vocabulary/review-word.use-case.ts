@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException, BadRequestException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { VocabularyPractice } from '../../../../domain/entities/vocabulary-practice.entity';
 import { PracticeStatus } from '../../../../domain/entities/practice-session.entity';
 import { IVocabularyPracticeRepository } from '../../../interfaces/repositories/vocabulary-practice-repository.interface';
@@ -18,7 +23,7 @@ export class ReviewWordUseCase {
     reviewWordDto: ReviewWordDto,
   ): Promise<VocabularyPractice> {
     const practice = await this.vocabularyPracticeRepository.findById(practiceId);
-    
+
     if (!practice) {
       throw new NotFoundException('Vocabulary practice not found');
     }
@@ -32,26 +37,26 @@ export class ReviewWordUseCase {
     }
 
     // Determine if the answer is correct
-    const isCorrect = reviewWordDto.userAnswer.toLowerCase().trim() === reviewWordDto.correctAnswer.toLowerCase().trim();
-    
+    const isCorrect =
+      reviewWordDto.userAnswer.toLowerCase().trim() ===
+      reviewWordDto.correctAnswer.toLowerCase().trim();
+
     // Review the word
     practice.reviewWord(isCorrect);
 
     // Update practice
-    const updatedPractice = await this.vocabularyPracticeRepository.update(
-      practice.id,
-      {
-        wordsReviewed: practice.wordsReviewed,
-        correctAnswers: practice.correctAnswers,
-        incorrectAnswers: practice.incorrectAnswers,
-        reviewedWords: practice.reviewedWords,
-      }
-    );
+    const updatedPractice = await this.vocabularyPracticeRepository.update(practice.id, {
+      wordsReviewed: practice.wordsReviewed,
+      correctAnswers: practice.correctAnswers,
+      incorrectAnswers: practice.incorrectAnswers,
+      reviewedWords: practice.reviewedWords,
+    });
 
     // Update session progress, score and time
     const newProgress = practice.getProgress();
     const newScore = practice.getScore();
-    const totalTimeSpent = practice.practiceSession.timeSpentSeconds + reviewWordDto.timeSpentSeconds;
+    const totalTimeSpent =
+      practice.practiceSession.timeSpentSeconds + reviewWordDto.timeSpentSeconds;
 
     await this.practiceSessionRepository.update(practice.practiceSession.id, {
       progress: newProgress,

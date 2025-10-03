@@ -1,6 +1,14 @@
-import { Injectable, Inject, Logger, BadRequestException, NotFoundException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  Inject,
+  Logger,
+  BadRequestException,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { IChapterRepository } from '../../interfaces/repositories/chapter-repository.interface';
 import { CompleteChapterDto } from '../../dtos/chapters/complete-chapter.dto';
+import { UserProgress } from '../../../domain/entities/user-progress.entity';
 
 @Injectable()
 export class CompleteChapterUseCase {
@@ -11,11 +19,15 @@ export class CompleteChapterUseCase {
     private readonly chapterRepository: IChapterRepository,
   ) {}
 
-  async execute(userId: string, chapterId: string, completeChapterDto: CompleteChapterDto): Promise<{
+  async execute(
+    userId: string,
+    chapterId: string,
+    completeChapterDto: CompleteChapterDto,
+  ): Promise<{
     success: boolean;
     chapterCompleted: boolean;
     nextChapterUnlocked: boolean;
-    userProgress: any;
+    userProgress: UserProgress | null;
     message: string;
   }> {
     try {
@@ -46,7 +58,9 @@ export class CompleteChapterUseCase {
       // Validate that user has completed enough vocabulary items to complete chapter
       const currentProgress = chapterData.userProgress;
       if (!currentProgress || !currentProgress.canCompleteChapter()) {
-        throw new BadRequestException('Cannot complete chapter. Not all vocabulary items have been learned.');
+        throw new BadRequestException(
+          'Cannot complete chapter. Not all vocabulary items have been learned.',
+        );
       }
 
       // Mark chapter as completed
@@ -70,22 +84,29 @@ export class CompleteChapterUseCase {
       }
 
       // Check if next chapter was unlocked
-      const nextChapter = await this.chapterRepository.getNextChapterToUnlock(chapterData.chapter.order);
+      const nextChapter = await this.chapterRepository.getNextChapterToUnlock(
+        chapterData.chapter.order,
+      );
       const nextChapterUnlocked = !!nextChapter;
 
-      this.logger.log(`Chapter ${chapterId} completed for user ${userId}. Next chapter unlocked: ${nextChapterUnlocked}`);
+      this.logger.log(
+        `Chapter ${chapterId} completed for user ${userId}. Next chapter unlocked: ${nextChapterUnlocked}`,
+      );
 
       return {
         success: true,
         chapterCompleted: true,
         nextChapterUnlocked,
         userProgress: updatedProgress,
-        message: nextChapterUnlocked ? 
-          'Chapter completed and next chapter unlocked!' : 
-          'Chapter completed! You have finished all available chapters.',
+        message: nextChapterUnlocked
+          ? 'Chapter completed and next chapter unlocked!'
+          : 'Chapter completed! You have finished all available chapters.',
       };
     } catch (error) {
-      this.logger.error(`Error completing chapter ${chapterId} for user ${userId}:`, error instanceof Error ? error.message : String(error));
+      this.logger.error(
+        `Error completing chapter ${chapterId} for user ${userId}:`,
+        error instanceof Error ? error.message : String(error),
+      );
       throw error;
     }
   }

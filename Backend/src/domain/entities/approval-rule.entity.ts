@@ -36,7 +36,7 @@ export class ApprovalRule {
   isActive!: boolean;
 
   @Column({ type: 'jsonb', nullable: true })
-  metadata!: Record<string, any> | null;
+  metadata!: Record<string, unknown> | null;
 
   @CreateDateColumn({ type: 'timestamptz' })
   readonly createdAt!: Date;

@@ -8,7 +8,7 @@ export interface ConfigureApprovalRuleRequest {
   maxAttempts: number;
   allowErrorCarryover: boolean;
   isActive: boolean;
-  specialRequirements?: Record<string, any>;
+  specialRequirements?: Record<string, unknown>;
   description?: string;
 }
 
@@ -19,7 +19,7 @@ export interface ConfigureApprovalRuleResponse {
   maxAttempts: number;
   allowErrorCarryover: boolean;
   isActive: boolean;
-  specialRequirements?: Record<string, any>;
+  specialRequirements?: Record<string, unknown>;
   description?: string;
   createdAt: Date;
   updatedAt: Date;
@@ -61,7 +61,7 @@ export class ConfigureApprovalRuleUseCase {
           metadata: request.specialRequirements ?? null,
           description: request.description ?? null,
         });
-        
+
         this.logger.log(`Updated existing approval rule: ${rule.id}`);
       } else {
         // Create new rule
@@ -74,7 +74,7 @@ export class ConfigureApprovalRuleUseCase {
           metadata: request.specialRequirements ?? null,
           description: request.description ?? null,
         });
-        
+
         this.logger.log(`Created new approval rule: ${rule.id}`);
       }
 
@@ -186,7 +186,7 @@ export class DeleteApprovalRuleUseCase {
       }
 
       await this.approvalRuleRepository.delete(ruleId);
-      
+
       this.logger.log(`Approval rule deleted successfully: ${ruleId}`);
     } catch (error) {
       this.logger.error(

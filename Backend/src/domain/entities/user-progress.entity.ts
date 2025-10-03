@@ -45,7 +45,7 @@ export class UserProgress {
   totalVocabularyItems!: number;
 
   @Column({ type: 'jsonb', nullable: true })
-  extraData!: Record<string, any> | null;
+  extraData!: Record<string, unknown> | null;
 
   @ManyToOne(() => User, { eager: false })
   @JoinColumn({ name: 'userId' })

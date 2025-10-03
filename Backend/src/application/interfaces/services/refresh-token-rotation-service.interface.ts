@@ -14,7 +14,14 @@ export interface TokenRotationResult {
 
 export interface TokenValidationResult {
   isValid: boolean;
-  token?: any;
+  token?: {
+    jti: string;
+    familyId: string;
+    userId: string;
+    tokenHash: string;
+    expiresAt: Date;
+    revoked: boolean;
+  };
   reason?: string;
   shouldRevokeFamily?: boolean;
 }

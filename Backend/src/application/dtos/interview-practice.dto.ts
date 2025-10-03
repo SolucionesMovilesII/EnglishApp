@@ -1,6 +1,21 @@
-import { IsOptional, IsNumber, IsString, Min, Max, IsArray, ValidateNested, IsEnum, IsDate, IsBoolean } from 'class-validator';
+import {
+  IsOptional,
+  IsNumber,
+  IsString,
+  Min,
+  Max,
+  IsArray,
+  ValidateNested,
+  IsEnum,
+  IsDate,
+  IsBoolean,
+} from 'class-validator';
 import { Type } from 'class-transformer';
-import { CreatePracticeSessionDto, UpdatePracticeSessionDto, PracticeSessionResponseDto } from './practice-session.dto';
+import {
+  CreatePracticeSessionDto,
+  UpdatePracticeSessionDto,
+  PracticeSessionResponseDto,
+} from './practice-session.dto';
 import { InterviewType, ResponseQuality } from '../../domain/entities/interview-practice.entity';
 
 export class CreateInterviewPracticeDto extends CreatePracticeSessionDto {
@@ -315,7 +330,7 @@ export class InterviewStatsDto {
     interviewType: InterviewType;
     overallScore: number;
     completedAt: Date;
-  }>
+  }>;
 
   constructor(partial: Partial<InterviewStatsDto>) {
     Object.assign(this, partial);

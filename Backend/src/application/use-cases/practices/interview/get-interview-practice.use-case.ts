@@ -4,13 +4,11 @@ import { IInterviewPracticeRepository } from '../../../interfaces/repositories/i
 
 @Injectable()
 export class GetInterviewPracticeUseCase {
-  constructor(
-    private readonly interviewPracticeRepository: IInterviewPracticeRepository,
-  ) {}
+  constructor(private readonly interviewPracticeRepository: IInterviewPracticeRepository) {}
 
   async execute(practiceId: string, userId: string): Promise<InterviewPractice> {
     const practice = await this.interviewPracticeRepository.findById(practiceId);
-    
+
     if (!practice) {
       throw new NotFoundException('Interview practice not found');
     }
@@ -25,7 +23,7 @@ export class GetInterviewPracticeUseCase {
 
   async getBySessionId(sessionId: string, userId: string): Promise<InterviewPractice> {
     const practice = await this.interviewPracticeRepository.findByPracticeSessionId(sessionId);
-    
+
     if (!practice) {
       throw new NotFoundException('Interview practice not found for this session');
     }

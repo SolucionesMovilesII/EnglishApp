@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as jwt from 'jsonwebtoken';
-import { SignOptions, VerifyOptions } from 'jsonwebtoken';
+import { SignOptions, VerifyOptions, Algorithm } from 'jsonwebtoken';
+import { StringValue } from 'ms';
 import { v4 as uuidv4 } from 'uuid';
 import { IJwtService } from '../../application/interfaces/services/jwt-service.interface';
 
@@ -26,7 +27,7 @@ export class JwtService implements IJwtService {
   private readonly issuer: string;
   private readonly audience: string;
   private readonly keyId?: string | undefined;
-  private readonly algorithm: string;
+  private readonly algorithm: Algorithm;
 
   constructor(private readonly configService: ConfigService) {
     this.accessTokenSecret =
@@ -39,7 +40,7 @@ export class JwtService implements IJwtService {
     this.issuer = this.configService.get<string>('jwt.issuer') || 'english-app-backend';
     this.audience = this.configService.get<string>('jwt.audience') || 'english-app-client';
     this.keyId = this.configService.get<string>('jwt.keyId');
-    this.algorithm = this.configService.get<string>('jwt.algorithm') || 'HS256';
+    this.algorithm = (this.configService.get<string>('jwt.algorithm') || 'HS256') as Algorithm;
   }
 
   /**
@@ -62,7 +63,7 @@ export class JwtService implements IJwtService {
     };
 
     const signOptions: SignOptions = {
-      algorithm: this.algorithm as any,
+      algorithm: this.algorithm,
       ...(this.keyId && { keyid: this.keyId }),
     };
 
@@ -89,7 +90,7 @@ export class JwtService implements IJwtService {
     };
 
     const signOptions: SignOptions = {
-      algorithm: this.algorithm as any,
+      algorithm: this.algorithm,
       ...(this.keyId && { keyid: this.keyId }),
     };
 
@@ -99,11 +100,11 @@ export class JwtService implements IJwtService {
   /**
    * Legacy method for backward compatibility
    */
-  async sign(payload: object, options?: { expiresIn?: string }): Promise<string> {
+  async sign(payload: Record<string, unknown>, options?: { expiresIn?: string }): Promise<string> {
     const expiresIn = options?.expiresIn || this.accessTokenExpiresIn;
     const signOptions: SignOptions = {
-      expiresIn: expiresIn as any,
-      algorithm: this.algorithm as any,
+      expiresIn: expiresIn as StringValue,
+      algorithm: this.algorithm,
       ...(this.keyId && { keyid: this.keyId }),
     };
     return jwt.sign(payload, this.accessTokenSecret, signOptions);
@@ -117,11 +118,12 @@ export class JwtService implements IJwtService {
       const verifyOptions: VerifyOptions = {
         issuer: this.issuer,
         audience: this.audience,
-        algorithms: [this.algorithm as any],
+        algorithms: [this.algorithm],
       };
       return jwt.verify(token, this.accessTokenSecret, verifyOptions) as JwtPayload;
-    } catch (error: any) {
-      throw new Error(`Invalid access token: ${error?.message || 'Unknown error'}`);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      throw new Error(`Invalid access token: ${errorMessage}`);
     }
   }
 
@@ -133,7 +135,7 @@ export class JwtService implements IJwtService {
       const verifyOptions: VerifyOptions = {
         issuer: this.issuer,
         audience: this.audience,
-        algorithms: [this.algorithm as any],
+        algorithms: [this.algorithm],
       };
       const payload = jwt.verify(token, this.refreshTokenSecret, verifyOptions) as JwtPayload;
 
@@ -142,15 +144,16 @@ export class JwtService implements IJwtService {
       }
 
       return payload;
-    } catch (error: any) {
-      throw new Error(`Invalid refresh token: ${error?.message || 'Unknown error'}`);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      throw new Error(`Invalid refresh token: ${errorMessage}`);
     }
   }
 
   /**
    * Decode a token without verification (for debugging/inspection)
    */
-  decode(token: string): any {
+  decode(token: string): unknown {
     return jwt.decode(token, { complete: true });
   }
 

@@ -1,6 +1,6 @@
 class EnvironmentConfig {
   // API Configuration - Updated to point to local backend
-  static const String _defaultApiUrl = 'http://localhost:3000';
+  static const String _defaultApiUrl = 'https://ripe-crews-heal.loca.lt';
   static const String _defaultApiVersion = 'api/v1';
   
   // Get environment variables with fallbacks
@@ -43,7 +43,7 @@ class EnvironmentConfig {
   static bool get enableLogging {
     return const bool.fromEnvironment(
       'ENABLE_API_LOGGING',
-      defaultValue: true,
+      defaultValue: false,
     );
   }
   

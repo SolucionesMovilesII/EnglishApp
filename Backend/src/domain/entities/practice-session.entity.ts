@@ -80,7 +80,7 @@ export class PracticeSession {
   timeSpentSeconds!: number;
 
   @Column({ name: 'extra_data', type: 'json', nullable: true })
-  extraData?: Record<string, any>;
+  extraData?: Record<string, unknown>;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;
@@ -114,14 +114,14 @@ export class PracticeSession {
   markAsCompleted(score?: number): void {
     this.status = PracticeStatus.COMPLETED;
     this.completedAt = new Date();
-    
+
     if (score !== undefined) {
       this.score = score;
     }
-    
+
     if (this.startedAt && !this.durationSeconds) {
       this.durationSeconds = Math.floor(
-        (this.completedAt.getTime() - this.startedAt.getTime()) / 1000
+        (this.completedAt.getTime() - this.startedAt.getTime()) / 1000,
       );
     }
   }
@@ -129,21 +129,21 @@ export class PracticeSession {
   markAsAbandoned(): void {
     this.status = PracticeStatus.ABANDONED;
     this.completedAt = new Date();
-    
+
     if (this.startedAt && !this.durationSeconds) {
       this.durationSeconds = Math.floor(
-        (this.completedAt.getTime() - this.startedAt.getTime()) / 1000
+        (this.completedAt.getTime() - this.startedAt.getTime()) / 1000,
       );
     }
   }
 
-  updateProgress(score: number, progress?: number, extraData?: Record<string, any>): void {
+  updateProgress(score: number, progress?: number, extraData?: Record<string, unknown>): void {
     this.score = score;
     if (progress !== undefined) {
       this.progress = progress;
     }
     this.status = PracticeStatus.IN_PROGRESS;
-    
+
     if (extraData) {
       this.extraData = { ...this.extraData, ...extraData };
     }

@@ -1,16 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import '../models/chapter_evaluation.dart';
 import '../l10n/app_localizations.dart';
 
 class EvaluationDetailsScreen extends StatelessWidget {
   final ChapterEvaluation evaluation;
 
-  const EvaluationDetailsScreen({
-    super.key,
-    required this.evaluation,
-  });
+  const EvaluationDetailsScreen({super.key, required this.evaluation});
 
   @override
   Widget build(BuildContext context) {
@@ -85,7 +81,7 @@ class EvaluationDetailsScreen extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 20),
-                    
+
                     // Puntuación principal
                     Center(
                       child: Column(
@@ -107,16 +103,18 @@ class EvaluationDetailsScreen extends StatelessWidget {
                                 children: [
                                   Text(
                                     '${evaluation.score}',
-                                    style: theme.textTheme.headlineLarge?.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                      color: evaluation.statusColor,
-                                    ),
+                                    style: theme.textTheme.headlineLarge
+                                        ?.copyWith(
+                                          fontWeight: FontWeight.bold,
+                                          color: evaluation.statusColor,
+                                        ),
                                   ),
                                   Text(
                                     '/${evaluation.maxScore}',
-                                    style: theme.textTheme.titleMedium?.copyWith(
-                                      color: theme.colorScheme.outline,
-                                    ),
+                                    style: theme.textTheme.titleMedium
+                                        ?.copyWith(
+                                          color: theme.colorScheme.outline,
+                                        ),
                                   ),
                                 ],
                               ),
@@ -138,7 +136,7 @@ class EvaluationDetailsScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
-            
+
             // Información de la evaluación
             Card(
               child: Padding(
@@ -177,7 +175,7 @@ class EvaluationDetailsScreen extends StatelessWidget {
                 ),
               ),
             ),
-            
+
             // Desglose por habilidades (si está disponible)
             if (evaluation.skillBreakdown != null &&
                 evaluation.skillBreakdown!.isNotEmpty) ...[
@@ -198,10 +196,7 @@ class EvaluationDetailsScreen extends StatelessWidget {
                       ...evaluation.skillBreakdown!.map(
                         (skill) => Padding(
                           padding: const EdgeInsets.only(bottom: 16),
-                          child: _SkillCard(
-                            skill: skill,
-                            theme: theme,
-                          ),
+                          child: _SkillCard(skill: skill, theme: theme),
                         ),
                       ),
                     ],
@@ -209,9 +204,10 @@ class EvaluationDetailsScreen extends StatelessWidget {
                 ),
               ),
             ],
-            
+
             // Retroalimentación (si está disponible)
-            if (evaluation.feedback != null && evaluation.feedback!.isNotEmpty) ...[
+            if (evaluation.feedback != null &&
+                evaluation.feedback!.isNotEmpty) ...[
               const SizedBox(height: 16),
               Card(
                 child: Padding(
@@ -230,7 +226,8 @@ class EvaluationDetailsScreen extends StatelessWidget {
                         width: double.infinity,
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: theme.colorScheme.surfaceVariant.withOpacity(0.5),
+                          color: theme.colorScheme.surfaceContainerHighest
+                              .withOpacity(0.5),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
@@ -243,9 +240,9 @@ class EvaluationDetailsScreen extends StatelessWidget {
                 ),
               ),
             ],
-            
+
             const SizedBox(height: 24),
-            
+
             // Botón de acción
             SizedBox(
               width: double.infinity,
@@ -253,9 +250,7 @@ class EvaluationDetailsScreen extends StatelessWidget {
                 onPressed: () {
                   // TODO: Implementar navegación a repetir capítulo
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(l10n.featureComingSoon),
-                    ),
+                    SnackBar(content: Text(l10n.featureComingSoon)),
                   );
                 },
                 icon: const Icon(Icons.refresh),
@@ -295,11 +290,7 @@ class _InfoRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Icon(
-          icon,
-          size: 20,
-          color: theme.colorScheme.primary,
-        ),
+        Icon(icon, size: 20, color: theme.colorScheme.primary),
         const SizedBox(width: 12),
         Expanded(
           child: Text(
@@ -324,24 +315,19 @@ class _SkillCard extends StatelessWidget {
   final SkillEvaluation skill;
   final ThemeData theme;
 
-  const _SkillCard({
-    required this.skill,
-    required this.theme,
-  });
+  const _SkillCard({required this.skill, required this.theme});
 
   @override
   Widget build(BuildContext context) {
     final percentage = skill.percentage;
     final color = _getSkillColor(percentage);
-    
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceVariant.withOpacity(0.3),
+        color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: color.withOpacity(0.3),
-        ),
+        border: Border.all(color: color.withOpacity(0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -369,7 +355,7 @@ class _SkillCard extends StatelessWidget {
           const SizedBox(height: 8),
           LinearProgressIndicator(
             value: percentage / 100,
-            backgroundColor: theme.colorScheme.surfaceVariant,
+            backgroundColor: theme.colorScheme.surfaceContainerHighest,
             valueColor: AlwaysStoppedAnimation<Color>(color),
             minHeight: 6,
           ),

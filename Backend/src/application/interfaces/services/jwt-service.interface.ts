@@ -6,7 +6,7 @@ export interface IJwtService {
   createRefreshToken(userId: string, role: string): Promise<string>;
   verify(token: string): Promise<JwtPayload>;
   verifyRefreshToken(token: string): Promise<JwtPayload>;
-  decode(token: string): any;
+  decode(token: string): unknown;
 
   // Legacy method for backward compatibility
   sign(payload: object, options?: { expiresIn?: string }): Promise<string>;

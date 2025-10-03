@@ -1,7 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { Repository, LessThan } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ApprovalEvaluation, EvaluationStatus } from '../../domain/entities/approval-evaluation.entity';
+import {
+  ApprovalEvaluation,
+  EvaluationStatus,
+} from '../../domain/entities/approval-evaluation.entity';
 import { IApprovalEvaluationRepository } from '../../application/interfaces/repositories/approval-evaluation-repository.interface';
 
 @Injectable()
@@ -42,7 +45,10 @@ export class ApprovalEvaluationRepository implements IApprovalEvaluationReposito
     });
   }
 
-  async findLatestByUserAndChapter(userId: string, chapterId: string): Promise<ApprovalEvaluation | null> {
+  async findLatestByUserAndChapter(
+    userId: string,
+    chapterId: string,
+  ): Promise<ApprovalEvaluation | null> {
     return await this.repository.findOne({
       where: { userId, chapterId },
       order: { attemptNumber: 'DESC' },
@@ -58,7 +64,11 @@ export class ApprovalEvaluationRepository implements IApprovalEvaluationReposito
     });
   }
 
-  async findPreviousAttempts(userId: string, chapterId: string, currentAttempt: number): Promise<ApprovalEvaluation[]> {
+  async findPreviousAttempts(
+    userId: string,
+    chapterId: string,
+    currentAttempt: number,
+  ): Promise<ApprovalEvaluation[]> {
     return await this.repository.find({
       where: {
         userId,
@@ -112,21 +122,24 @@ export class ApprovalEvaluationRepository implements IApprovalEvaluationReposito
     const totalEvaluations = evaluations.length;
     const approvedCount = evaluations.filter(e => e.status === EvaluationStatus.APPROVED).length;
     const rejectedCount = evaluations.filter(e => e.status === EvaluationStatus.REJECTED).length;
-    
-    const averageScore = totalEvaluations > 0 
-      ? evaluations.reduce((sum, e) => sum + e.score, 0) / totalEvaluations 
-      : 0;
-    
+
+    const averageScore =
+      totalEvaluations > 0
+        ? evaluations.reduce((sum, e) => sum + e.score, 0) / totalEvaluations
+        : 0;
+
     // Calculate average attempts per user
     const userAttempts = new Map<string, number>();
     evaluations.forEach(e => {
       const current = userAttempts.get(e.userId) || 0;
       userAttempts.set(e.userId, Math.max(current, e.attemptNumber));
     });
-    
-    const averageAttempts = userAttempts.size > 0 
-      ? Array.from(userAttempts.values()).reduce((sum, attempts) => sum + attempts, 0) / userAttempts.size
-      : 0;
+
+    const averageAttempts =
+      userAttempts.size > 0
+        ? Array.from(userAttempts.values()).reduce((sum, attempts) => sum + attempts, 0) /
+          userAttempts.size
+        : 0;
 
     return {
       totalEvaluations,

@@ -5,8 +5,18 @@ export interface IQuizPracticeRepository {
   findById(id: string): Promise<QuizPractice | null>;
   findByPracticeSessionId(practiceSessionId: string): Promise<QuizPractice | null>;
   findByUserId(userId: string, limit?: number, offset?: number): Promise<QuizPractice[]>;
-  findByUserIdAndCategory(userId: string, category: string, limit?: number, offset?: number): Promise<QuizPractice[]>;
-  findByUserIdAndDifficulty(userId: string, difficulty: string, limit?: number, offset?: number): Promise<QuizPractice[]>;
+  findByUserIdAndCategory(
+    userId: string,
+    category: string,
+    limit?: number,
+    offset?: number,
+  ): Promise<QuizPractice[]>;
+  findByUserIdAndDifficulty(
+    userId: string,
+    difficulty: string,
+    limit?: number,
+    offset?: number,
+  ): Promise<QuizPractice[]>;
   update(id: string, updates: Partial<QuizPractice>): Promise<QuizPractice>;
   delete(id: string): Promise<void>;
   getStatsByUserId(userId: string): Promise<{
@@ -17,10 +27,12 @@ export interface IQuizPracticeRepository {
     averageTimePerQuestion: number;
     categoriesPlayed: string[];
   }>;
-  getAvailableCategories(): Promise<Array<{
-    category: string;
-    displayName: string;
-    description: string;
-    totalQuizzes: number;
-  }>>;
+  getAvailableCategories(): Promise<
+    Array<{
+      category: string;
+      displayName: string;
+      description: string;
+      totalQuizzes: number;
+    }>
+  >;
 }

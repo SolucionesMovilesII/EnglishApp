@@ -8,7 +8,7 @@ export interface UpdateApprovalRuleRequest {
   maxAttempts?: number;
   allowErrorCarryover?: boolean;
   isActive?: boolean;
-  specialRequirements?: Record<string, any>;
+  specialRequirements?: Record<string, unknown>;
   description?: string;
 }
 
@@ -21,7 +21,10 @@ export class UpdateApprovalRuleUseCase {
     private readonly approvalRuleRepository: IApprovalRuleRepository,
   ) {}
 
-  async execute(ruleId: string, request: UpdateApprovalRuleRequest): Promise<ConfigureApprovalRuleResponse> {
+  async execute(
+    ruleId: string,
+    request: UpdateApprovalRuleRequest,
+  ): Promise<ConfigureApprovalRuleResponse> {
     this.logger.log(`Updating approval rule: ${ruleId}`);
 
     try {
@@ -36,34 +39,34 @@ export class UpdateApprovalRuleUseCase {
 
       // Prepare update data (only include provided fields)
       const updateData: Partial<ApprovalRule> = {};
-      
+
       if (request.minScoreThreshold !== undefined) {
         updateData.minScoreThreshold = request.minScoreThreshold;
       }
-      
+
       if (request.maxAttempts !== undefined) {
         updateData.maxAttempts = request.maxAttempts;
       }
-      
+
       if (request.allowErrorCarryover !== undefined) {
         updateData.allowErrorCarryover = request.allowErrorCarryover;
       }
-      
+
       if (request.isActive !== undefined) {
         updateData.isActive = request.isActive;
       }
-      
+
       if (request.specialRequirements !== undefined) {
         updateData.metadata = request.specialRequirements;
       }
-      
+
       if (request.description !== undefined) {
         updateData.description = request.description;
       }
 
       // Update the rule
       const updatedRule = await this.approvalRuleRepository.update(ruleId, updateData);
-      
+
       this.logger.log(`Approval rule updated successfully: ${ruleId}`);
 
       return this.mapToResponse(updatedRule);

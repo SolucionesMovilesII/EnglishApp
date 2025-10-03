@@ -162,76 +162,54 @@
   "livesResetTomorrow": "Lives reset tomorrow",
   "nextResetTomorrow": "Next reset tomorrow",
   "refresh": "Refresh",
-  "vocabularyChaptersTitle": "Vocabulary Chapters",
-  "loadingVocabularyChapters": "Loading vocabulary chapters...",
-  "errorLoadingChapters": "Error loading chapters",
-  "unknownError": "An unknown error occurred",
-  "dismiss": "Dismiss",
-  "tryAgain": "Try Again",
-  "noChaptersAvailable": "No chapters available",
-  "noChaptersDescription": "Check back later for new vocabulary chapters",
-  "yourProgress": "Your Progress",
-  "chaptersCompleted": "Chapters Completed",
-  "unlocked": "Unlocked",
-  "locked": "Locked",
+  "repeatChapterTitle": "Repeat Chapter",
+  "repeatChapterWarning": "You've already completed this chapter. Repeating it won't affect your current score, but it's a great way to reinforce your learning!",
+  "currentScore": "Current Score: {score} points",
+  "@currentScore": {
+    "placeholders": {
+      "score": {
+        "type": "int",
+        "example": "85"
+      }
+    }
+  },
+  "repeatChapterBenefit": "Perfect practice makes perfect! Use this opportunity to strengthen your knowledge.",
+  "repeatChapter": "Repeat Chapter",
+  "chapterResetForRepetition": "Chapter '{chapterTitle}' has been reset for repetition. Your original score is preserved!",
+  "@chapterResetForRepetition": {
+    "placeholders": {
+      "chapterTitle": {
+        "type": "String",
+        "example": "English Basics"
+      }
+    }
+  },
   "progress": "Progress",
-  "completed": "Completed",
-  "continue_": "Continue",
-  "start": "Start",
-  "chapterLocked": "Chapter Locked",
-  "chapterLockedDescription": "Complete chapter {previousChapter} to unlock this chapter",
-  "@chapterLockedDescription": {
+  "episodeContent": "Episode Content",
+  "episodeContentPlaceholder": "Episode content will be displayed here",
+  "replayEpisode": "Replay Episode",
+  "startEpisode": "Start Episode",
+  "startingEpisode": "Starting {episodeTitle}...",
+  "@startingEpisode": {
     "placeholders": {
-      "previousChapter": {
-        "type": "int"
+      "episodeTitle": {
+        "type": "String",
+        "example": "Episode 1"
       }
     }
   },
-  "understood": "Understood",
-  "chapterCompleted": "Chapter Completed",
-  "chapterCompletedDescription": "You have already completed this chapter. You can review it anytime.",
-  "completedOn": "Completed on {date}",
-  "@completedOn": {
-    "placeholders": {
-      "date": {
-        "type": "DateTime",
-        "format": "yMd"
-      }
-    }
-  },
-  "close": "Close",
-  "reviewChapter": "Review Chapter",
-  "noLivesTitle": "No Lives Available",
-  "noLivesMessage": "You need at least one life to start a chapter. Lives reset daily.",
-  "nextResetAt": "Next reset at {time}",
-  "@nextResetAt": {
-    "placeholders": {
-      "time": {
-        "type": "String"
-      }
-    }
-  },
-  "repeatChapterWarning": "Are you sure you want to repeat this chapter? Your current progress will be saved.",
-  "evaluationHistory": "View your evaluation history and progress",
-  "currentScore": "Current Score",
-  "home": "Home",
-  "viewProgress": "View Progress",
-  "benefits": "Benefits of repeating:",
-  "improveScore": "• Improve your score",
-  "reinforceLearning": "• Reinforce learning",
-  "betterUnderstanding": "• Better understanding",
-  "confirm": "Confirm",
-  "chapterResults": "Chapter Results",
-  "allChapters": "All Chapters",
-  "chapter": "Chapter",
-  "noEvaluationsFound": "No evaluations found",
-  "completeChaptersToSeeResults": "Complete chapters to see your results here",
-  "evaluationInfo": "Evaluation Information",
+  "evaluationDetails": "Evaluation Details",
+  "score": "Score",
   "completedDate": "Completed Date",
   "attempts": "Attempts",
   "timeSpent": "Time Spent",
   "skillBreakdown": "Skill Breakdown",
   "feedback": "Feedback",
-  "featureComingSoon": "Feature coming soon",
-  "repeatChapter": "Repeat Chapter"
+  "featureComingSoon": "This feature is coming soon!",
+  "chapter": "Chapter",
+  "evaluationInfo": "Evaluation Information",
+  "chapterResults": "Chapter Results",
+  "allChapters": "All Chapters",
+  "noEvaluationsFound": "No evaluations found",
+  "completeChaptersToSeeResults": "Complete chapters to see results"
 }
