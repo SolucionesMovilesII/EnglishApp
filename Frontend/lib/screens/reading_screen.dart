@@ -4,6 +4,8 @@ import '../providers/reading_provider.dart';
 import '../providers/progress_provider.dart';
 import '../l10n/app_localizations.dart';
 import '../utils/audio_service.dart';
+import '../widgets/highlighted_text_widget.dart';
+import '../models/highlighted_word.dart';
 
 class ReadingScreen extends StatelessWidget {
   final String chapterId;
@@ -35,6 +37,11 @@ class _ReadingScreenContentState extends State<_ReadingScreenContent> {
   bool _isPaused = false;
   double _speechRate = 0.5;
   double _volume = 1.0;
+  
+  // Variables para el resaltado de texto
+  bool _enableVocabularyHighlights = true;
+  bool _enableGrammarHighlights = false;
+  bool _showHighlightConfig = false;
 
   @override
   void dispose() {
@@ -98,6 +105,103 @@ class _ReadingScreenContentState extends State<_ReadingScreenContent> {
     });
   }
 
+  void _onHighlightConfigChanged(bool vocabulary, bool grammar) {
+    setState(() {
+      _enableVocabularyHighlights = vocabulary;
+      _enableGrammarHighlights = grammar;
+    });
+  }
+
+  void _onWordTap(HighlightedWord word) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Row(
+            children: [
+              Container(
+                width: 12,
+                height: 12,
+                decoration: BoxDecoration(
+                  color: word.type.color,
+                  shape: BoxShape.circle,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                word.word,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const Spacer(),
+              Chip(
+                label: Text(
+                  word.type.name,
+                  style: const TextStyle(fontSize: 12),
+                ),
+                backgroundColor: word.type.color.withOpacity(0.2),
+              ),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (word.definition != null) ...[
+                const Text(
+                  'Definición:',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  word.definition!,
+                  style: const TextStyle(fontSize: 14),
+                ),
+                const SizedBox(height: 12),
+              ],
+              if (word.translation != null) ...[
+                const Text(
+                  'Traducción:',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  word.translation!,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+              ],
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cerrar'),
+            ),
+            if (word.word.isNotEmpty)
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  _speakText(word.word);
+                },
+                child: const Text('Pronunciar'),
+              ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -107,6 +211,18 @@ class _ReadingScreenContentState extends State<_ReadingScreenContent> {
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Theme.of(context).colorScheme.onPrimary,
         actions: [
+          IconButton(
+            icon: Icon(
+              _showHighlightConfig ? Icons.highlight_off : Icons.highlight,
+              color: Theme.of(context).colorScheme.onPrimary,
+            ),
+            onPressed: () {
+              setState(() {
+                _showHighlightConfig = !_showHighlightConfig;
+              });
+            },
+            tooltip: _showHighlightConfig ? 'Ocultar configuración' : 'Configurar resaltado',
+          ),
           Consumer<ReadingProvider>(
             builder: (context, readingProvider, child) {
               return Container(
@@ -206,12 +322,16 @@ class _ReadingScreenContentState extends State<_ReadingScreenContent> {
                                 ],
                               ),
                               const SizedBox(height: 16),
-                              Text(
-                                readingProvider.currentParagraph.content,
-                                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                              HighlightedTextWidget(
+                                text: readingProvider.currentParagraph.content,
+                                textStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(
                                   height: 1.6,
                                   fontSize: 16,
                                 ),
+                                enableVocabularyHighlights: _enableVocabularyHighlights,
+                                enableGrammarHighlights: _enableGrammarHighlights,
+                                onWordTap: _onWordTap,
+                                showTooltips: false, // Usamos nuestro diálogo personalizado
                               ),
                             ],
                           ),
@@ -219,6 +339,16 @@ class _ReadingScreenContentState extends State<_ReadingScreenContent> {
                       ),
 
                       const SizedBox(height: 24),
+
+                      // Highlight Configuration
+                      if (_showHighlightConfig) ...[
+                        HighlightConfigWidget(
+                          enableVocabulary: _enableVocabularyHighlights,
+                          enableGrammar: _enableGrammarHighlights,
+                          onConfigChanged: _onHighlightConfigChanged,
+                        ),
+                        const SizedBox(height: 16),
+                      ],
 
                       // Reading Complete Message
                       if (readingProvider.isReadingComplete && !readingProvider.isQuizComplete) ...[

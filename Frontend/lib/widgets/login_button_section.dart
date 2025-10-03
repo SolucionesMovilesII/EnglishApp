@@ -46,6 +46,7 @@ class LoginButtonSection extends StatelessWidget {
                 ] : null,
               ),
               child: ElevatedButton(
+                key: const Key('login_button'),
                 onPressed: (authProvider.isLoading || !(isEmailValid && isPasswordValid)) ? null : onLoginPressed,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: (isEmailValid && isPasswordValid)

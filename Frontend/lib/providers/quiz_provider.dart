@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import '../models/quiz_question.dart';
+import '../services/quiz_practice_service.dart';
 import 'progress_provider.dart';
 
 class QuizProvider with ChangeNotifier {
   final List<QuizQuestion> _questions = QuizQuestion.getSampleQuestions();
   final ProgressProvider? _progressProvider;
+  final QuizPracticeService _quizService = QuizPracticeService();
   final String _chapterId;
   
   int _currentQuestionIndex = 0;
@@ -12,6 +14,8 @@ class QuizProvider with ChangeNotifier {
   int _score = 100;
   bool _hasAnswered = false;
   bool _showResult = false;
+  QuizPracticeSession? _currentSession;
+  bool _isLoading = false;
   
   QuizProvider({
     ProgressProvider? progressProvider,
@@ -27,6 +31,8 @@ class QuizProvider with ChangeNotifier {
   bool get hasAnswered => _hasAnswered;
   bool get showResult => _showResult;
   bool get canSubmit => _selectedOption != null && !_hasAnswered;
+  QuizPracticeSession? get currentSession => _currentSession;
+  bool get isLoading => _isLoading;
 
   void selectOption(int optionIndex) {
     if (!_hasAnswered) {
@@ -89,5 +95,114 @@ class QuizProvider with ChangeNotifier {
     return _hasAnswered && 
            _selectedOption == optionIndex && 
            optionIndex != currentQuestion.correctAnswer;
+  }
+  
+  // Create a new quiz practice session
+  Future<void> createQuizSession({
+    required String userId,
+    required String token,
+    String? episodeId,
+    String quizCategory = 'general',
+    String difficultyLevel = 'beginner',
+    int totalQuestions = 10,
+  }) async {
+    _isLoading = true;
+    notifyListeners();
+    
+    try {
+      _currentSession = await _quizService.createQuizSession(
+        token: token,
+        userId: userId,
+        chapterId: _chapterId,
+        episodeId: episodeId,
+        quizCategory: quizCategory,
+        difficultyLevel: difficultyLevel,
+        totalQuestions: totalQuestions,
+      );
+      
+      if (_currentSession != null) {
+        // Update local state based on session data
+        _currentQuestionIndex = 0;
+        _score = _currentSession!.score.toInt();
+      }
+    } catch (e) {
+      print('Error creating quiz session: $e');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+  
+  // Submit answer using the service
+  Future<void> submitAnswerToService({
+    required String token,
+    required int timeSpentSeconds,
+  }) async {
+    if (_currentSession == null || _selectedOption == null) return;
+    
+    try {
+      _currentSession = await _quizService.answerQuestion(
+        sessionId: _currentSession!.id,
+        token: token,
+        questionNumber: _currentQuestionIndex + 1,
+        userAnswer: _selectedOption!,
+        timeSpentSeconds: timeSpentSeconds,
+      );
+      
+      if (_currentSession != null) {
+        _score = _currentSession!.score.toInt();
+      }
+      
+      notifyListeners();
+    } catch (e) {
+      print('Error submitting answer: $e');
+    }
+  }
+  
+  // Complete quiz session
+  Future<void> completeQuizSession({
+    required String token,
+    required int totalTimeSpent,
+  }) async {
+    if (_currentSession == null) return;
+    
+    try {
+      _currentSession = await _quizService.completeQuiz(
+        sessionId: _currentSession!.id,
+        token: token,
+        totalTimeSpent: totalTimeSpent,
+      );
+      
+      if (_currentSession != null) {
+        // Save final progress
+        _progressProvider?.onChapterCompleted(_chapterId, _currentSession!.score);
+      }
+      
+      notifyListeners();
+    } catch (e) {
+      print('Error completing quiz: $e');
+    }
+  }
+  
+  // Get user quiz statistics
+  Future<QuizStats?> getUserStats({
+    required String userId,
+    required String token,
+    String? timeframe,
+    String? category,
+    String? difficultyLevel,
+  }) async {
+    try {
+      return await _quizService.getUserQuizStats(
+        userId: userId,
+        token: token,
+        timeframe: timeframe,
+        category: category,
+        difficultyLevel: difficultyLevel,
+      );
+    } catch (e) {
+      print('Error getting quiz stats: $e');
+      return null;
+    }
   }
 }

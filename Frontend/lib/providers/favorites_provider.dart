@@ -320,7 +320,7 @@ class FavoritesProvider with ChangeNotifier {
       }
     } catch (e) {
       if (EnvironmentConfig.enableLogging && EnvironmentConfig.isDevelopment) {
-        print('❌ Failed to sync favorite to server: $e');
+        debugPrint('❌ Failed to sync favorite to server: $e');
       }
     }
   }
@@ -333,7 +333,7 @@ class FavoritesProvider with ChangeNotifier {
       await _apiService.delete(endpoint, token: token);
     } catch (e) {
       if (EnvironmentConfig.enableLogging && EnvironmentConfig.isDevelopment) {
-        print('❌ Failed to remove favorite from server: $e');
+        debugPrint('❌ Failed to remove favorite from server: $e');
       }
     }
   }

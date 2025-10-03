@@ -7,7 +7,9 @@ import 'providers/theme_provider.dart';
 import 'providers/locale_provider.dart';
 import 'providers/progress_provider.dart';
 import 'providers/lives_provider.dart';
+import 'providers/evaluation_provider.dart';
 import 'providers/episode_provider.dart';
+
 import 'screens/login_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/loading_screen.dart';
@@ -38,6 +40,15 @@ class EnglishApp extends StatelessWidget {
           ),
           update: (context, auth, previous) => previous ?? LivesProvider(auth),
         ),
+        ChangeNotifierProxyProvider<AuthProvider, EvaluationProvider>(
+          create: (context) => EvaluationProvider(
+            Provider.of<AuthProvider>(context, listen: false),
+          ),
+          update: (context, auth, previous) =>
+              previous ?? EvaluationProvider(auth),
+        ),
+        // Si necesitas EpisodeProvider como ChangeNotifier:
+        // ChangeNotifierProvider(create: (_) => EpisodeProvider()),
       ],
       child: Consumer2<ThemeProvider, LocaleProvider>(
         builder: (context, themeProvider, localeProvider, child) {
