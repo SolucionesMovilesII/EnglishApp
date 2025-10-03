@@ -9,563 +9,484 @@ class AppLocalizationsQu extends AppLocalizations {
   AppLocalizationsQu([String locale = 'qu']) : super(locale);
 
   @override
-  String get appTitle => 'Inglis yachay app';
+  String get appTitle => 'App de Aprendizaje de English';
 
   @override
-  String get login => 'Yaykuy';
+  String get login => 'Iniciar Sesión';
 
   @override
-  String get email => 'Korreu elektroniku';
+  String get email => 'Correo electrónico';
 
   @override
-  String get password => 'Chimpu';
+  String get password => 'Contraseña';
 
   @override
-  String get loginButton => 'Yaykuy';
+  String get loginButton => 'Entrar';
 
   @override
-  String get loginWithGoogle => 'Google-wan yaykuy';
+  String get loginWithGoogle => 'Iniciar con Google';
 
   @override
-  String get loginWithApple => 'Apple-wan yaykuy';
+  String get loginWithApple => 'Iniciar con Apple';
 
   @override
-  String get emailRequired => 'Korreuqa munsisqa';
+  String get emailRequired => 'El correo es requerido';
 
   @override
-  String get emailInvalid => 'Allin korreuta qillqay';
+  String get emailInvalid => 'Ingrese un correo válido';
 
   @override
-  String get passwordRequired => 'Chimpuqa munsisqa';
+  String get passwordRequired => 'La contraseña es requerida';
 
   @override
-  String get passwordTooShort => 'Chimpuqa, ñawpaqman, 6 qillqakama kanan';
+  String get passwordTooShort =>
+      'La contraseña debe tener al menos 6 caracteres';
 
   @override
-  String get hi => 'Imaynallan kashanki';
+  String get hi => 'Hola';
 
   @override
-  String get continueText => 'Qatiy';
+  String get continueText => 'Continuar';
 
   @override
-  String get vocabulary => 'Simi qillqa';
+  String get vocabulary => 'Vocabulario';
 
   @override
-  String get reading => 'Ñawinchay';
+  String get reading => 'Lectura';
 
   @override
-  String get interview => 'Rimanakuy';
+  String get interview => 'Entrevista';
 
   @override
-  String get home => 'Qallariy';
+  String get home => 'Inicio';
 
   @override
-  String get documents => 'Qillqakuna';
+  String get documents => 'Documentos';
 
   @override
-  String get book => 'P’anqa';
+  String get book => 'Libro';
 
   @override
-  String get help => 'Yanapay';
+  String get help => 'Ayuda';
 
   @override
-  String get settings => 'Ajustes';
+  String get settings => 'Configuración';
 
   @override
-  String get theme => 'T’ema';
+  String get theme => 'Tema';
 
   @override
-  String get language => 'Simi';
+  String get language => 'Idioma';
 
   @override
-  String get lightTheme => 'K’anchay';
+  String get lightTheme => 'Claro';
 
   @override
-  String get darkTheme => 'Tuta';
+  String get darkTheme => 'Oscuro';
 
   @override
-  String get colorPalette => 'Llimp’i qutuna';
+  String get colorPalette => 'Paleta de Colores';
 
   @override
-  String get system => 'Sistima';
+  String get system => 'Sistema';
 
   @override
-  String get notifications => 'Willakuykuna';
+  String get notifications => 'Notificaciones';
 
   @override
-  String get notificationsEnabled => 'Willakuykuna aktivasqa';
+  String get notificationsEnabled => 'Notificaciones activadas';
 
   @override
-  String get notificationsDisabled => 'Willakuykuna mana aktivasqa';
+  String get notificationsDisabled => 'Notificaciones desactivadas';
 
   @override
-  String get logout => 'Lloqsiy';
+  String get logout => 'Cerrar Sesión';
 
   @override
-  String get selectLanguage => 'Simi akllay';
+  String get selectLanguage => 'Seleccionar Idioma';
 
   @override
-  String get selectColorPalette => 'Llimp’i qutunta akllay';
+  String get selectColorPalette => 'Seleccionar Paleta de Colores';
 
   @override
-  String get confirmLogout => 'Lloqsiyta chaninchay';
+  String get confirmLogout => 'Confirmar Cerrar Sesión';
 
   @override
-  String get logoutConfirmation => '¿Cheqaqchu lloqsiyta munanki?';
+  String get logoutConfirmation =>
+      '¿Estás seguro de que quieres cerrar sesión?';
 
   @override
-  String get cancel => 'Ch’utiy';
+  String get cancel => 'Cancelar';
 
   @override
-  String get welcomeBack => '¡Kutiykamuway!';
+  String get welcomeBack => '¡Bienvenido de vuelta!';
 
   @override
-  String get yourLearningPath => 'Qampa yachay ñan';
+  String get yourLearningPath => 'Tu Ruta de Aprendizaje';
 
   @override
-  String get learningSlogan => 'Yachay • Praktikay • Atipay';
+  String get learningSlogan => 'Aprende • Practica • Domina';
 
   @override
-  String get signingYouIn => 'Sesiónta qallariyku...';
+  String get signingYouIn => 'Iniciando sesión...';
 
   @override
-  String get connectingWithGoogle => 'Google-wan t’inkichkan...';
+  String get connectingWithGoogle => 'Conectando con Google...';
 
   @override
-  String get connectingWithApple => 'Apple-wan t’inkichkan...';
+  String get connectingWithApple => 'Conectando con Apple...';
 
   @override
-  String get loadingExperience => 'Qampaq yachay kawsayta churachkan...';
+  String get loadingExperience => 'Cargando tu experiencia de aprendizaje...';
 
   @override
-  String get initializingExperience => 'Kawsayta qallarichkan...';
+  String get initializingExperience =>
+      'Inicializando tu experiencia de aprendizaje...';
 
   @override
-  String get or => 'Utaq';
+  String get or => 'O';
 
   @override
-  String get user => 'Usuaryu';
+  String get user => 'Usuario';
 
   @override
   String livesRemaining(int lives) {
-    return '$lives/5';
+    return '5/5';
   }
 
   @override
-  String get chapterProgress => 'Kapitulu 4/5';
+  String get chapterProgress => 'Cap 4/5';
 
   @override
   String get software => 'Software';
 
   @override
-  String get databases => 'Datos qutuna';
+  String get databases => 'Bases de Datos';
 
   @override
   String navigatingToSection(String section) {
-    return 'Seksion $section-man purichkan...';
+    return 'Navegando a la sección $section...';
   }
 
   @override
-  String get emailPasswordRequired => 'Korreu hina chimpuqa munsisqa';
+  String get emailPasswordRequired =>
+      'El correo y la contraseña son requeridos';
 
   @override
   String get invalidCredentials =>
-      'Mana allin qillqakuna. Korreu hina chimputa qhaway.';
+      'Invalid credentials. Please check your email and password.';
 
   @override
-  String get googleSignInFailed => 'Google-wan yaykuyqa pantasqa';
+  String get googleSignInFailed => 'Error al iniciar sesión con Google';
 
   @override
-  String get appleSignInFailed => 'Apple-wan yaykuyqa pantasqa';
+  String get appleSignInFailed => 'Error al iniciar sesión con Apple';
 
   @override
-  String get errorDuringLogout => 'Lloqsispa pantasqa';
+  String get errorDuringLogout => 'Error al cerrar sesión';
 
   @override
-  String get errorCheckingAuth => 'Autentikasyonta qhawaspa pantasqa';
+  String get errorCheckingAuth =>
+      'Error al verificar el estado de autenticación';
 
   @override
-  String get errorInMockLogin => 'Yachachiyniy yaykuyqa pantasqa';
+  String get errorInMockLogin => 'Error en el inicio de sesión de prueba';
 
   @override
-  String get comingSoon => 'Hamuq pachapi';
+  String get comingSoon => 'Próximamente';
 
   @override
   String sectionTitle(String title) {
-    return 'Seksion $title';
+    return 'Sección $title';
   }
 
   @override
-  String get selectCustomColor => 'Sapaq llimp’ita akllay';
+  String get selectCustomColor => 'Seleccionar Color Personalizado';
 
   @override
-  String get hue => 'Llimp’i';
+  String get hue => 'Matiz';
 
   @override
-  String get saturation => 'Q’illiy';
+  String get saturation => 'Saturación';
 
   @override
-  String get lightness => 'Q’anchay';
+  String get lightness => 'Luminosidad';
 
   @override
-  String get quickColors => 'Utqay llimp’ikuna';
+  String get quickColors => 'Colores Rápidos';
 
   @override
-  String get selectColor => 'Llimp’ita akllay';
+  String get selectColor => 'Seleccionar Color';
 
   @override
-  String get quiz => 'Rikuchiy';
+  String get quiz => 'Quiz';
 
   @override
-  String get question => 'Tapuy';
+  String get question => 'Pregunta';
 
   @override
-  String get submit => 'Apachiy';
+  String get submit => 'Enviar';
 
   @override
-  String get nextQuestion => 'Hamuq tapuy';
+  String get nextQuestion => 'Siguiente Pregunta';
 
   @override
-  String get score => 'Puntu';
+  String get score => 'Puntuación';
 
   @override
-  String get points => 'puntu';
+  String get points => 'puntos';
 
   @override
   String get completeePreviousEpisode =>
-      'Ñawpaq episodioq tukuy, chaymanta kayta kichay';
+      'Completa el episodio anterior para desbloquear este';
 
   @override
-  String get episodeCompleted => 'Episodiota tukurirqanki - Kutiypaq tapay';
+  String get episodeCompleted => 'Episodio completado - Toca para repetir';
 
   @override
-  String get continueEpisode => 'Episodiota qatiy';
+  String get continueEpisode => 'Continuar episodio';
 
   @override
   String get completePreviousEpisode =>
-      'Ñawpaq episodioq tukuy, chaymanta kicharinqa';
+      'Completa el episodio anterior para desbloquear';
 
   @override
   String playingEpisode(String episodeTitle) {
-    return 'Episodio $episodeTitle pukllachkan';
+    return 'Reproduciendo $episodeTitle';
   }
 
   @override
-  String get dontHaveAccount => '¿Mana kuyenteyuqchu kanki?';
+  String get dontHaveAccount => '¿No tienes una cuenta?';
 
   @override
-  String get signUp => 'Qillqakuy';
+  String get signUp => 'Registrarse';
 
   @override
-  String get createAccount => 'Kuyenta kamachiy';
+  String get createAccount => 'Crear Cuenta';
 
   @override
   String get joinUsSlogan =>
-      'Qamakuway, inglis teknikuta yachayta qallariy';
+      'Únete para comenzar tu viaje con el inglés técnico';
 
   @override
-  String get fullName => 'Sutiykita hunt’achiy';
+  String get fullName => 'Nombre Completo';
 
   @override
-  String get enterFullName => 'Suti hunt’asqaykita qillqay';
+  String get enterFullName => 'Ingresa tu nombre completo';
 
   @override
-  String get confirmPassword => 'Chimputa chaninchay';
+  String get confirmPassword => 'Confirmar Contraseña';
 
   @override
-  String get enterConfirmPassword => 'Chimputa chaninchay qillqay';
+  String get enterConfirmPassword => 'Confirma tu contraseña';
 
   @override
   String get acceptTerms =>
-      'Sumaq Kamachikuna hina Amañakuy qillqakuna-ta aqllini';
+      'Acepto los Términos de Servicio y Política de Privacidad';
 
   @override
-  String get pleaseEnterName => 'Ama hina, sutiykita qillqay';
+  String get pleaseEnterName => 'Por favor ingresa tu nombre';
 
   @override
-  String get nameTooShort => 'Sutiyqa iskay qillqakama kanan';
+  String get nameTooShort => 'El nombre debe tener al menos 2 caracteres';
 
   @override
-  String get passwordsDontMatch => 'Chimupukuna mana tinkunchu';
+  String get passwordsDontMatch => 'Las contraseñas no coinciden';
 
   @override
-  String get pleaseAcceptTerms => 'Ama hina, kamachikunata aqllay';
+  String get pleaseAcceptTerms => 'Por favor acepta los términos y condiciones';
 
   @override
-  String get alreadyHaveAccount => '¿Ña kuyenteyuqchu kanki?';
+  String get alreadyHaveAccount => '¿Ya tienes una cuenta?';
 
   @override
-  String get signIn => 'Yaykuy';
+  String get signIn => 'Iniciar Sesión';
 
   @override
-  String get creatingAccount => 'Kuyenta kamachkan...';
+  String get creatingAccount => 'Creando tu cuenta...';
 
   @override
-  String get register => 'Qillqakuy';
+  String get register => 'Registrarse';
 
   @override
-  String get signUpWithGoogle => 'Google-wan qillqakuy';
+  String get signUpWithGoogle => 'Registrarse con Google';
 
   @override
-  String get signUpWithApple => 'Apple-wan qillqakuy';
+  String get signUpWithApple => 'Registrarse con Apple';
 
   @override
-  String get creatingAccountWithGoogle => 'Google-wan kuyenta kamachkan...';
+  String get creatingAccountWithGoogle => 'Creando cuenta con Google...';
 
   @override
-  String get creatingAccountWithApple => 'Apple-wan kuyenta kamachkan...';
+  String get creatingAccountWithApple => 'Creando cuenta con Apple...';
 
   @override
-  String get forgotPassword => '¿Chimputa qunqarirqanki?';
+  String get forgotPassword => '¿Olvidaste tu contraseña?';
 
   @override
-  String get checkYourEmail => 'Korreuykita qhaway';
+  String get checkYourEmail => 'Revisa tu correo';
 
   @override
   String get forgotPasswordSubtitle =>
-      'Ama nanaychu. Korreuykita qillqay, chaymanta chimpu kutichinapaq t’inkita apachikunqayku.';
+      '¡No te preocupes! Ingresa tu dirección de correo y te enviaremos un enlace para restablecer tu contraseña.';
 
   @override
   String get emailSentMessage =>
-      'Chimpu kutichinapaq t’inki apachisqayku. Ama hina, korreuykita qhaway, kamachikuta qatiy.';
+      'Hemos enviado un enlace para restablecer tu contraseña a tu dirección de correo. Por favor revisa tu bandeja de entrada y sigue las instrucciones.';
 
   @override
-  String get emailAddress => 'Korreu direccion';
+  String get emailAddress => 'Dirección de correo';
 
   @override
-  String get enterEmailAddress => 'Korreu direccionta qillqay';
+  String get enterEmailAddress => 'Ingresa tu dirección de correo';
 
   @override
-  String get sendResetLink => 'Kutichiy t’inki apachiy';
+  String get sendResetLink => 'Enviar enlace de restablecimiento';
 
   @override
-  String get backToLogin => 'Yaykuy-man kutiy';
+  String get backToLogin => 'Volver al inicio de sesión';
 
   @override
-  String get emailSent => 'Korreu apachisqa';
+  String get emailSent => 'Correo enviado';
 
   @override
-  String get sendingResetLink => 'Kutichiy t’inki apachichkan...';
+  String get sendingResetLink => 'Enviando enlace de restablecimiento...';
 
   @override
-  String get emailSentSuccessfully => '¡Kutichiy t’inki allin apachisqa!';
+  String get emailSentSuccessfully =>
+      '¡Correo de restablecimiento enviado exitosamente!';
 
   @override
-  String get resendEmail => 'Wakmanta korreuta apachiy';
+  String get resendEmail => 'Reenviar correo';
 
   @override
-  String get openEmailApp => 'Korreu aplikasiyonta kichay';
+  String get openEmailApp => 'Abrir aplicación de correo';
 
   @override
-  String get resetLinkSentAgain => '¡Kutichiy t’inki wakmanta apachisqa!';
+  String get resetLinkSentAgain =>
+      '¡Enlace de restablecimiento enviado nuevamente!';
 
   @override
-  String get openingEmailApp => 'Korreu aplikasiyonta kichachkan...';
+  String get openingEmailApp => 'Abriendo aplicación de correo...';
 
   @override
-  String get forgotPasswordQuestion => '¿Chimputa qunqarirqanki?';
+  String get forgotPasswordQuestion => '¿Olvidaste tu contraseña?';
 
   @override
-  String get rememberSession => 'Sesionta yuyariy';
+  String get rememberSession => 'Recordar sesión';
 
   @override
-  String get folders => 'Q’ipikuna';
+  String get folders => 'Carpetas';
 
   @override
-  String get errorLoadingLives => 'Kawsaykunata churaypi pantasqa';
+  String get errorLoadingLives => 'Error loading lives';
 
   @override
-  String get retry => 'Wakmanta yapay';
+  String get retry => 'Retry';
 
   @override
-  String get noLivesRemaining => '¡Kawsaykunam mana kachkanchu!';
+  String get noLivesRemaining => 'No lives remaining!';
 
   @override
-  String get livesResetTomorrow => 'Kawsaykuna paqarin kutichinqa';
+  String get livesResetTomorrow => 'Lives reset tomorrow';
 
   @override
-  String get nextResetTomorrow => 'Qatiq kutichiy paqarin';
+  String get nextResetTomorrow => 'Next reset tomorrow';
 
   @override
-  String get refresh => 'Musuqchakuy';
-
-  // ----- Repeat Chapter -----
+  String get refresh => 'Refresh';
 
   @override
-  String get repeatChapterTitle => 'Kapituluta kutiy';
+  String get vocabularyChaptersTitle => 'Vocabulary Chapters';
 
   @override
-  String get repeatChapterWarning =>
-      'Kay kapitulota ña tukurirqanki. Kutiypaqqa mana puntuyki tikranchu, ichaqa yachaykiqa aswan sinchikunqa!';
+  String get loadingVocabularyChapters => 'Loading vocabulary chapters...';
 
   @override
-  String currentScore(int score) {
-    return 'Kunan puntu: $score';
-  }
+  String get errorLoadingChapters => 'Error loading chapters';
 
   @override
-  String get repeatChapterBenefit =>
-      'Kutiq praktikaymi sumaq. Kay pacha qampaq yachayta sinchiy.';
+  String get unknownError => 'An unknown error occurred';
 
   @override
-  String get repeatChapter => 'Kapituluta kutiy';
+  String get dismiss => 'Dismiss';
 
   @override
-  String chapterResetForRepetition(String chapterTitle) {
-    return 'Kapitulu «$chapterTitle» kutiypaq kutichisqa. Puntuykikunaqa waqllasqa kachkan!';
-  }
+  String get tryAgain => 'Try Again';
 
   @override
-  String get progress => 'Ñawpaqman';
-
-  @override
-  String get episodeContent => 'Episodiopa contenido';
-
-  @override
-  String get episodeContentPlaceholder => 'Kaypi episodiopa contenido rikurinqa';
-
-  @override
-  String get replayEpisode => 'Episodiota kutiy';
-
-  @override
-  String get startEpisode => 'Episodiota qallariy';
-
-  @override
-  String startingEpisode(String episodeTitle) {
-    return '$episodeTitle qallarikuspa...';
-  }
-
-  // ----- Evaluation -----
-
-  @override
-  String get evaluationDetails => 'Tupuykunapa willakuy';
-
-  @override
-  String get completedDate => 'Tukusqa p’unchaw';
-
-  @override
-  String get attempts => 'Akllanakuykuna';
-
-  @override
-  String get timeSpent => 'Pacha apachisqa';
-
-  @override
-  String get skillBreakdown => 'Yachay ruwanapa t’aqaq';
-
-  @override
-  String get feedback => 'Kuti willakuy';
-
-  @override
-  String get featureComingSoon => 'Kay rikch’ayninqa utqay hamunqa!';
-
-  @override
-  String get chapter => 'Kapitulu';
-
-  @override
-  String get evaluationInfo => 'Tupuy willakuy';
-
-  @override
-  String get chapterResults => 'Kapitulupa sutinakuy';
-
-  @override
-  String get allChapters => 'Tukuy kapitulukuna';
-
-  @override
-  String get noEvaluationsFound => 'Mana tupuy tariwasqa';
-
-  @override
-  String get completeChaptersToSeeResults =>
-      'Kapitulukunata tukuy, chaymanta sutinakuyta qhaway';
-
-  // ----- Vocabulary Chapters -----
-
-  @override
-  String get vocabularyChaptersTitle => 'Simi kapitulukuna';
-
-  @override
-  String get loadingVocabularyChapters => 'Simi kapitulukuna churachkan...';
-
-  @override
-  String get errorLoadingChapters => 'Kapitulukuna churanapi pantasqa';
-
-  @override
-  String get unknownError => 'Mana riqsisqa pantay';
-
-  @override
-  String get dismiss => 'Wisq’uy';
-
-  @override
-  String get tryAgain => 'Wakmanta';
-
-  @override
-  String get noChaptersAvailable => 'Mana kapitulu kachkan';
+  String get noChaptersAvailable => 'No chapters available';
 
   @override
   String get noChaptersDescription =>
-      'Qhipaman kutiy, simi kapitulukunaqa chayamunqa';
+      'Check back later for new vocabulary chapters';
 
   @override
-  String get yourProgress => 'Qampa ñawpaqman';
+  String get yourProgress => 'Your Progress';
 
   @override
-  String get chaptersCompleted => 'Kapitulukuna tukusqa';
+  String get chaptersCompleted => 'Chapters Completed';
 
   @override
-  String get unlocked => 'Kichasqa';
+  String get unlocked => 'Unlocked';
 
   @override
-  String get locked => 'Wichqasqa';
+  String get locked => 'Locked';
 
   @override
-  String get completed => 'Tukusqa';
+  String get progress => 'Progress';
 
   @override
-  String get continue_ => 'Qatiy';
+  String get completed => 'Completed';
 
   @override
-  String get start => 'Qallariy';
+  String get continue_ => 'Continue';
 
   @override
-  String get chapterLocked => 'Kapitulu wichqasqa';
+  String get start => 'Start';
+
+  @override
+  String get chapterLocked => 'Chapter Locked';
 
   @override
   String chapterLockedDescription(int previousChapter) {
-    return 'Kay kapitulu kicharinapaq, ñawpaq kapitulu $previousChapter tukuy';
+    return 'Complete chapter $previousChapter to unlock this chapter';
   }
 
   @override
-  String get understood => 'Riqsisqa';
+  String get understood => 'Understood';
 
   @override
-  String get chapterCompleted => 'Kapitulu tukusqa';
+  String get chapterCompleted => 'Chapter Completed';
 
   @override
   String get chapterCompletedDescription =>
-      'Kay kapituluqa ña tukusqam. Ima p’unchawpas qhawariyta atinki.';
+      'You have already completed this chapter. You can review it anytime.';
 
   @override
   String completedOn(DateTime date) {
     final intl.DateFormat dateDateFormat = intl.DateFormat.yMd(localeName);
     final String dateString = dateDateFormat.format(date);
-    return 'Tukusqa: $dateString';
+
+    return 'Completed on $dateString';
   }
 
   @override
-  String get close => 'Wisq’uy';
+  String get close => 'Close';
 
   @override
-  String get reviewChapter => 'Kapituluta qhawariy';
+  String get reviewChapter => 'Review Chapter';
 
   @override
-  String get noLivesTitle => 'Kawsaykuna mana kachkan';
+  String get noLivesTitle => 'No Lives Available';
 
   @override
   String get noLivesMessage =>
-      'Huk kawsaypachapas munsunki kapituluta qallariypaq. Kawsaykuna p’unchaw p’unchaw kutichikun.';
+      'You need at least one life to start a chapter. Lives reset daily.';
 
   @override
   String nextResetAt(String time) {
-    return 'Qatiq kutichiy: $time';
+    return 'Next reset at $time';
   }
 
   @override
