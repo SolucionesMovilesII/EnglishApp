@@ -163,6 +163,42 @@ class ApiService {
     }
   }
   
+  // DELETE request method
+  Future<ApiResponse> delete(
+    String endpoint, {
+    String? token,
+  }) async {
+    try {
+      final url = Uri.parse(endpoint);
+      _logRequest('DELETE', endpoint, null);
+      
+      final response = await http.delete(
+        url,
+        headers: _getHeaders(token: token),
+      ).timeout(EnvironmentConfig.apiTimeout);
+      
+      _logResponse(response);
+      
+      return ApiResponse(
+        statusCode: response.statusCode,
+        data: _parseResponse(response.body),
+        success: response.statusCode >= 200 && response.statusCode < 300,
+        message: _extractMessage(response.body, response.statusCode),
+      );
+    } catch (e) {
+      if (EnvironmentConfig.enableLogging && EnvironmentConfig.isDevelopment) {
+        // ignore: avoid_print
+        print('❌ API Error: $e');
+      }
+      return ApiResponse(
+        statusCode: 0,
+        data: null,
+        success: false,
+        message: _handleError(e),
+      );
+    }
+  }
+  
   // Helper method to parse JSON response
   dynamic _parseResponse(String responseBody) {
     try {
@@ -217,6 +253,32 @@ class ApiService {
     } else {
       return 'Network error. Please try again later.';
     }
+  }
+
+  // --- Vocabulary Chapters API Methods ---
+
+  /// Get all vocabulary chapters with their unlock status and progress
+  Future<ApiResponse> getVocabularyChapters(String token) async {
+    final endpoint = '${EnvironmentConfig.fullApiUrl}/vocab/chapters';
+    return await get(endpoint, token: token);
+  }
+
+  /// Complete a vocabulary chapter
+  Future<ApiResponse> completeVocabularyChapter(
+    String chapterId,
+    String token, {
+    int? finalScore,
+    String? completionNotes,
+    Map<String, dynamic>? extraData,
+  }) async {
+    final endpoint = '${EnvironmentConfig.fullApiUrl}/vocab/chapters/$chapterId/complete';
+    
+    final body = <String, dynamic>{};
+    if (finalScore != null) body['finalScore'] = finalScore;
+    if (completionNotes != null) body['completionNotes'] = completionNotes;
+    if (extraData != null) body['extraData'] = extraData;
+
+    return await post(endpoint, body: body, token: token);
   }
 }
 

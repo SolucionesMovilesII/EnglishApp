@@ -5,7 +5,7 @@ import { IUserProgressRepository } from '../../../interfaces/repositories/user-p
 import { IUserRepository } from '../../../interfaces/repositories/user-repository.interface';
 import { CreateProgressDto } from '../../../dtos/progress/create-progress.dto';
 import { User } from '../../../../domain/entities/user.entity';
-import { UserProgress } from '../../../../domain/entities/user-progress.entity';
+
 
 describe('CreateProgressUseCase', () => {
   let useCase: CreateProgressUseCase;
@@ -61,10 +61,21 @@ describe('CreateProgressUseCase', () => {
       chapterId: mockChapterId,
       score: 85.5,
       lastActivity: new Date(),
+      chapterCompleted: false,
+      chapterCompletionDate: null,
+      vocabularyItemsLearned: 10,
+      totalVocabularyItems: 20,
       extraData: { vocab: { chapter: 2, lastWord: 'apple' } },
+      user: mockUser,
+      chapter: null,
       createdAt: new Date(),
       updatedAt: new Date(),
-    } as UserProgress;
+      getProgressPercentage: jest.fn().mockReturnValue(50),
+      markChapterCompleted: jest.fn(),
+      incrementVocabularyLearned: jest.fn(),
+      isChapterInProgress: jest.fn().mockReturnValue(true),
+      canCompleteChapter: jest.fn().mockReturnValue(false),
+    } as any;
 
     it('should create progress successfully when user exists', async () => {
       mockUserRepository.findById.mockResolvedValue(mockUser);
@@ -116,7 +127,15 @@ describe('CreateProgressUseCase', () => {
 
     it('should handle progress without score', async () => {
       const dtoWithoutScore = { chapterId: mockChapterId };
-      const progressWithoutScore = { ...mockProgress, score: null };
+      const progressWithoutScore = { 
+        ...mockProgress, 
+        score: null,
+        getProgressPercentage: jest.fn().mockReturnValue(50),
+        markChapterCompleted: jest.fn(),
+        incrementVocabularyLearned: jest.fn(),
+        isChapterInProgress: jest.fn().mockReturnValue(true),
+        canCompleteChapter: jest.fn().mockReturnValue(false),
+      };
 
       mockUserRepository.findById.mockResolvedValue(mockUser);
       mockUserProgressRepository.createOrUpdate.mockResolvedValue(progressWithoutScore);

@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../utils/api_service.dart';
 import '../utils/environment_config.dart';
+import 'approval_provider.dart';
 
 enum ProgressState {
   initial,
@@ -15,6 +16,7 @@ enum ProgressState {
 
 class ProgressProvider with ChangeNotifier {
   final ApiService _apiService = ApiService();
+  ApprovalProvider? _approvalProvider;
   
   ProgressState _progressState = ProgressState.initial;
   String? _errorMessage;
@@ -22,6 +24,11 @@ class ProgressProvider with ChangeNotifier {
   final List<Map<String, dynamic>> _pendingSaves = [];
   bool _isOfflineMode = false;
   bool _simulateNetworkError = false;
+  
+  // Approval integration
+  void setApprovalProvider(ApprovalProvider approvalProvider) {
+    _approvalProvider = approvalProvider;
+  }
   
   // Getters
   ProgressState get progressState => _progressState;
@@ -142,15 +149,37 @@ class ProgressProvider with ChangeNotifier {
   }
 
   /// Detect and save progress based on module events
-  Future<void> onChapterCompleted(String chapterId, double score) async {
+  Future<void> onChapterCompleted(String chapterId, double score, {int errors = 0, int timeSpent = 0}) async {
     await saveProgress(
       chapterId: chapterId,
       score: score,
       extraData: {
         'event_type': 'chapter_completed',
         'completed_at': DateTime.now().toIso8601String(),
+        'errors': errors,
+        'time_spent': timeSpent,
       },
     );
+    
+    // Trigger approval evaluation if approval provider is available
+    if (_approvalProvider != null) {
+      try {
+        await _approvalProvider!.evaluateChapterApproval(
+          chapterId: chapterId,
+          score: score,
+          errors: errors,
+          timeSpent: timeSpent,
+        );
+        
+        if (kDebugMode) {
+          print('✅ Approval evaluation completed for chapter: $chapterId');
+        }
+      } catch (e) {
+        if (kDebugMode) {
+          print('⚠️ Failed to evaluate approval for chapter $chapterId: $e');
+        }
+      }
+    }
   }
 
   Future<void> onQuizAnswered(String chapterId, double score, int questionIndex) async {

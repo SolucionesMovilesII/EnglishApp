@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:provider/provider.dart';
 import 'package:english_app/providers/episode_provider.dart';
 import 'package:english_app/widgets/repeat_chapter_dialog.dart';
 import 'package:english_app/models/episode.dart';
@@ -15,7 +14,9 @@ void main() {
       episodeProvider = EpisodeProvider();
     });
 
-    testWidgets('RepeatChapterDialog displays correctly', (WidgetTester tester) async {
+    testWidgets('RepeatChapterDialog displays correctly', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           localizationsDelegates: const [
@@ -24,10 +25,7 @@ void main() {
             GlobalWidgetsLocalizations.delegate,
             GlobalCupertinoLocalizations.delegate,
           ],
-          supportedLocales: const [
-            Locale('en'),
-            Locale('es'),
-          ],
+          supportedLocales: const [Locale('en'), Locale('es')],
           home: Scaffold(
             body: Builder(
               builder: (context) => ElevatedButton(
@@ -57,7 +55,9 @@ void main() {
       expect(find.text('Cancel'), findsOneWidget);
     });
 
-    testWidgets('RepeatChapterDialog cancel button works', (WidgetTester tester) async {
+    testWidgets('RepeatChapterDialog cancel button works', (
+      WidgetTester tester,
+    ) async {
       bool cancelCalled = false;
 
       await tester.pumpWidget(
@@ -68,10 +68,7 @@ void main() {
             GlobalWidgetsLocalizations.delegate,
             GlobalCupertinoLocalizations.delegate,
           ],
-          supportedLocales: const [
-            Locale('en'),
-            Locale('es'),
-          ],
+          supportedLocales: const [Locale('en'), Locale('es')],
           home: Scaffold(
             body: Builder(
               builder: (context) => ElevatedButton(
@@ -95,7 +92,7 @@ void main() {
       // Show dialog and tap cancel
       await tester.tap(find.text('Show Dialog'));
       await tester.pumpAndSettle();
-      
+
       await tester.tap(find.text('Cancel'));
       await tester.pumpAndSettle();
 
@@ -103,7 +100,9 @@ void main() {
       expect(cancelCalled, isTrue);
     });
 
-    testWidgets('RepeatChapterDialog confirm button works', (WidgetTester tester) async {
+    testWidgets('RepeatChapterDialog confirm button works', (
+      WidgetTester tester,
+    ) async {
       bool confirmCalled = false;
 
       await tester.pumpWidget(
@@ -114,10 +113,7 @@ void main() {
             GlobalWidgetsLocalizations.delegate,
             GlobalCupertinoLocalizations.delegate,
           ],
-          supportedLocales: const [
-            Locale('en'),
-            Locale('es'),
-          ],
+          supportedLocales: const [Locale('en'), Locale('es')],
           home: Scaffold(
             body: Builder(
               builder: (context) => ElevatedButton(
@@ -141,7 +137,7 @@ void main() {
       // Show dialog and tap confirm
       await tester.tap(find.text('Show Dialog'));
       await tester.pumpAndSettle();
-      
+
       // Find the confirm button (there might be multiple "Repeat Chapter" texts)
       final confirmButtons = find.text('Repeat Chapter');
       await tester.tap(confirmButtons.last);
@@ -173,7 +169,7 @@ void main() {
 
       // Verify reset behavior
       final resetChapter = episodeProvider.currentChapter;
-      
+
       // First episode should be current
       expect(resetChapter.episodes[0].status, EpisodeStatus.current);
       expect(resetChapter.episodes[0].progress, 0.0);
