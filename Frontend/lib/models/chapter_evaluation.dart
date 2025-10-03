@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 enum EvaluationStatus { excellent, passed, needsImprovement, failed }
 
@@ -72,8 +73,8 @@ class ChapterEvaluation {
       timeSpent: Duration(seconds: json['timeSpentSeconds']),
       skillBreakdown: json['skillBreakdown'] != null
           ? (json['skillBreakdown'] as List)
-                .map((skill) => SkillEvaluation.fromJson(skill))
-                .toList()
+              .map((skill) => SkillEvaluation.fromJson(skill))
+              .toList()
           : null,
       feedback: json['feedback'],
     );

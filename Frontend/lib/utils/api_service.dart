@@ -280,6 +280,59 @@ class ApiService {
 
     return await post(endpoint, body: body, token: token);
   }
+
+  // --- Evaluation API Methods ---
+
+  /// Get all chapter evaluations for the authenticated user
+  Future<ApiResponse> getChapterEvaluations({String? token}) async {
+    final endpoint = '${EnvironmentConfig.fullApiUrl}/approval/evaluations';
+    return await get(endpoint, token: token);
+  }
+
+  /// Evaluate a specific chapter
+  Future<ApiResponse> evaluateChapter(
+    int chapterId,
+    Map<String, dynamic> evaluationData, {
+    String? token,
+  }) async {
+    final endpoint = '${EnvironmentConfig.fullApiUrl}/approval/evaluate/$chapterId';
+    
+    final body = {
+      'chapterId': chapterId,
+      ...evaluationData,
+    };
+
+    return await post(endpoint, body: body, token: token);
+  }
+
+  /// Get evaluation history for a specific user
+  Future<ApiResponse> getEvaluationHistory(int? userId, {String? token}) async {
+    final endpoint = userId != null 
+        ? '${EnvironmentConfig.fullApiUrl}/approval/history/$userId'
+        : '${EnvironmentConfig.fullApiUrl}/approval/history';
+    return await get(endpoint, token: token);
+  }
+
+  /// Get evaluation details by evaluation ID
+  Future<ApiResponse> getEvaluationDetails(String evaluationId, {String? token}) async {
+    final endpoint = '${EnvironmentConfig.fullApiUrl}/approval/evaluations/$evaluationId';
+    return await get(endpoint, token: token);
+  }
+
+  /// Configure approval rules (admin only)
+  Future<ApiResponse> configureApprovalRule(
+    Map<String, dynamic> ruleData, {
+    String? token,
+  }) async {
+    final endpoint = '${EnvironmentConfig.fullApiUrl}/approval/rules';
+    return await post(endpoint, body: ruleData, token: token);
+  }
+
+  /// Get current approval rules
+  Future<ApiResponse> getApprovalRules({String? token}) async {
+    final endpoint = '${EnvironmentConfig.fullApiUrl}/approval/rules';
+    return await get(endpoint, token: token);
+  }
 }
 
 // API Response wrapper class
