@@ -330,6 +330,138 @@ abstract class AppLocalizations {
   String get noLivesTitle;
   String get noLivesMessage;
   String nextResetAt(String time);
+
+  /// No description provided for @repeatChapterWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to repeat this chapter? Your current progress will be saved.'**
+  String get repeatChapterWarning;
+
+  /// No description provided for @evaluationHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'View your evaluation history and progress'**
+  String get evaluationHistory;
+
+  /// No description provided for @currentScore.
+  ///
+  /// In en, this message translates to:
+  /// **'Current Score'**
+  String get currentScore;
+
+  /// No description provided for @viewProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'View Progress'**
+  String get viewProgress;
+
+  /// No description provided for @benefits.
+  ///
+  /// In en, this message translates to:
+  /// **'Benefits of repeating:'**
+  String get benefits;
+
+  /// No description provided for @improveScore.
+  ///
+  /// In en, this message translates to:
+  /// **'• Improve your score'**
+  String get improveScore;
+
+  /// No description provided for @reinforceLearning.
+  ///
+  /// In en, this message translates to:
+  /// **'• Reinforce learning'**
+  String get reinforceLearning;
+
+  /// No description provided for @betterUnderstanding.
+  ///
+  /// In en, this message translates to:
+  /// **'• Better understanding'**
+  String get betterUnderstanding;
+
+  /// No description provided for @confirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm'**
+  String get confirm;
+
+  /// No description provided for @chapterResults.
+  ///
+  /// In en, this message translates to:
+  /// **'Chapter Results'**
+  String get chapterResults;
+
+  /// No description provided for @allChapters.
+  ///
+  /// In en, this message translates to:
+  /// **'All Chapters'**
+  String get allChapters;
+
+  /// No description provided for @chapter.
+  ///
+  /// In en, this message translates to:
+  /// **'Chapter'**
+  String get chapter;
+
+  /// No description provided for @noEvaluationsFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No evaluations found'**
+  String get noEvaluationsFound;
+
+  /// No description provided for @completeChaptersToSeeResults.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete chapters to see your results here'**
+  String get completeChaptersToSeeResults;
+
+  /// No description provided for @evaluationInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Evaluation Information'**
+  String get evaluationInfo;
+
+  /// No description provided for @completedDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed Date'**
+  String get completedDate;
+
+  /// No description provided for @attempts.
+  ///
+  /// In en, this message translates to:
+  /// **'Attempts'**
+  String get attempts;
+
+  /// No description provided for @timeSpent.
+  ///
+  /// In en, this message translates to:
+  /// **'Time Spent'**
+  String get timeSpent;
+
+  /// No description provided for @skillBreakdown.
+  ///
+  /// In en, this message translates to:
+  /// **'Skill Breakdown'**
+  String get skillBreakdown;
+
+  /// No description provided for @feedback.
+  ///
+  /// In en, this message translates to:
+  /// **'Feedback'**
+  String get feedback;
+
+  /// No description provided for @featureComingSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Feature coming soon'**
+  String get featureComingSoon;
+
+  /// No description provided for @repeatChapter.
+  ///
+  /// In en, this message translates to:
+  /// **'Repeat Chapter'**
+  String get repeatChapter;
 }
 
 class _AppLocalizationsDelegate

@@ -10,6 +10,7 @@ import '../l10n/app_localizations.dart';
 import 'settings_screen.dart';
 import 'quiz_screen.dart';
 import 'chapter_episodes_screen.dart';
+import 'chapter_results_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -158,9 +159,30 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
       appBar: AppBar(
-        toolbarHeight: 0,
+        toolbarHeight: 56,
         backgroundColor: Theme.of(context).colorScheme.primary,
         elevation: 0,
+        title: Text(
+          AppLocalizations.of(context)!.home,
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+            color: Theme.of(context).colorScheme.onPrimary,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        actions: [
+          IconButton(
+            icon: Icon(
+              Icons.analytics_outlined,
+              color: Theme.of(context).colorScheme.onPrimary,
+            ),
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => const ChapterResultsScreen(),
+              ),
+            ),
+            tooltip: AppLocalizations.of(context)!.chapterResults,
+          ),
+        ],
         systemOverlayStyle: SystemUiOverlayStyle(
           statusBarColor: Theme.of(context).colorScheme.primary,
           statusBarIconBrightness: Theme.of(context).brightness == Brightness.dark 
@@ -237,6 +259,25 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                             description: AppLocalizations.of(context)!.interview,
                             icon: CustomIcons.interviewIcon(),
                             onTap: () => _navigateToSection('interview'),
+                          ),
+                          
+                          const SizedBox(height: 8),
+                          
+                          // Chapter Results Card
+                          CustomCard(
+                            title: AppLocalizations.of(context)!.chapterResults,
+                            subtitle: AppLocalizations.of(context)!.viewProgress,
+                            description: AppLocalizations.of(context)!.evaluationHistory,
+                            icon: Icon(
+                              Icons.analytics,
+                              size: 32,
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                            onTap: () => Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => const ChapterResultsScreen(),
+                              ),
+                            ),
                           ),
                         ],
                       ),

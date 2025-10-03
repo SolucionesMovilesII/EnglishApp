@@ -232,7 +232,6 @@
   "continue_": "Continue",
   "start": "Start",
   "chapterLocked": "Chapter Locked",
-
   "chapterLockedDescription": "Complete chapter {previousChapter} to unlock this chapter",
   "@chapterLockedDescription": {
     "placeholders": {
@@ -242,11 +241,9 @@
       }
     }
   },
-
   "understood": "Understood",
   "chapterCompleted": "Chapter Completed",
   "chapterCompletedDescription": "You have already completed this chapter. You can review it anytime.",
-
   "completedOn": "Completed on {date}",
   "@completedOn": {
     "placeholders": {
@@ -256,12 +253,10 @@
       }
     }
   },
-
   "close": "Close",
   "reviewChapter": "Review Chapter",
   "noLivesTitle": "No Lives Available",
   "noLivesMessage": "You need at least one life to start a chapter. Lives reset daily.",
-
   "nextResetAt": "Next reset at {time}",
   "@nextResetAt": {
     "placeholders": {
@@ -272,7 +267,6 @@
     }
   },
 
-  // Evaluation (hu-006-1)
   "evaluationDetails": "Evaluation Details",
   "completedDate": "Completed Date",
   "attempts": "Attempts",

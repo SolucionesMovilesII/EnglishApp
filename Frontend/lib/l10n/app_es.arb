@@ -50,10 +50,7 @@
   "livesRemaining": "{lives}/5",
   "@livesRemaining": {
     "placeholders": {
-      "lives": {
-        "type": "int",
-        "example": 3
-      }
+      "lives": { "type": "int", "example": 3 }
     }
   },
 
@@ -64,10 +61,7 @@
   "navigatingToSection": "Navegando a la sección {section}...",
   "@navigatingToSection": {
     "placeholders": {
-      "section": {
-        "type": "String",
-        "example": "Vocabulario"
-      }
+      "section": { "type": "String", "example": "Vocabulario" }
     }
   },
 
@@ -84,10 +78,7 @@
   "sectionTitle": "Sección {title}",
   "@sectionTitle": {
     "placeholders": {
-      "title": {
-        "type": "String",
-        "example": "Vocabulario"
-      }
+      "title": { "type": "String", "example": "Vocabulario" }
     }
   },
 
@@ -113,10 +104,7 @@
   "playingEpisode": "Reproduciendo {episodeTitle}",
   "@playingEpisode": {
     "placeholders": {
-      "episodeTitle": {
-        "type": "String",
-        "example": "Episodio 1"
-      }
+      "episodeTitle": { "type": "String", "example": "Episodio 1" }
     }
   },
 
@@ -170,10 +158,7 @@
   "currentScore": "Puntuación actual: {score} puntos",
   "@currentScore": {
     "placeholders": {
-      "score": {
-        "type": "int",
-        "example": 42
-      }
+      "score": { "type": "int", "example": 42 }
     }
   },
 
@@ -183,10 +168,7 @@
   "chapterResetForRepetition": "El capítulo '{chapterTitle}' ha sido reiniciado para repetición. ¡Tu puntuación original se mantiene!",
   "@chapterResetForRepetition": {
     "placeholders": {
-      "chapterTitle": {
-        "type": "String",
-        "example": "Fundamentos de Inglés"
-      }
+      "chapterTitle": { "type": "String", "example": "Fundamentos de Inglés" }
     }
   },
 
@@ -199,10 +181,7 @@
   "startingEpisode": "Iniciando {episodeTitle}...",
   "@startingEpisode": {
     "placeholders": {
-      "episodeTitle": {
-        "type": "String",
-        "example": "Episodio 2"
-      }
+      "episodeTitle": { "type": "String", "example": "Episodio 2" }
     }
   },
 
@@ -226,10 +205,7 @@
   "chapterLockedDescription": "Completa el capítulo {previousChapter} para desbloquear este capítulo",
   "@chapterLockedDescription": {
     "placeholders": {
-      "previousChapter": {
-        "type": "int",
-        "example": 3
-      }
+      "previousChapter": { "type": "int", "example": 3 }
     }
   },
 
@@ -240,10 +216,7 @@
   "completedOn": "Completado el {date}",
   "@completedOn": {
     "placeholders": {
-      "date": {
-        "type": "String",
-        "example": "31/12/2025"
-      }
+      "date": { "type": "String", "example": "31/12/2025" }
     }
   },
 
@@ -251,14 +224,24 @@
   "reviewChapter": "Repasar Capítulo",
   "noLivesTitle": "Sin Vidas Disponibles",
   "noLivesMessage": "Necesitas al menos una vida para comenzar un capítulo. Las vidas se reinician diariamente.",
-
   "nextResetAt": "Próximo reinicio a las {time}",
   "@nextResetAt": {
     "placeholders": {
-      "time": {
-        "type": "String",
-        "example": "08:00"
-      }
+      "time": { "type": "String", "example": "08:00" }
     }
-  }
+  },
+
+  "evaluationDetails": "Detalles de la Evaluación",
+  "completedDate": "Fecha de Finalización",
+  "attempts": "Intentos",
+  "timeSpent": "Tiempo Empleado",
+  "skillBreakdown": "Desglose por Habilidades",
+  "feedback": "Retroalimentación",
+  "featureComingSoon": "Función próximamente disponible",
+  "chapter": "Capítulo",
+  "evaluationInfo": "Información de la Evaluación",
+  "chapterResults": "Resultados por Capítulo",
+  "allChapters": "Todos los Capítulos",
+  "noEvaluationsFound": "No se encontraron evaluaciones",
+  "completeChaptersToSeeResults": "Completa capítulos para ver resultados"
 }
