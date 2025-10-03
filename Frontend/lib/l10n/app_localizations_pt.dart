@@ -9,7 +9,7 @@ class AppLocalizationsPt extends AppLocalizations {
   AppLocalizationsPt([String locale = 'pt']) : super(locale);
 
   @override
-  String get appTitle => 'App de Aprendizado de English';
+  String get appTitle => 'App de Aprendizado de Inglês';
 
   @override
   String get login => 'Entrar';
@@ -33,7 +33,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get emailRequired => 'Email é obrigatório';
 
   @override
-  String get emailInvalid => 'Por favor insira um email válido';
+  String get emailInvalid => 'Por favor, insira um email válido';
 
   @override
   String get passwordRequired => 'Senha é obrigatória';
@@ -111,7 +111,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get confirmLogout => 'Confirmar Saída';
 
   @override
-  String get logoutConfirmation => 'Tem certeza que deseja sair?';
+  String get logoutConfirmation => 'Tem certeza de que deseja sair?';
 
   @override
   String get cancel => 'Cancelar';
@@ -135,8 +135,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get connectingWithApple => 'Conectando com Apple...';
 
   @override
-  String get loadingExperience =>
-      'Carregando sua experiência de aprendizado...';
+  String get loadingExperience => 'Carregando sua experiência de aprendizado...';
 
   @override
   String get initializingExperience =>
@@ -150,11 +149,11 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String livesRemaining(int lives) {
-    return '5/5';
+    return '$lives/5';
   }
 
   @override
-  String get chapterProgress => 'Cap 4/5';
+  String get chapterProgress => 'Capítulo 4/5';
 
   @override
   String get software => 'Software';
@@ -164,37 +163,37 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String navigatingToSection(String section) {
-    return 'Navegando para a seção $section...';
+    return 'Indo para a seção $section...';
   }
 
   @override
-  String get emailPasswordRequired => 'Email and password are required';
+  String get emailPasswordRequired => 'Email e senha são obrigatórios';
 
   @override
   String get invalidCredentials =>
-      'Invalid credentials. Please check your email and password.';
+      'Credenciais inválidas. Por favor, verifique seu email e senha.';
 
   @override
-  String get googleSignInFailed => 'Google sign in failed';
+  String get googleSignInFailed => 'Falha ao entrar com Google';
 
   @override
-  String get appleSignInFailed => 'Apple sign in failed';
+  String get appleSignInFailed => 'Falha ao entrar com Apple';
 
   @override
-  String get errorDuringLogout => 'Error during logout';
+  String get errorDuringLogout => 'Erro ao sair';
 
   @override
-  String get errorCheckingAuth => 'Error checking authentication status';
+  String get errorCheckingAuth => 'Erro ao verificar autenticação';
 
   @override
-  String get errorInMockLogin => 'Error in mock login';
+  String get errorInMockLogin => 'Erro no login de teste';
 
   @override
-  String get comingSoon => 'Coming Soon';
+  String get comingSoon => 'Em breve';
 
   @override
   String sectionTitle(String title) {
-    return '$title Section';
+    return 'Seção $title';
   }
 
   @override
@@ -235,20 +234,21 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get completeePreviousEpisode =>
-      'Complete o episódio anterior para desbloquear este';
+      'Conclua o episódio anterior para desbloquear este';
 
   @override
-  String get episodeCompleted => 'Episode completed - Tap to replay';
+  String get episodeCompleted => 'Episódio concluído - Toque para repetir';
 
   @override
-  String get continueEpisode => 'Continue episode';
+  String get continueEpisode => 'Continuar episódio';
 
   @override
-  String get completePreviousEpisode => 'Complete previous episode to unlock';
+  String get completePreviousEpisode =>
+      'Conclua o episódio anterior para desbloquear';
 
   @override
   String playingEpisode(String episodeTitle) {
-    return 'Playing $episodeTitle';
+    return 'Reproduzindo $episodeTitle';
   }
 
   @override
@@ -262,7 +262,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get joinUsSlogan =>
-      'Junte-se para começar sua jornada com inglês técnico';
+      'Junte-se a nós e comece sua jornada com o inglês técnico';
 
   @override
   String get fullName => 'Nome Completo';
@@ -278,10 +278,10 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get acceptTerms =>
-      'Aceito os Termos de Serviço e Política de Privacidade';
+      'Aceito os Termos de Serviço e a Política de Privacidade';
 
   @override
-  String get pleaseEnterName => 'Por favor digite seu nome';
+  String get pleaseEnterName => 'Por favor, digite seu nome';
 
   @override
   String get nameTooShort => 'O nome deve ter pelo menos 2 caracteres';
@@ -290,7 +290,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get passwordsDontMatch => 'As senhas não coincidem';
 
   @override
-  String get pleaseAcceptTerms => 'Por favor aceite os termos e condições';
+  String get pleaseAcceptTerms => 'Por favor, aceite os termos e condições';
 
   @override
   String get alreadyHaveAccount => 'Já tem uma conta?';
@@ -324,11 +324,11 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get forgotPasswordSubtitle =>
-      'Não se preocupe! Digite seu endereço de email e enviaremos um link para redefinir sua senha.';
+      'Não se preocupe! Digite seu email e enviaremos um link para redefinir sua senha.';
 
   @override
   String get emailSentMessage =>
-      'Enviamos um link para redefinir sua senha para seu endereço de email. Por favor, verifique sua caixa de entrada e siga as instruções.';
+      'Enviamos um link para redefinir sua senha. Verifique sua caixa de entrada e siga as instruções.';
 
   @override
   String get emailAddress => 'Endereço de email';
@@ -371,26 +371,27 @@ class AppLocalizationsPt extends AppLocalizations {
   String get rememberSession => 'Lembrar sessão';
 
   @override
-  String get folders => 'Folders';
+  String get folders => 'Pastas';
 
   @override
-  String get errorLoadingLives => 'Error loading lives';
+  String get errorLoadingLives => 'Erro ao carregar vidas';
 
   @override
-  String get retry => 'Retry';
+  String get retry => 'Tentar novamente';
 
   @override
-  String get noLivesRemaining => 'No lives remaining!';
+  String get noLivesRemaining => 'Sem vidas restantes!';
 
   @override
-  String get livesResetTomorrow => 'Lives reset tomorrow';
+  String get livesResetTomorrow => 'As vidas reiniciam amanhã';
 
   @override
-  String get nextResetTomorrow => 'Next reset tomorrow';
+  String get nextResetTomorrow => 'Próximo reinício amanhã';
 
   @override
-  String get refresh => 'Refresh';
+  String get refresh => 'Atualizar';
 
+  // -------- Repetir Capítulo --------
   @override
   String get repeatChapterTitle => 'Repeat Chapter';
 

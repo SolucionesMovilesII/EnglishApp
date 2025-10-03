@@ -81,7 +81,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get lightTheme => 'Светлая';
 
   @override
-  String get darkTheme => 'Темная';
+  String get darkTheme => 'Тёмная';
 
   @override
   String get colorPalette => 'Цветовая палитра';
@@ -117,7 +117,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get cancel => 'Отмена';
 
   @override
-  String get welcomeBack => 'Добро пожаловать!';
+  String get welcomeBack => 'С возвращением!';
 
   @override
   String get yourLearningPath => 'Ваш путь обучения';
@@ -135,10 +135,10 @@ class AppLocalizationsRu extends AppLocalizations {
   String get connectingWithApple => 'Подключение к Apple...';
 
   @override
-  String get loadingExperience => 'Загрузка вашего опыта обучения...';
+  String get loadingExperience => 'Загружаем ваш опыт обучения...';
 
   @override
-  String get initializingExperience => 'Инициализация вашего опыта обучения...';
+  String get initializingExperience => 'Инициализируем опыт обучения...';
 
   @override
   String get or => 'ИЛИ';
@@ -148,7 +148,8 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String livesRemaining(int lives) {
-    return '5/5';
+    // Формат как "3/5"
+    return '$lives/5';
   }
 
   @override
@@ -162,15 +163,15 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String navigatingToSection(String section) {
-    return 'Navigating to $section section...';
+    return 'Переход к разделу $section...';
   }
 
   @override
-  String get emailPasswordRequired => 'Требуется электронная почта и пароль';
+  String get emailPasswordRequired => 'Требуются электронная почта и пароль';
 
   @override
   String get invalidCredentials =>
-      'Invalid credentials. Please check your email and password.';
+      'Неверные данные. Проверьте почту и пароль.';
 
   @override
   String get googleSignInFailed => 'Ошибка входа через Google';
@@ -185,7 +186,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get errorCheckingAuth => 'Ошибка проверки статуса аутентификации';
 
   @override
-  String get errorInMockLogin => 'Ошибка в тестовом входе';
+  String get errorInMockLogin => 'Ошибка тестового входа';
 
   @override
   String get comingSoon => 'Скоро';
@@ -196,7 +197,7 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
-  String get selectCustomColor => 'Выбрать пользовательский цвет';
+  String get selectCustomColor => 'Выбрать собственный цвет';
 
   @override
   String get hue => 'Оттенок';
@@ -214,7 +215,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get selectColor => 'Выбрать цвет';
 
   @override
-  String get quiz => 'Quiz';
+  String get quiz => 'Викторина';
 
   @override
   String get question => 'Вопрос';
@@ -226,17 +227,17 @@ class AppLocalizationsRu extends AppLocalizations {
   String get nextQuestion => 'Следующий вопрос';
 
   @override
-  String get score => 'Score';
+  String get score => 'Счёт';
 
   @override
   String get points => 'очков';
 
   @override
   String get completeePreviousEpisode =>
-      'Complete the previous episode to unlock this one';
+      'Завершите предыдущий эпизод, чтобы открыть этот';
 
   @override
-  String get episodeCompleted => 'Эпизод завершен - Нажмите для повтора';
+  String get episodeCompleted => 'Эпизод завершён — нажмите, чтобы повторить';
 
   @override
   String get continueEpisode => 'Продолжить эпизод';
@@ -254,14 +255,14 @@ class AppLocalizationsRu extends AppLocalizations {
   String get dontHaveAccount => 'Нет аккаунта?';
 
   @override
-  String get signUp => 'Регистрация';
+  String get signUp => 'Зарегистрироваться';
 
   @override
   String get createAccount => 'Создать аккаунт';
 
   @override
   String get joinUsSlogan =>
-      'Присоединяйтесь к нам, чтобы начать изучение технического английского';
+      'Присоединяйтесь и начните путь в техническом английском';
 
   @override
   String get fullName => 'Полное имя';
@@ -273,35 +274,35 @@ class AppLocalizationsRu extends AppLocalizations {
   String get confirmPassword => 'Подтвердить пароль';
 
   @override
-  String get enterConfirmPassword => 'Подтвердите ваш пароль';
+  String get enterConfirmPassword => 'Повторите пароль';
 
   @override
   String get acceptTerms =>
-      'Я принимаю Условия обслуживания и Политику конфиденциальности';
+      'Я принимаю Условия использования и Политику конфиденциальности';
 
   @override
-  String get pleaseEnterName => 'Пожалуйста, введите ваше имя';
+  String get pleaseEnterName => 'Пожалуйста, введите имя';
 
   @override
-  String get nameTooShort => 'Имя должно содержать не менее 2 символов';
+  String get nameTooShort => 'Имя должно содержать минимум 2 символа';
 
   @override
   String get passwordsDontMatch => 'Пароли не совпадают';
 
   @override
-  String get pleaseAcceptTerms => 'Пожалуйста, примите условия и положения';
+  String get pleaseAcceptTerms => 'Пожалуйста, примите условия';
 
   @override
-  String get alreadyHaveAccount => 'Уже есть аккаунт? ';
+  String get alreadyHaveAccount => 'Уже есть аккаунт?';
 
   @override
   String get signIn => 'Войти';
 
   @override
-  String get creatingAccount => 'Создание вашего аккаунта...';
+  String get creatingAccount => 'Создаём ваш аккаунт...';
 
   @override
-  String get register => 'Зарегистрироваться';
+  String get register => 'Регистрация';
 
   @override
   String get signUpWithGoogle => 'Зарегистрироваться через Google';
@@ -319,49 +320,49 @@ class AppLocalizationsRu extends AppLocalizations {
   String get forgotPassword => 'Забыли пароль?';
 
   @override
-  String get checkYourEmail => 'Проверьте вашу электронную почту';
+  String get checkYourEmail => 'Проверьте почту';
 
   @override
   String get forgotPasswordSubtitle =>
-      'Не волнуйтесь! Введите ваш адрес электронной почты, и мы отправим вам ссылку для сброса пароля.';
+      'Не волнуйтесь! Введите адрес электронной почты, и мы отправим ссылку для сброса пароля.';
 
   @override
   String get emailSentMessage =>
-      'Мы отправили ссылку для сброса пароля на ваш адрес электронной почты. Пожалуйста, проверьте входящие сообщения и следуйте инструкциям.';
+      'Мы отправили ссылку для сброса пароля на вашу почту. Проверьте входящие и следуйте инструкциям.';
 
   @override
   String get emailAddress => 'Адрес электронной почты';
 
   @override
-  String get enterEmailAddress => 'Введите ваш адрес электронной почты';
+  String get enterEmailAddress => 'Введите адрес электронной почты';
 
   @override
   String get sendResetLink => 'Отправить ссылку для сброса';
 
   @override
-  String get backToLogin => 'Вернуться к входу';
+  String get backToLogin => 'Вернуться ко входу';
 
   @override
   String get emailSent => 'Письмо отправлено';
 
   @override
-  String get sendingResetLink => 'Отправка ссылки для сброса...';
+  String get sendingResetLink => 'Отправляем ссылку для сброса...';
 
   @override
   String get emailSentSuccessfully =>
       'Письмо для сброса пароля успешно отправлено!';
 
   @override
-  String get resendEmail => 'Отправить письмо повторно';
+  String get resendEmail => 'Отправить ещё раз';
 
   @override
   String get openEmailApp => 'Открыть почтовое приложение';
 
   @override
-  String get resetLinkSentAgain => 'Ссылка для сброса отправлена снова!';
+  String get resetLinkSentAgain => 'Ссылка для сброса отправлена повторно!';
 
   @override
-  String get openingEmailApp => 'Открытие почтового приложения...';
+  String get openingEmailApp => 'Открываем почтовое приложение...';
 
   @override
   String get forgotPasswordQuestion => 'Забыли пароль?';
@@ -373,22 +374,27 @@ class AppLocalizationsRu extends AppLocalizations {
   String get folders => 'Папки';
 
   @override
-  String get errorLoadingLives => 'Error loading lives';
+  String get errorLoadingLives => 'Ошибка загрузки жизней';
 
   @override
-  String get retry => 'Retry';
+  String get retry => 'Повторить';
 
   @override
-  String get noLivesRemaining => 'No lives remaining!';
+  String get noLivesRemaining => 'Жизни закончились!';
 
   @override
-  String get livesResetTomorrow => 'Lives reset tomorrow';
+  String get livesResetTomorrow => 'Жизни обновятся завтра';
 
   @override
-  String get nextResetTomorrow => 'Next reset tomorrow';
+  String get nextResetTomorrow => 'Следующее обновление — завтра';
 
   @override
-  String get refresh => 'Refresh';
+  String get refresh => 'Обновить';
+
+  // ----- Повтор главы -----
+
+  @override
+  String get repeatChapterTitle => 'Повторить главу';
 
   @override
   String get repeatChapterTitle => 'Repeat Chapter';

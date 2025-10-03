@@ -19,6 +19,9 @@
   "home": "Home",
   "documents": "Documents",
   "book": "Book",
+  "@book": {
+    "description": "Book section title"
+  },
   "help": "Help",
   "settings": "Settings",
   "theme": "Theme",
@@ -46,19 +49,31 @@
   "initializingExperience": "Initializing your learning experience...",
   "or": "OR",
   "user": "User",
-  "livesRemaining": "5/5",
-  "chapterProgress": "Cap 4/5",
+
+  "livesRemaining": "{lives} lives remaining",
+  "@livesRemaining": {
+    "placeholders": {
+      "lives": {
+        "type": "int",
+        "example": 3
+      }
+    }
+  },
+
+  "chapterProgress": "Chapter 4/5",
   "software": "Software",
   "databases": "Databases",
+
   "navigatingToSection": "Navigating to {section} section...",
   "@navigatingToSection": {
     "placeholders": {
       "section": {
         "type": "String",
-        "example": "vocabulary"
+        "example": "Vocabulary"
       }
     }
   },
+
   "emailPasswordRequired": "Email and password are required",
   "invalidCredentials": "Invalid credentials. Please check your email and password.",
   "googleSignInFailed": "Google sign in failed",
@@ -67,6 +82,7 @@
   "errorCheckingAuth": "Error checking authentication status",
   "errorInMockLogin": "Error in mock login",
   "comingSoon": "Coming Soon",
+
   "sectionTitle": "{title} Section",
   "@sectionTitle": {
     "placeholders": {
@@ -76,22 +92,26 @@
       }
     }
   },
+
   "selectCustomColor": "Select Custom Color",
   "hue": "Hue",
   "saturation": "Saturation",
   "lightness": "Lightness",
   "quickColors": "Quick Colors",
   "selectColor": "Select Color",
+
   "quiz": "Quiz",
   "question": "Question",
   "submit": "Submit",
   "nextQuestion": "Next Question",
   "score": "Score",
   "points": "points",
+
   "completeePreviousEpisode": "Complete the previous episode to unlock this one",
   "episodeCompleted": "Episode completed - Tap to replay",
   "continueEpisode": "Continue episode",
   "completePreviousEpisode": "Complete previous episode to unlock",
+
   "playingEpisode": "Playing {episodeTitle}",
   "@playingEpisode": {
     "placeholders": {
@@ -101,6 +121,7 @@
       }
     }
   },
+
   "dontHaveAccount": "Don't have an account?",
   "signUp": "Sign Up",
   "createAccount": "Create Account",
@@ -122,6 +143,7 @@
   "signUpWithApple": "Sign up with Apple",
   "creatingAccountWithGoogle": "Creating account with Google...",
   "creatingAccountWithApple": "Creating account with Apple...",
+
   "forgotPassword": "Forgot Password?",
   "checkYourEmail": "Check Your Email",
   "forgotPasswordSubtitle": "Don't worry! Enter your email address and we'll send you a link to reset your password.",
@@ -139,23 +161,28 @@
   "openingEmailApp": "Opening email app...",
   "forgotPasswordQuestion": "Forgot your password?",
   "rememberSession": "Remember session",
+
   "folders": "Folders",
   "@folders": {
     "description": "Folders section title"
   },
-  "book": "Book",
-  "@book": {
-    "description": "Book section title"
-  },
+
   "errorLoadingLives": "Error loading lives",
   "retry": "Retry",
   "noLivesRemaining": "No lives remaining!",
-  "livesRemaining": "{lives} lives remaining",
-  "@livesRemaining": {
+  "livesResetTomorrow": "Lives reset tomorrow",
+  "nextResetTomorrow": "Next reset tomorrow",
+  "refresh": "Refresh",
+
+  "repeatChapterTitle": "Repeat Chapter",
+  "repeatChapterWarning": "You've already completed this chapter. Repeating it won't affect your current score, but it's a great way to reinforce your learning.",
+
+  "currentScore": "Current score: {score} points",
+  "@currentScore": {
     "placeholders": {
-      "lives": {
+      "score": {
         "type": "int",
-        "example": "3"
+        "example": 85
       }
     }
   },

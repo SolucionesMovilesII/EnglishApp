@@ -8,6 +8,8 @@ import 'app_localizations.dart';
 class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
+  // ======================= Common / Auth =======================
+
   @override
   String get appTitle => 'Language Learning App';
 
@@ -47,6 +49,8 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get continueText => 'Continue';
 
+  // ======================= Main Sections =======================
+
   @override
   String get vocabulary => 'Vocabulary';
 
@@ -62,6 +66,7 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get documents => 'Documents';
 
+  /// Book section title
   @override
   String get book => 'Book';
 
@@ -89,6 +94,8 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get system => 'System';
 
+  // ======================= Notifications =======================
+
   @override
   String get notifications => 'Notifications';
 
@@ -97,6 +104,8 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get notificationsDisabled => 'Notifications disabled';
+
+  // ======================= Session / UI =======================
 
   @override
   String get logout => 'Logout';
@@ -111,7 +120,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get confirmLogout => 'Confirm Logout';
 
   @override
-  String get logoutConfirmation => 'Are you sure you want to logout?';
+  String get logoutConfirmation => 'Are you sure you want to log out?';
 
   @override
   String get cancel => 'Cancel';
@@ -138,8 +147,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get loadingExperience => 'Loading your learning experience...';
 
   @override
-  String get initializingExperience =>
-      'Initializing your learning experience...';
+  String get initializingExperience => 'Initializing your learning experience...';
 
   @override
   String get or => 'OR';
@@ -147,25 +155,25 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get user => 'User';
 
+  // Lives / Progress snippets
   @override
-  String livesRemaining(int lives) {
-    return '$lives lives remaining';
-  }
+  String livesRemaining(int lives) => '$lives lives remaining';
 
   @override
-  String get chapterProgress => 'Cap 4/5';
+  String get chapterProgress => 'Chapter 4/5';
 
+  // Tech topics
   @override
   String get software => 'Software';
 
   @override
   String get databases => 'Databases';
 
+  // Navigation helper
   @override
-  String navigatingToSection(String section) {
-    return 'Navigating to $section section...';
-  }
+  String navigatingToSection(String section) => 'Navigating to $section section...';
 
+  // Auth errors
   @override
   String get emailPasswordRequired => 'Email and password are required';
 
@@ -191,11 +199,11 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get comingSoon => 'Coming Soon';
 
+  // Generic section title
   @override
-  String sectionTitle(String title) {
-    return '$title Section';
-  }
+  String sectionTitle(String title) => '$title Section';
 
+  // Color picker
   @override
   String get selectCustomColor => 'Select Custom Color';
 
@@ -214,6 +222,7 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get selectColor => 'Select Color';
 
+  // Quiz
   @override
   String get quiz => 'Quiz';
 
@@ -232,6 +241,7 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get points => 'points';
 
+  // Episodes
   @override
   String get completeePreviousEpisode =>
       'Complete the previous episode to unlock this one';
@@ -246,10 +256,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get completePreviousEpisode => 'Complete previous episode to unlock';
 
   @override
-  String playingEpisode(String episodeTitle) {
-    return 'Playing $episodeTitle';
-  }
+  String playingEpisode(String episodeTitle) => 'Playing $episodeTitle';
 
+  // Account / Register
   @override
   String get dontHaveAccount => 'Don\'t have an account?';
 
@@ -313,6 +322,7 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get creatingAccountWithApple => 'Creating account with Apple...';
 
+  // Forgot password
   @override
   String get forgotPassword => 'Forgot Password?';
 
@@ -363,9 +373,11 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get forgotPasswordQuestion => 'Forgot your password?';
 
+  // Misc
   @override
   String get rememberSession => 'Remember session';
 
+  /// Folders section title
   @override
   String get folders => 'Folders';
 
@@ -386,6 +398,50 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get refresh => 'Refresh';
+
+  // ======================= Repeat Chapter =======================
+
+  @override
+  String get repeatChapterTitle => 'Repeat Chapter';
+
+  @override
+  String get repeatChapterWarning =>
+      'You\'ve already completed this chapter. Repeating it won\'t affect your current score, but it\'s a great way to reinforce your learning!';
+
+  @override
+  String currentScore(int score) => 'Current score: $score points';
+
+  @override
+  String get repeatChapterBenefit =>
+      'Practice makes perfect! Use this opportunity to strengthen your knowledge.';
+
+  @override
+  String get repeatChapter => 'Repeat Chapter';
+
+  @override
+  String chapterResetForRepetition(String chapterTitle) =>
+      'Chapter "$chapterTitle" has been reset for repetition. Your original score is preserved!';
+
+  // These appear in some locales together with repeat chapter:
+  @override
+  String get progress => 'Progress';
+
+  @override
+  String get episodeContent => 'Episode Content';
+
+  @override
+  String get episodeContentPlaceholder => 'Episode content will be displayed here';
+
+  @override
+  String get replayEpisode => 'Replay Episode';
+
+  @override
+  String get startEpisode => 'Start Episode';
+
+  @override
+  String startingEpisode(String episodeTitle) => 'Starting $episodeTitle...';
+
+  // ======================= Vocabulary Chapters =======================
 
   @override
   String get repeatChapterTitle => 'Repeat Chapter';
@@ -460,10 +516,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get evaluationInfo => 'Evaluation Information';
 
   @override
-  String get chapterResults => 'Chapter Results';
+  String get feedback => 'Feedback';
 
   @override
-  String get allChapters => 'All Chapters';
+  String get featureComingSoon => 'This feature is coming soon!';
 
   @override
   String get noEvaluationsFound => 'No evaluations found';

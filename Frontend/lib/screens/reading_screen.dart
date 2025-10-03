@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../providers/reading_provider.dart';
 import '../providers/progress_provider.dart';
 import '../l10n/app_localizations.dart';
+import '../utils/audio_service.dart';
 
 class ReadingScreen extends StatelessWidget {
   final String chapterId;
@@ -21,8 +22,81 @@ class ReadingScreen extends StatelessWidget {
   }
 }
 
-class _ReadingScreenContent extends StatelessWidget {
+class _ReadingScreenContent extends StatefulWidget {
   const _ReadingScreenContent();
+
+  @override
+  State<_ReadingScreenContent> createState() => _ReadingScreenContentState();
+}
+
+class _ReadingScreenContentState extends State<_ReadingScreenContent> {
+  final AudioService _audioService = AudioService();
+  bool _isPlaying = false;
+  bool _isPaused = false;
+  double _speechRate = 0.5;
+  double _volume = 1.0;
+
+  @override
+  void dispose() {
+    _audioService.stop();
+    super.dispose();
+  }
+
+  Future<void> _speakText(String text) async {
+    if (_isPlaying) {
+      await _audioService.stop();
+      setState(() {
+        _isPlaying = false;
+        _isPaused = false;
+      });
+      return;
+    }
+
+    setState(() {
+      _isPlaying = true;
+      _isPaused = false;
+    });
+
+    await _audioService.setSpeechRate(_speechRate);
+    await _audioService.setVolume(_volume);
+    
+    final success = await _audioService.speakText(text, language: 'en-US');
+    
+    if (mounted) {
+      setState(() {
+        _isPlaying = false;
+        _isPaused = false;
+      });
+    }
+
+    if (!success) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Error al reproducir audio'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _pauseAudio() async {
+    if (_isPlaying && !_isPaused) {
+      await _audioService.pause();
+      setState(() {
+        _isPaused = true;
+      });
+    }
+  }
+
+  Future<void> _stopAudio() async {
+    await _audioService.stop();
+    setState(() {
+      _isPlaying = false;
+      _isPaused = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -109,12 +183,27 @@ class _ReadingScreenContent extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                'Paragraph ${readingProvider.currentParagraph.paragraphNumber}',
-                                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                  color: Theme.of(context).colorScheme.primary,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    'Paragraph ${readingProvider.currentParagraph.paragraphNumber}',
+                                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                      color: Theme.of(context).colorScheme.primary,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  IconButton(
+                                    onPressed: () => _speakText(readingProvider.currentParagraph.content),
+                                    icon: Icon(
+                                      _isPlaying ? Icons.stop : Icons.volume_up,
+                                      color: _isPlaying 
+                                          ? Theme.of(context).colorScheme.error
+                                          : Theme.of(context).colorScheme.primary,
+                                    ),
+                                    tooltip: _isPlaying ? 'Detener lectura' : 'Leer en voz alta',
+                                  ),
+                                ],
                               ),
                               const SizedBox(height: 16),
                               Text(
@@ -213,6 +302,80 @@ class _ReadingScreenContent extends StatelessWidget {
                   ),
                 ),
               ),
+
+              // Accessibility Controls
+              if (_isPlaying || _isPaused)
+                Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 16),
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          IconButton(
+                            onPressed: _stopAudio,
+                            icon: const Icon(Icons.stop),
+                            tooltip: 'Detener',
+                          ),
+                          const SizedBox(width: 16),
+                          IconButton(
+                            onPressed: _pauseAudio,
+                            icon: Icon(_isPaused ? Icons.play_arrow : Icons.pause),
+                            tooltip: _isPaused ? 'Reanudar' : 'Pausar',
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          const Icon(Icons.speed),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Slider(
+                              value: _speechRate,
+                              min: 0.1,
+                              max: 1.0,
+                              divisions: 9,
+                              label: '${(_speechRate * 100).round()}%',
+                              onChanged: (value) {
+                                setState(() {
+                                  _speechRate = value;
+                                });
+                                _audioService.setSpeechRate(value);
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          const Icon(Icons.volume_up),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Slider(
+                              value: _volume,
+                              min: 0.0,
+                              max: 1.0,
+                              divisions: 10,
+                              label: '${(_volume * 100).round()}%',
+                              onChanged: (value) {
+                                setState(() {
+                                  _volume = value;
+                                });
+                                _audioService.setVolume(value);
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
 
               // Navigation Controls
               Container(

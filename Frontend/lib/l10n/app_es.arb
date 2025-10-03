@@ -1,6 +1,6 @@
 {
   "@@locale": "es",
-  "appTitle": "App de Aprendizaje de English",
+  "appTitle": "App de Aprendizaje de Inglés",
   "login": "Iniciar Sesión",
   "email": "Correo electrónico",
   "password": "Contraseña",
@@ -46,19 +46,25 @@
   "initializingExperience": "Inicializando tu experiencia de aprendizaje...",
   "or": "O",
   "user": "Usuario",
-  "livesRemaining": "5/5",
+
+  "livesRemaining": "{lives}/5",
+  "@livesRemaining": {
+    "placeholders": {
+      "lives": { "type": "int", "example": 3 }
+    }
+  },
+
   "chapterProgress": "Cap 4/5",
   "software": "Software",
   "databases": "Bases de Datos",
+
   "navigatingToSection": "Navegando a la sección {section}...",
   "@navigatingToSection": {
     "placeholders": {
-      "section": {
-        "type": "String",
-        "example": "vocabulario"
-      }
+      "section": { "type": "String", "example": "Vocabulario" }
     }
   },
+
   "emailPasswordRequired": "El correo y la contraseña son requeridos",
   "invalidCredentials": "Credenciales inválidas. Verifica tu correo y contraseña.",
   "googleSignInFailed": "Error al iniciar sesión con Google",
@@ -67,42 +73,41 @@
   "errorCheckingAuth": "Error al verificar el estado de autenticación",
   "errorInMockLogin": "Error en el inicio de sesión de prueba",
   "folders": "Carpetas",
-  "book": "Libro",
   "comingSoon": "Próximamente",
+
   "sectionTitle": "Sección {title}",
   "@sectionTitle": {
     "placeholders": {
-      "title": {
-        "type": "String",
-        "example": "Vocabulario"
-      }
+      "title": { "type": "String", "example": "Vocabulario" }
     }
   },
+
   "selectCustomColor": "Seleccionar Color Personalizado",
   "hue": "Matiz",
   "saturation": "Saturación",
   "lightness": "Luminosidad",
   "quickColors": "Colores Rápidos",
   "selectColor": "Seleccionar Color",
+
   "quiz": "Quiz",
   "question": "Pregunta",
   "submit": "Enviar",
   "nextQuestion": "Siguiente Pregunta",
   "score": "Puntuación",
   "points": "puntos",
+
   "completeePreviousEpisode": "Completa el episodio anterior para desbloquear este",
   "episodeCompleted": "Episodio completado - Toca para repetir",
   "continueEpisode": "Continuar episodio",
   "completePreviousEpisode": "Completa el episodio anterior para desbloquear",
+
   "playingEpisode": "Reproduciendo {episodeTitle}",
   "@playingEpisode": {
     "placeholders": {
-      "episodeTitle": {
-        "type": "String",
-        "example": "Episodio 1"
-      }
+      "episodeTitle": { "type": "String", "example": "Episodio 1" }
     }
   },
+
   "dontHaveAccount": "¿No tienes una cuenta?",
   "signUp": "Registrarse",
   "createAccount": "Crear Cuenta",
@@ -124,6 +129,7 @@
   "signUpWithApple": "Registrarse con Apple",
   "creatingAccountWithGoogle": "Creando cuenta con Google...",
   "creatingAccountWithApple": "Creando cuenta con Apple...",
+
   "forgotPassword": "¿Olvidaste tu contraseña?",
   "checkYourEmail": "Revisa tu correo",
   "forgotPasswordSubtitle": "¡No te preocupes! Ingresa tu dirección de correo y te enviaremos un enlace para restablecer tu contraseña.",

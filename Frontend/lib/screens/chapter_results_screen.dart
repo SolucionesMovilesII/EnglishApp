@@ -3,6 +3,7 @@ import '../models/chapter_evaluation.dart';
 import '../widgets/chapter_evaluation_card.dart';
 import 'evaluation_details_screen.dart';
 import '../l10n/app_localizations.dart';
+import '../providers/evaluation_provider.dart';
 
 class ChapterResultsScreen extends StatefulWidget {
   const ChapterResultsScreen({super.key});
@@ -12,14 +13,19 @@ class ChapterResultsScreen extends StatefulWidget {
 }
 
 class _ChapterResultsScreenState extends State<ChapterResultsScreen> {
+  // Campos del branch main (se conservan por compatibilidad; el flujo usa Provider)
   List<ChapterEvaluation> evaluations = [];
   bool isLoading = true;
+
   String? selectedChapter;
 
   @override
   void initState() {
     super.initState();
-    _loadEvaluations();
+    // Cargamos tras primer frame usando Provider
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadEvaluations();
+    });
   }
 
   Future<void> _loadEvaluations() async {
@@ -72,14 +78,15 @@ class _ChapterResultsScreenState extends State<ChapterResultsScreen> {
     });
   }
 
-  List<ChapterEvaluation> get filteredEvaluations {
+  List<ChapterEvaluation> _getFilteredEvaluations(
+      List<ChapterEvaluation> evaluations) {
     if (selectedChapter == null) return evaluations;
     return evaluations
         .where((eval) => eval.chapterNumber.toString() == selectedChapter)
         .toList();
   }
 
-  Set<String> get availableChapters {
+  Set<String> _getAvailableChapters(List<ChapterEvaluation> evaluations) {
     return evaluations.map((eval) => eval.chapterNumber.toString()).toSet();
   }
 
@@ -126,16 +133,16 @@ class _ChapterResultsScreenState extends State<ChapterResultsScreen> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(
-                            Icons.assessment_outlined,
+                            Icons.error_outline,
                             size: 64,
-                            color: theme.colorScheme.outline,
+                            color: theme.colorScheme.error.withOpacity(0.7),
                           ),
                           const SizedBox(height: 16),
                           Text(
-                            l10n.noEvaluationsFound,
+                            l10n.unknownError,
                             style: theme.textTheme.headlineSmall?.copyWith(
-                              color: theme.colorScheme.onSurface,
-                              fontWeight: FontWeight.bold,
+                              color:
+                                  theme.colorScheme.onSurface.withOpacity(0.7),
                             ),
                           ),
                           const SizedBox(height: 8),
@@ -148,33 +155,81 @@ class _ChapterResultsScreenState extends State<ChapterResultsScreen> {
                             ),
                             textAlign: TextAlign.center,
                           ),
+                          const SizedBox(height: 24),
+                          ElevatedButton.icon(
+                            onPressed: () =>
+                                evaluationProvider.getChapterEvaluations(),
+                            icon: const Icon(Icons.refresh),
+                            label: Text(l10n.tryAgain),
+                          ),
                         ],
                       ),
                     )
-                  : ListView.builder(
-                      padding: const EdgeInsets.all(16),
-                      itemCount: filteredEvaluations.length,
-                      itemBuilder: (context, index) {
-                        final evaluation = filteredEvaluations[index];
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 12),
-                          child: ChapterEvaluationCard(
-                            evaluation: evaluation,
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => EvaluationDetailsScreen(
-                                    evaluation: evaluation,
+                  : RefreshIndicator(
+                      onRefresh: () =>
+                          evaluationProvider.refreshEvaluations(),
+                      child: filteredEvaluations.isEmpty
+                          ? Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.assessment_outlined,
+                                    size: 64,
+                                    color: theme.colorScheme.primary
+                                        .withOpacity(0.5),
                                   ),
-                                ),
-                              );
-                            },
-                          ),
-                        );
-                      },
+                                  const SizedBox(height: 16),
+                                  Text(
+                                    l10n.noEvaluationsFound,
+                                    style: theme.textTheme.headlineSmall
+                                        ?.copyWith(
+                                      color: theme.colorScheme.onSurface
+                                          .withOpacity(0.7),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    l10n.completeChaptersToSeeResults,
+                                    style: theme.textTheme.bodyLarge
+                                        ?.copyWith(
+                                      color: theme.colorScheme.onSurface
+                                          .withOpacity(0.7),
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ],
+                              ),
+                            )
+                          : ListView.builder(
+                              padding: const EdgeInsets.all(16),
+                              itemCount: filteredEvaluations.length,
+                              itemBuilder: (context, index) {
+                                final evaluation =
+                                    filteredEvaluations[index];
+                                return Padding(
+                                  padding:
+                                      const EdgeInsets.only(bottom: 12),
+                                  child: ChapterEvaluationCard(
+                                    evaluation: evaluation,
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              EvaluationDetailsScreen(
+                                            evaluation: evaluation,
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                );
+                              },
+                            ),
                     ),
-            ),
+        );
+      },
     );
   }
 }
