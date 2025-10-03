@@ -46,6 +46,11 @@ dependencies:
   
   # Storage
   shared_preferences: ^2.2.2
+  sqflite: ^2.3.0
+  path: ^1.8.3
+  
+  # Audio
+  flutter_tts: ^4.0.2
   
   # Authentication
   google_sign_in: ^6.2.1
@@ -56,8 +61,6 @@ dependencies:
   
   # HTTP requests
   http: ^1.1.0
-  integration_test:
-    sdk: flutter
 
 dev_dependencies:
   flutter_test:

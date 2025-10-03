@@ -9,7 +9,7 @@ class AppLocalizationsEs extends AppLocalizations {
   AppLocalizationsEs([String locale = 'es']) : super(locale);
 
   @override
-  String get appTitle => 'App de Aprendizaje de English';
+  String get appTitle => 'App de Aprendizaje de Inglés';
 
   @override
   String get login => 'Iniciar Sesión';
@@ -109,7 +109,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get selectColorPalette => 'Seleccionar Paleta de Colores';
 
   @override
-  String get confirmLogout => 'Confirmar Cerrar Sesión';
+  String get confirmLogout => 'Confirmar Cierre de Sesión';
 
   @override
   String get logoutConfirmation =>
@@ -151,7 +151,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String livesRemaining(int lives) {
-    return '5/5';
+    return '$lives/5';
   }
 
   @override
@@ -282,10 +282,10 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get acceptTerms =>
-      'Acepto los Términos de Servicio y Política de Privacidad';
+      'Acepto los Términos de Servicio y la Política de Privacidad';
 
   @override
-  String get pleaseEnterName => 'Por favor ingresa tu nombre';
+  String get pleaseEnterName => 'Por favor, ingresa tu nombre';
 
   @override
   String get nameTooShort => 'El nombre debe tener al menos 2 caracteres';
@@ -294,7 +294,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get passwordsDontMatch => 'Las contraseñas no coinciden';
 
   @override
-  String get pleaseAcceptTerms => 'Por favor acepta los términos y condiciones';
+  String get pleaseAcceptTerms =>
+      'Por favor, acepta los términos y condiciones';
 
   @override
   String get alreadyHaveAccount => '¿Ya tienes una cuenta?';
@@ -332,7 +333,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get emailSentMessage =>
-      'Hemos enviado un enlace para restablecer tu contraseña a tu dirección de correo. Por favor revisa tu bandeja de entrada y sigue las instrucciones.';
+      'Hemos enviado un enlace para restablecer tu contraseña a tu dirección de correo. Revisa tu bandeja de entrada y sigue las instrucciones.';
 
   @override
   String get emailAddress => 'Dirección de correo';
@@ -379,13 +380,13 @@ class AppLocalizationsEs extends AppLocalizations {
   String get folders => 'Carpetas';
 
   @override
-  String get errorLoadingLives => 'Error loading lives';
+  String get errorLoadingLives => 'Error al cargar vidas';
 
   @override
-  String get retry => 'Retry';
+  String get retry => 'Reintentar';
 
   @override
-  String get noLivesRemaining => 'No lives remaining!';
+  String get noLivesRemaining => '¡No quedan vidas!';
 
   @override
   String get livesResetTomorrow => 'Las vidas se reinician mañana';
@@ -396,6 +397,8 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get refresh => 'Actualizar';
 
+  // -------- Repetir Capítulo --------
+
   @override
   String get repeatChapterTitle => 'Repetir Capítulo';
 
@@ -405,39 +408,152 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String currentScore(int score) {
-    return 'Puntuación Actual: $score puntos';
+    return 'Puntuación actual: $score puntos';
   }
 
   @override
   String get repeatChapterBenefit =>
-      '¡La práctica perfecta hace la perfección! Usa esta oportunidad para fortalecer tu conocimiento.';
+      '¡La práctica lleva a la perfección! Aprovecha esta oportunidad para fortalecer tu conocimiento.';
 
   @override
   String get repeatChapter => 'Repetir Capítulo';
 
   @override
   String chapterResetForRepetition(String chapterTitle) {
-    return 'El capítulo \'$chapterTitle\' ha sido reiniciado para repetición. ¡Tu puntuación original se mantiene!';
+    return 'El capítulo "$chapterTitle" ha sido reiniciado para repetición. ¡Tu puntuación original se mantiene!';
   }
+
+  // -------- Capítulos de Vocabulario --------
+
+  @override
+  String get vocabularyChaptersTitle => 'Capítulos de Vocabulario';
+
+  @override
+  String get loadingVocabularyChapters =>
+      'Cargando capítulos de vocabulario...';
+
+  @override
+  String get errorLoadingChapters => 'Error al cargar capítulos';
+
+  @override
+  String get unknownError => 'Ocurrió un error desconocido';
+
+  @override
+  String get dismiss => 'Descartar';
+
+  @override
+  String get tryAgain => 'Intentar de nuevo';
+
+  @override
+  String get noChaptersAvailable => 'No hay capítulos disponibles';
+
+  @override
+  String get noChaptersDescription =>
+      'Vuelve más tarde para ver nuevos capítulos de vocabulario';
+
+  @override
+  String get yourProgress => 'Tu Progreso';
+
+  @override
+  String get chaptersCompleted => 'Capítulos Completados';
+
+  @override
+  String get unlocked => 'Desbloqueado';
+
+  @override
+  String get locked => 'Bloqueado';
 
   @override
   String get progress => 'Progreso';
 
   @override
-  String get episodeContent => 'Contenido del Episodio';
+  String get completed => 'Completado';
 
   @override
-  String get episodeContentPlaceholder =>
-      'El contenido del episodio se mostrará aquí';
+  String get continue_ => 'Continuar';
 
   @override
-  String get replayEpisode => 'Repetir Episodio';
+  String get start => 'Comenzar';
 
   @override
-  String get startEpisode => 'Iniciar Episodio';
+  String get chapterLocked => 'Capítulo Bloqueado';
 
   @override
-  String startingEpisode(String episodeTitle) {
-    return 'Iniciando $episodeTitle...';
+  String chapterLockedDescription(int previousChapter) {
+    return 'Completa el capítulo $previousChapter para desbloquear este capítulo';
   }
+
+  @override
+  String get understood => 'Entendido';
+
+  @override
+  String get chapterCompleted => 'Capítulo Completado';
+
+  @override
+  String get chapterCompletedDescription =>
+      'Ya completaste este capítulo. Puedes repasarlo cuando quieras.';
+
+  @override
+  String completedOn(DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.yMd(localeName);
+    final String dateString = dateDateFormat.format(date);
+    return 'Completado el $dateString';
+  }
+
+  @override
+  String get close => 'Cerrar';
+
+  @override
+  String get reviewChapter => 'Repasar Capítulo';
+
+  @override
+  String get noLivesTitle => 'Sin Vidas Disponibles';
+
+  @override
+  String get noLivesMessage =>
+      'Necesitas al menos una vida para comenzar un capítulo. Las vidas se reinician diariamente.';
+
+  @override
+  String nextResetAt(String time) {
+    return 'Próximo reinicio a las $time';
+  }
+
+  @override
+  String get evaluationDetails => 'Evaluation Details';
+
+  @override
+  String get completedDate => 'Completed Date';
+
+  @override
+  String get attempts => 'Attempts';
+
+  @override
+  String get timeSpent => 'Time Spent';
+
+  @override
+  String get skillBreakdown => 'Skill Breakdown';
+
+  @override
+  String get feedback => 'Feedback';
+
+  @override
+  String get featureComingSoon => 'This feature is coming soon!';
+
+  @override
+  String get chapter => 'Chapter';
+
+  @override
+  String get evaluationInfo => 'Evaluation Information';
+
+  @override
+  String get chapterResults => 'Chapter Results';
+
+  @override
+  String get allChapters => 'All Chapters';
+
+  @override
+  String get noEvaluationsFound => 'No evaluations found';
+
+  @override
+  String get completeChaptersToSeeResults => 'Complete chapters to see results';
 }
