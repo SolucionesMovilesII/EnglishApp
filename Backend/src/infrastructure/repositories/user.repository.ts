@@ -105,14 +105,14 @@ export class UserRepository implements IUserRepository {
       }
 
       if (updateUserDto.person) {
-        const updatePersonData: any = {
+        const updatePersonData: Partial<Person> = {
           ...updateUserDto.person,
         };
 
         await queryRunner.manager.update(Person, user.personId, updatePersonData);
       }
 
-      const updateUserData: any = {};
+      const updateUserData: Partial<User> = {};
       if (updateUserDto.email) updateUserData.email = updateUserDto.email;
       if (updateUserDto.role) updateUserData.role = updateUserDto.role;
       if (updateUserDto.passwordResetToken !== undefined)
@@ -145,6 +145,7 @@ export class UserRepository implements IUserRepository {
     return result.affected !== 0;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async updateRefreshToken(_id: string, _refreshToken: string | null): Promise<boolean> {
     // Note: Refresh tokens are managed through RefreshToken entity, not directly on User
     // This method signature exists for interface compliance but should be implemented

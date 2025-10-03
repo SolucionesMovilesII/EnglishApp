@@ -20,7 +20,8 @@ export class GetChaptersStatusUseCase {
     try {
       this.logger.log(`Getting chapters status for user: ${userId}`);
 
-      const { chapters: chaptersWithProgress } = await this.chapterRepository.getUserChapterStatus(userId);
+      const { chapters: chaptersWithProgress } =
+        await this.chapterRepository.getUserChapterStatus(userId);
 
       const chapters: ChapterStatusDto[] = chaptersWithProgress.map(item => ({
         id: item.chapter.id,
@@ -42,7 +43,9 @@ export class GetChaptersStatusUseCase {
       const unlockedChapters = chapters.filter(c => c.isUnlocked).length;
       const completedChapters = chapters.filter(c => c.isCompleted).length;
 
-      this.logger.log(`Retrieved ${totalChapters} chapters, ${unlockedChapters} unlocked, ${completedChapters} completed for user ${userId}`);
+      this.logger.log(
+        `Retrieved ${totalChapters} chapters, ${unlockedChapters} unlocked, ${completedChapters} completed for user ${userId}`,
+      );
 
       return {
         chapters,
@@ -51,7 +54,10 @@ export class GetChaptersStatusUseCase {
         completedChapters,
       };
     } catch (error) {
-      this.logger.error(`Error getting chapters status for user ${userId}:`, error instanceof Error ? error.message : String(error));
+      this.logger.error(
+        `Error getting chapters status for user ${userId}:`,
+        error instanceof Error ? error.message : String(error),
+      );
       throw error;
     }
   }

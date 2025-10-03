@@ -9,37 +9,101 @@ import {
   ApprovalEvaluation,
   EvaluationStatus,
 } from '../../../domain/entities/approval-evaluation.entity';
+import { User } from '../../../domain/entities/user.entity';
+import { Person } from '../../../domain/entities/person.entity';
+import { ApprovalRule } from '../../../domain/entities/approval-rule.entity';
 
-describe('GetEvaluationHistoryUseCase', () => {
-  let useCase: GetEvaluationHistoryUseCase;
-  let approvalEvaluationRepository: jest.Mocked<IApprovalEvaluationRepository>;
+// Helper functions for creating mock objects
+function createMockUser(overrides: Partial<User> = {}): User {
+  return {
+    id: 'user-123',
+    email: 'test@example.com',
+    isEmailVerified: true,
+    password: 'hashedPassword',
+    authProvider: 'EMAIL_PASSWORD',
+    providerUserId: null,
+    role: 'STUDENT',
+    isActive: true,
+    lastLoginAt: null,
+    emailVerificationToken: null,
+    passwordResetToken: null,
+    passwordResetTokenExpires: null,
+    personId: 'person-123',
+    person: {} as Person,
+    refreshTokens: [],
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    get isGoogleAuth() {
+      return false;
+    },
+    get isAppleAuth() {
+      return false;
+    },
+    get isEmailPasswordAuth() {
+      return true;
+    },
+    get isAdmin() {
+      return false;
+    },
+    get isSuperAdmin() {
+      return false;
+    },
+    ...overrides,
+  } as User;
+}
 
-  const mockEvaluation: ApprovalEvaluation = {
+function createMockApprovalRule(overrides: Partial<ApprovalRule> = {}): ApprovalRule {
+  return {
+    id: 'rule-123',
+    name: 'Test Rule',
+    description: null,
+    chapterId: null,
+    minScoreThreshold: 80,
+    maxAttempts: 3,
+    allowErrorCarryover: false,
+    isActive: true,
+    metadata: null,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    isApplicableToChapter: () => true,
+    canRetryAfterFailure: () => true,
+    ...overrides,
+  } as ApprovalRule;
+}
+
+function createMockApprovalEvaluation(
+  overrides: Partial<ApprovalEvaluation> = {},
+): ApprovalEvaluation {
+  return {
     id: 'eval-123',
     userId: 'user-123',
     ruleId: 'rule-123',
-    chapterId: '1',
+    chapterId: 'chapter-123',
     score: 85,
     threshold: 80,
     status: EvaluationStatus.APPROVED,
     attemptNumber: 1,
     errorsFromPreviousAttempts: 0,
-    feedback: 'Good job!',
+    feedback: null,
+    evaluationData: null,
     evaluatedAt: new Date(),
-    evaluationData: { timeSpent: 300 },
-    user: {} as never,
-    rule: {} as never,
+    user: createMockUser(),
+    rule: createMockApprovalRule(),
     createdAt: new Date(),
     updatedAt: new Date(),
-    isApproved: jest.fn(),
-    isRejected: jest.fn(),
-    isPending: jest.fn(),
-    getAdjustedScore: jest.fn(),
-    approve: jest.fn(),
-    reject: jest.fn(),
-    hasErrorCarryover: jest.fn(),
-    getScoreWithPenalty: jest.fn(),
+    ...overrides,
   } as ApprovalEvaluation;
+}
+
+describe('GetEvaluationHistoryUseCase', () => {
+  let useCase: GetEvaluationHistoryUseCase;
+  let approvalEvaluationRepository: jest.Mocked<IApprovalEvaluationRepository>;
+
+  const mockEvaluation: ApprovalEvaluation = createMockApprovalEvaluation({
+    chapterId: '1',
+    feedback: 'Good job!',
+    evaluationData: { timeSpent: 300 },
+  });
 
   beforeEach(async () => {
     const mockRepository = {

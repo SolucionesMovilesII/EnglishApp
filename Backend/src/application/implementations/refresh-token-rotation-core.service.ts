@@ -38,7 +38,7 @@ export class RefreshTokenRotationCoreService {
     const startTime = Date.now();
     this.logger.debug(`Starting token rotation for hash: ${oldTokenHash.substring(0, 10)}...`);
 
-    return await this.dataSource.transaction(async _transactionalEntityManager => {
+    return await this.dataSource.transaction(async () => {
       try {
         // Find the existing token
         const existingToken = await this.refreshTokenRepository.findByTokenHash(oldTokenHash);
@@ -172,7 +172,14 @@ export class RefreshTokenRotationCoreService {
           isValid: false,
           reason: 'TOKEN_REVOKED',
           shouldRevokeFamily: true,
-          token: token,
+          token: {
+            jti: token.jti,
+            familyId: token.familyId,
+            userId: token.userId,
+            tokenHash: token.tokenHash,
+            expiresAt: token.expiresAt,
+            revoked: token.isRevoked(),
+          },
         };
       }
 
@@ -182,7 +189,14 @@ export class RefreshTokenRotationCoreService {
           isValid: false,
           reason: 'TOKEN_EXPIRED',
           shouldRevokeFamily: false,
-          token: token,
+          token: {
+            jti: token.jti,
+            familyId: token.familyId,
+            userId: token.userId,
+            tokenHash: token.tokenHash,
+            expiresAt: token.expiresAt,
+            revoked: token.isRevoked(),
+          },
         };
       }
 
@@ -198,7 +212,14 @@ export class RefreshTokenRotationCoreService {
         isValid: true,
         reason: 'VALID_AND_ROTATED',
         shouldRevokeFamily: false,
-        token: token,
+        token: {
+          jti: token.jti,
+          familyId: token.familyId,
+          userId: token.userId,
+          tokenHash: token.tokenHash,
+          expiresAt: token.expiresAt,
+          revoked: token.isRevoked(),
+        },
         rotation: rotation,
       };
     } catch (error: unknown) {

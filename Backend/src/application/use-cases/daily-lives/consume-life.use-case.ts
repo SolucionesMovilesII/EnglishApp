@@ -22,18 +22,18 @@ export class ConsumeLifeUseCase {
       // Check if user has lives available
       if (dailyLives.currentLives <= 0) {
         this.logger.warn(`User ${userId} attempted to consume life but has no lives remaining`);
-        
+
         const nextReset = this.getNextResetTime();
         throw new NoLivesError(
           'You have no lives remaining. Try again tomorrow.',
           nextReset.toISOString(),
-          0
+          0,
         );
       }
 
       // Consume a life
       const updatedLives = await this.dailyLivesRepository.consumeLife(userId);
-      
+
       if (!updatedLives) {
         throw new BadRequestException('Failed to consume life - user record not found');
       }
@@ -48,9 +48,10 @@ export class ConsumeLifeUseCase {
         nextReset: nextReset.toISOString(),
       };
 
-      this.logger.log(`Life consumed for user ${userId}. Lives remaining: ${updatedLives.currentLives}`);
+      this.logger.log(
+        `Life consumed for user ${userId}. Lives remaining: ${updatedLives.currentLives}`,
+      );
       return response;
-
     } catch (error) {
       if (error instanceof NoLivesError) {
         throw error; // Re-throw NoLivesError as is

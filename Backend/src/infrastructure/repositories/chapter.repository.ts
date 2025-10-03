@@ -51,15 +51,13 @@ export class ChapterRepository implements IChapterRepository {
       where: { userId },
     });
 
-    const progressMap = new Map(
-      userProgresses.map(progress => [progress.chapterId, progress])
-    );
+    const progressMap = new Map(userProgresses.map(progress => [progress.chapterId, progress]));
 
     const unlockedChapters: Chapter[] = [];
 
     for (const chapter of chapters) {
       const isUnlocked = await this.isChapterUnlocked(chapter, progressMap);
-      
+
       if (isUnlocked) {
         unlockedChapters.push(chapter);
       }
@@ -68,7 +66,10 @@ export class ChapterRepository implements IChapterRepository {
     return unlockedChapters;
   }
 
-  async getChapterWithProgress(chapterId: string, userId: string): Promise<{
+  async getChapterWithProgress(
+    chapterId: string,
+    userId: string,
+  ): Promise<{
     chapter: Chapter;
     userProgress: UserProgress | null;
     isUnlocked: boolean;
@@ -88,9 +89,7 @@ export class ChapterRepository implements IChapterRepository {
       where: { userId },
     });
 
-    const progressMap = new Map(
-      userProgresses.map(progress => [progress.chapterId, progress])
-    );
+    const progressMap = new Map(userProgresses.map(progress => [progress.chapterId, progress]));
 
     const isUnlocked = await this.isChapterUnlocked(chapter, progressMap);
     const progressPercentage = userProgress ? userProgress.getProgressPercentage() : 0;
@@ -119,9 +118,7 @@ export class ChapterRepository implements IChapterRepository {
       where: { userId },
     });
 
-    const progressMap = new Map(
-      userProgresses.map(progress => [progress.chapterId, progress])
-    );
+    const progressMap = new Map(userProgresses.map(progress => [progress.chapterId, progress]));
 
     const chapterStatuses = [];
 
@@ -143,7 +140,7 @@ export class ChapterRepository implements IChapterRepository {
 
   async unlockNextChapter(userId: string, completedChapterOrder: number): Promise<boolean> {
     const nextChapter = await this.getNextChapterToUnlock(completedChapterOrder);
-    
+
     if (!nextChapter) return false;
 
     // Create initial progress for the next chapter if it doesn't exist
@@ -168,7 +165,11 @@ export class ChapterRepository implements IChapterRepository {
     });
   }
 
-  async createInitialProgress(userId: string, chapterId: string, totalVocabularyItems: number): Promise<UserProgress> {
+  async createInitialProgress(
+    userId: string,
+    chapterId: string,
+    totalVocabularyItems: number,
+  ): Promise<UserProgress> {
     const userProgress = this.userProgressRepository.create({
       userId,
       chapterId,
@@ -210,7 +211,7 @@ export class ChapterRepository implements IChapterRepository {
 
   private async isChapterUnlocked(
     chapter: Chapter,
-    progressMap: Map<string, UserProgress>
+    progressMap: Map<string, UserProgress>,
   ): Promise<boolean> {
     // First chapter is always unlocked
     if (chapter.order === 1) return true;

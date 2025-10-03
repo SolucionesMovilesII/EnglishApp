@@ -125,8 +125,6 @@ class AuthProvider with ChangeNotifier {
       // Log configuration for debugging
       if (EnvironmentConfig.isDevelopment) {
         EnvironmentConfig.logConfiguration();
-        print('🔄 Making login request to: ${EnvironmentConfig.loginEndpoint}');
-        print('📤 Request body: $requestBody');
       }
       
       // Make API call to backend
@@ -135,11 +133,6 @@ class AuthProvider with ChangeNotifier {
         body: requestBody,
         withCredentials: true,
       );
-      
-      if (EnvironmentConfig.isDevelopment) {
-        print('📥 Login response: ${response.statusCode} - ${response.message}');
-        print('📊 Response data: ${response.data}');
-      }
       
       if (response.success) {
         // Parse response data
@@ -176,15 +169,10 @@ class AuthProvider with ChangeNotifier {
         throw Exception(response.message);
       }
     } catch (e) {
-      if (EnvironmentConfig.isDevelopment) {
-        print('❌ Login error: $e');
-      }
       _authState = AuthState.unauthenticated;
       _errorMessage = e.toString().replaceFirst('Exception: ', '');
       notifyListeners();
       return false;
-    } finally {
-      _setLoading(false);
     }
   }
   

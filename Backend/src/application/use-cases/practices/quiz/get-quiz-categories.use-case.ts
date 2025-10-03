@@ -3,16 +3,16 @@ import { IQuizPracticeRepository } from '../../../interfaces/repositories/quiz-p
 
 @Injectable()
 export class GetQuizCategoriesUseCase {
-  constructor(
-    private readonly quizPracticeRepository: IQuizPracticeRepository,
-  ) {}
+  constructor(private readonly quizPracticeRepository: IQuizPracticeRepository) {}
 
-  async execute(): Promise<Array<{
-    category: string;
-    displayName: string;
-    description: string;
-    totalQuizzes: number;
-  }>> {
+  async execute(): Promise<
+    Array<{
+      category: string;
+      displayName: string;
+      description: string;
+      totalQuizzes: number;
+    }>
+  > {
     return this.quizPracticeRepository.getAvailableCategories();
   }
 

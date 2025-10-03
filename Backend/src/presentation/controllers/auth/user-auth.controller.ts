@@ -65,11 +65,7 @@ export class UserAuthController extends BaseAuthController {
     status: 500,
     description: 'Internal server error',
   })
-  async register(
-    @Body() registerDto: RegisterDto,
-    @Req() _request: Request,
-    @Res({ passthrough: true }) _response: Response,
-  ): Promise<RegisterResponseDto> {
+  async register(@Body() registerDto: RegisterDto): Promise<RegisterResponseDto> {
     try {
       // Device and IP info extraction for future use
       // const _ipAddress = this.extractIpAddress(request);
@@ -149,7 +145,8 @@ export class UserAuthController extends BaseAuthController {
       }
 
       // Remove refresh token from response body for security
-      const { refreshToken: _, ...publicResponse } = loginResult;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { refreshToken, ...publicResponse } = loginResult;
 
       this.logger.log(`User logged in successfully: ${loginResult.userId}`);
 

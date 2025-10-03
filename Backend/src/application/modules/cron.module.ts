@@ -7,7 +7,7 @@ import { DailyLivesResetService } from '../services/cron/daily-lives-reset.servi
   imports: [
     // Schedule module for cron jobs
     ScheduleModule.forRoot(),
-    
+
     // Import DailyLives module to get repository
     DailyLivesModule,
   ],

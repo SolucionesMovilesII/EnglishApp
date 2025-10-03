@@ -16,7 +16,7 @@ export class ApprovalRequirementsNotMetException extends ApprovalException {
   constructor(chapterId: string, score: number, requiredScore: number) {
     super(
       `Approval requirements not met for chapter ${chapterId}. Score: ${score}%, Required: ${requiredScore}%`,
-      HttpStatus.UNPROCESSABLE_ENTITY
+      HttpStatus.UNPROCESSABLE_ENTITY,
     );
   }
 }
@@ -26,10 +26,7 @@ export class ApprovalRequirementsNotMetException extends ApprovalException {
  */
 export class ApprovalRuleNotFoundException extends ApprovalException {
   constructor(chapterId: string) {
-    super(
-      `No approval rule found for chapter ${chapterId}`,
-      HttpStatus.NOT_FOUND
-    );
+    super(`No approval rule found for chapter ${chapterId}`, HttpStatus.NOT_FOUND);
   }
 }
 
@@ -38,10 +35,7 @@ export class ApprovalRuleNotFoundException extends ApprovalException {
  */
 export class InvalidApprovalRuleException extends ApprovalException {
   constructor(reason: string) {
-    super(
-      `Invalid approval rule configuration: ${reason}`,
-      HttpStatus.BAD_REQUEST
-    );
+    super(`Invalid approval rule configuration: ${reason}`, HttpStatus.BAD_REQUEST);
   }
 }
 
@@ -50,10 +44,7 @@ export class InvalidApprovalRuleException extends ApprovalException {
  */
 export class ChapterAttemptNotAllowedException extends ApprovalException {
   constructor(chapterId: string, reason: string) {
-    super(
-      `Chapter ${chapterId} attempt not allowed: ${reason}`,
-      HttpStatus.FORBIDDEN
-    );
+    super(`Chapter ${chapterId} attempt not allowed: ${reason}`, HttpStatus.FORBIDDEN);
   }
 }
 
@@ -64,7 +55,7 @@ export class DuplicateEvaluationException extends ApprovalException {
   constructor(userId: string, chapterId: string) {
     super(
       `Duplicate evaluation detected for user ${userId} on chapter ${chapterId}`,
-      HttpStatus.CONFLICT
+      HttpStatus.CONFLICT,
     );
   }
 }
@@ -74,10 +65,7 @@ export class DuplicateEvaluationException extends ApprovalException {
  */
 export class ErrorCarryOverException extends ApprovalException {
   constructor(message: string) {
-    super(
-      `Error carry-over processing failed: ${message}`,
-      HttpStatus.INTERNAL_SERVER_ERROR
-    );
+    super(`Error carry-over processing failed: ${message}`, HttpStatus.INTERNAL_SERVER_ERROR);
   }
 }
 
@@ -88,7 +76,7 @@ export class MaxAttemptsExceededException extends ApprovalException {
   constructor(chapterId: string, maxAttempts: number) {
     super(
       `Maximum attempts (${maxAttempts}) exceeded for chapter ${chapterId}`,
-      HttpStatus.TOO_MANY_REQUESTS
+      HttpStatus.TOO_MANY_REQUESTS,
     );
   }
 }
@@ -98,9 +86,6 @@ export class MaxAttemptsExceededException extends ApprovalException {
  */
 export class ApprovalMetricsException extends ApprovalException {
   constructor(message: string) {
-    super(
-      `Approval metrics error: ${message}`,
-      HttpStatus.INTERNAL_SERVER_ERROR
-    );
+    super(`Approval metrics error: ${message}`, HttpStatus.INTERNAL_SERVER_ERROR);
   }
 }

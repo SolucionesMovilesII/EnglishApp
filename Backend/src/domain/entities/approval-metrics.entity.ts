@@ -39,7 +39,7 @@ export class ApprovalMetrics {
   description!: string | null;
 
   @Column({ type: 'jsonb', nullable: true })
-  additionalData!: Record<string, any> | null;
+  additionalData!: Record<string, unknown> | null;
 
   @Column({ type: 'timestamptz' })
   recordedAt!: Date;
@@ -76,7 +76,7 @@ export class ApprovalMetrics {
     return this.recordedAt >= threshold;
   }
 
-  updateValue(newValue: number, additionalData?: Record<string, any>): void {
+  updateValue(newValue: number, additionalData?: Record<string, unknown>): void {
     this.value = newValue;
     this.recordedAt = new Date();
     if (additionalData) {

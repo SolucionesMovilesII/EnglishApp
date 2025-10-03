@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException, BadRequestException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { ReadingPractice } from '../../../../domain/entities/reading-practice.entity';
 import { PracticeStatus } from '../../../../domain/entities/practice-session.entity';
 import { IReadingPracticeRepository } from '../../../interfaces/repositories/reading-practice-repository.interface';
@@ -18,7 +23,7 @@ export class AnswerComprehensionUseCase {
     answerDto: AnswerComprehensionQuestionDto,
   ): Promise<ReadingPractice> {
     const practice = await this.readingPracticeRepository.findById(practiceId);
-    
+
     if (!practice) {
       throw new NotFoundException('Reading practice not found');
     }
@@ -35,13 +40,10 @@ export class AnswerComprehensionUseCase {
     practice.answerComprehensionQuestion(answerDto.isCorrect);
 
     // Update practice
-    const updatedPractice = await this.readingPracticeRepository.update(
-      practice.id,
-      {
-        comprehensionQuestionsCorrect: practice.comprehensionQuestionsCorrect,
-        comprehensionQuestionsTotal: practice.comprehensionQuestionsTotal,
-      }
-    );
+    const updatedPractice = await this.readingPracticeRepository.update(practice.id, {
+      comprehensionQuestionsCorrect: practice.comprehensionQuestionsCorrect,
+      comprehensionQuestionsTotal: practice.comprehensionQuestionsTotal,
+    });
 
     // Update session score
     const newScore = practice.getComprehensionScore();

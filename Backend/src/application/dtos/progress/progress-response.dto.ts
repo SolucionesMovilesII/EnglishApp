@@ -40,7 +40,7 @@ export class ProgressResponseDto {
     },
     nullable: true,
   })
-  readonly extraData!: Record<string, any> | null;
+  readonly extraData!: Record<string, unknown> | null;
 
   @ApiProperty({
     description: 'Creation timestamp',

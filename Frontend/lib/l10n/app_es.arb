@@ -147,101 +147,35 @@
   "openingEmailApp": "Abriendo aplicación de correo...",
   "forgotPasswordQuestion": "¿Olvidaste tu contraseña?",
   "rememberSession": "Recordar sesión",
-
   "livesResetTomorrow": "Las vidas se reinician mañana",
   "nextResetTomorrow": "Próximo reinicio mañana",
   "refresh": "Actualizar",
-
   "repeatChapterTitle": "Repetir Capítulo",
   "repeatChapterWarning": "Ya has completado este capítulo. Repetirlo no afectará tu puntuación actual, ¡pero es una excelente manera de reforzar tu aprendizaje!",
-
-  "currentScore": "Puntuación actual: {score} puntos",
-  "@currentScore": {
-    "placeholders": {
-      "score": { "type": "int", "example": 42 }
-    }
-  },
-
-  "repeatChapterBenefit": "¡La práctica lleva a la perfección! Aprovecha esta oportunidad para fortalecer tu conocimiento.",
+  "currentScore": "Puntuación Actual: {score} puntos",
+  "repeatChapterBenefit": "¡La práctica perfecta hace la perfección! Usa esta oportunidad para fortalecer tu conocimiento.",
   "repeatChapter": "Repetir Capítulo",
-
   "chapterResetForRepetition": "El capítulo '{chapterTitle}' ha sido reiniciado para repetición. ¡Tu puntuación original se mantiene!",
   "@chapterResetForRepetition": {
     "placeholders": {
-      "chapterTitle": { "type": "String", "example": "Fundamentos de Inglés" }
+      "chapterTitle": {
+        "type": "String",
+        "example": "English Basics"
+      }
     }
   },
-
   "progress": "Progreso",
   "episodeContent": "Contenido del Episodio",
   "episodeContentPlaceholder": "El contenido del episodio se mostrará aquí",
   "replayEpisode": "Repetir Episodio",
   "startEpisode": "Iniciar Episodio",
-
   "startingEpisode": "Iniciando {episodeTitle}...",
   "@startingEpisode": {
     "placeholders": {
-      "episodeTitle": { "type": "String", "example": "Episodio 2" }
+      "episodeTitle": {
+        "type": "String",
+        "example": "Episodio 1"
+      }
     }
-  },
-
-  "vocabularyChaptersTitle": "Capítulos de Vocabulario",
-  "loadingVocabularyChapters": "Cargando capítulos de vocabulario...",
-  "errorLoadingChapters": "Error al cargar capítulos",
-  "unknownError": "Ocurrió un error desconocido",
-  "dismiss": "Descartar",
-  "tryAgain": "Intentar de nuevo",
-  "noChaptersAvailable": "No hay capítulos disponibles",
-  "noChaptersDescription": "Vuelve más tarde para ver nuevos capítulos de vocabulario",
-  "yourProgress": "Tu Progreso",
-  "chaptersCompleted": "Capítulos Completados",
-  "unlocked": "Desbloqueado",
-  "locked": "Bloqueado",
-  "completed": "Completado",
-  "continue_": "Continuar",
-  "start": "Comenzar",
-  "chapterLocked": "Capítulo Bloqueado",
-
-  "chapterLockedDescription": "Completa el capítulo {previousChapter} para desbloquear este capítulo",
-  "@chapterLockedDescription": {
-    "placeholders": {
-      "previousChapter": { "type": "int", "example": 3 }
-    }
-  },
-
-  "understood": "Entendido",
-  "chapterCompleted": "Capítulo Completado",
-  "chapterCompletedDescription": "Ya completaste este capítulo. Puedes repasarlo cuando quieras.",
-
-  "completedOn": "Completado el {date}",
-  "@completedOn": {
-    "placeholders": {
-      "date": { "type": "String", "example": "31/12/2025" }
-    }
-  },
-
-  "close": "Cerrar",
-  "reviewChapter": "Repasar Capítulo",
-  "noLivesTitle": "Sin Vidas Disponibles",
-  "noLivesMessage": "Necesitas al menos una vida para comenzar un capítulo. Las vidas se reinician diariamente.",
-  "nextResetAt": "Próximo reinicio a las {time}",
-  "@nextResetAt": {
-    "placeholders": {
-      "time": { "type": "String", "example": "08:00" }
-    }
-  },
-
-  "evaluationDetails": "Detalles de la Evaluación",
-  "completedDate": "Fecha de Finalización",
-  "attempts": "Intentos",
-  "timeSpent": "Tiempo Empleado",
-  "skillBreakdown": "Desglose por Habilidades",
-  "feedback": "Retroalimentación",
-  "featureComingSoon": "Función próximamente disponible",
-  "chapter": "Capítulo",
-  "evaluationInfo": "Información de la Evaluación",
-  "chapterResults": "Resultados por Capítulo",
-  "allChapters": "Todos los Capítulos",
-  "noEvaluationsFound": "No se encontraron evaluaciones",
-  "completeChaptersToSeeResults": "Completa capítulos para ver resultados"
+  }
 }

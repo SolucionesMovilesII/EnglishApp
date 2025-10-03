@@ -21,7 +21,6 @@ import {
   ApiResponse,
   ApiBearerAuth,
   ApiExtraModels,
-
   ApiParam,
   ApiQuery,
 } from '@nestjs/swagger';
@@ -42,7 +41,7 @@ import {
   UserApprovalSummaryDto,
 } from '../../../application/dtos/approval';
 
-interface AuthenticatedRequest extends Request {
+export interface AuthenticatedRequest extends Request {
   user: {
     userId: string;
     email: string;
@@ -70,15 +69,14 @@ interface AuthenticatedRequest extends Request {
 export class ApprovalController {
   private readonly logger = new Logger(ApprovalController.name);
 
-  constructor(
-    private readonly approvalEngineService: ApprovalEngineService,
-  ) {}
+  constructor(private readonly approvalEngineService: ApprovalEngineService) {}
 
   @Post('evaluate')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Evaluate user approval for a chapter',
-    description: 'Evaluates if a user passes a chapter based on their score and approval rules. Handles error carryover from previous attempts.',
+    description:
+      'Evaluates if a user passes a chapter based on their score and approval rules. Handles error carryover from previous attempts.',
   })
   @ApiResponse({
     status: 200,
@@ -230,9 +228,7 @@ export class ApprovalController {
     @Query() query: Partial<GetEvaluationHistoryDto>,
     @Request() req: AuthenticatedRequest,
   ): Promise<EvaluationHistoryResponseDto> {
-    this.logger.log(
-      `Getting evaluation history for user: ${userId} by user: ${req.user.userId}`,
-    );
+    this.logger.log(`Getting evaluation history for user: ${userId} by user: ${req.user.userId}`);
 
     try {
       const historyDto: GetEvaluationHistoryDto = {
@@ -303,9 +299,7 @@ export class ApprovalController {
     @Param('userId', ParseUUIDPipe) userId: string,
     @Request() req: AuthenticatedRequest,
   ): Promise<UserApprovalSummaryDto> {
-    this.logger.log(
-      `Getting approval summary for user: ${userId} by user: ${req.user.userId}`,
-    );
+    this.logger.log(`Getting approval summary for user: ${userId} by user: ${req.user.userId}`);
 
     try {
       const result = await this.approvalEngineService.getUserApprovalSummary(userId);
@@ -319,7 +313,9 @@ export class ApprovalController {
         averageScore: result.averageScore,
         totalAttempts: result.totalEvaluations,
         pendingChapters: [], // This would need to be calculated separately
-        ...(result.lastEvaluation?.evaluatedAt && { lastEvaluationDate: result.lastEvaluation.evaluatedAt }),
+        ...(result.lastEvaluation?.evaluatedAt && {
+          lastEvaluationDate: result.lastEvaluation.evaluatedAt,
+        }),
       };
 
       this.logger.log(
@@ -358,9 +354,7 @@ export class ApprovalController {
     @Param('chapterId') chapterId: string,
     @Request() req: AuthenticatedRequest,
   ): Promise<ChapterEvaluationStatsDto> {
-    this.logger.log(
-      `Getting chapter stats for chapter: ${chapterId} by user: ${req.user.userId}`,
-    );
+    this.logger.log(`Getting chapter stats for chapter: ${chapterId} by user: ${req.user.userId}`);
 
     try {
       const result = await this.approvalEngineService.getChapterStats(chapterId);
@@ -369,7 +363,21 @@ export class ApprovalController {
         `AUDIT: Chapter stats retrieved for chapter ${chapterId} by user ${req.user.userId}`,
       );
 
-      return result;
+      // Map ChapterEvaluationStats to ChapterEvaluationStatsDto
+      const approvalRate =
+        result.totalEvaluations > 0 ? (result.approvedCount / result.totalEvaluations) * 100 : 0;
+
+      return {
+        chapterId,
+        totalEvaluations: result.totalEvaluations,
+        approvedCount: result.approvedCount,
+        failedCount: result.rejectedCount,
+        pendingCount: 0, // No pending evaluations in current implementation
+        averageScore: result.averageScore,
+        averageAdjustedScore: result.averageScore, // Same as average score for now
+        approvalRate,
+        averageAttempts: result.averageAttempts,
+      };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
       this.logger.error(`Error getting chapter stats: ${errorMessage}`);
@@ -512,16 +520,12 @@ export class ApprovalController {
     @Body(ValidationPipe) updateDto: UpdateApprovalRuleDto,
     @Request() req: AuthenticatedRequest,
   ): Promise<ApprovalRuleResponseDto> {
-    this.logger.log(
-      `Updating approval rule: ${ruleId} by user: ${req.user.userId}`,
-    );
+    this.logger.log(`Updating approval rule: ${ruleId} by user: ${req.user.userId}`);
 
     try {
       const result = await this.approvalEngineService.updateRule(ruleId, updateDto);
 
-      this.logger.log(
-        `AUDIT: Approval rule ${ruleId} updated by user ${req.user.userId}`,
-      );
+      this.logger.log(`AUDIT: Approval rule ${ruleId} updated by user ${req.user.userId}`);
 
       return result;
     } catch (error) {
@@ -563,16 +567,12 @@ export class ApprovalController {
     @Param('ruleId', ParseUUIDPipe) ruleId: string,
     @Request() req: AuthenticatedRequest,
   ): Promise<void> {
-    this.logger.log(
-      `Deleting approval rule: ${ruleId} by user: ${req.user.userId}`,
-    );
+    this.logger.log(`Deleting approval rule: ${ruleId} by user: ${req.user.userId}`);
 
     try {
       await this.approvalEngineService.deleteRule(ruleId);
 
-      this.logger.log(
-        `AUDIT: Approval rule ${ruleId} deleted by user ${req.user.userId}`,
-      );
+      this.logger.log(`AUDIT: Approval rule ${ruleId} deleted by user ${req.user.userId}`);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
       this.logger.error(`Error deleting rule: ${errorMessage}`);
@@ -584,7 +584,8 @@ export class ApprovalController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Check if user can attempt chapter',
-    description: 'Checks if a user can attempt a specific chapter based on approval rules and previous attempts.',
+    description:
+      'Checks if a user can attempt a specific chapter based on approval rules and previous attempts.',
   })
   @ApiParam({
     name: 'userId',

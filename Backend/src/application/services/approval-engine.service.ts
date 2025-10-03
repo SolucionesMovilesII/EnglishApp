@@ -1,8 +1,28 @@
 import { Injectable, Logger, Inject } from '@nestjs/common';
-import { EvaluateApprovalUseCase, EvaluateApprovalRequest, EvaluateApprovalResponse } from '../use-cases/approval/evaluate-approval.use-case';
-import { ConfigureApprovalRuleUseCase, GetApprovalRulesUseCase, DeleteApprovalRuleUseCase, ConfigureApprovalRuleRequest, ConfigureApprovalRuleResponse } from '../use-cases/approval/configure-approval-rule.use-case';
-import { UpdateApprovalRuleUseCase, UpdateApprovalRuleRequest } from '../use-cases/approval/update-approval-rule.use-case';
-import { GetEvaluationHistoryUseCase, GetChapterEvaluationStatsUseCase, GetLatestEvaluationUseCase, GetEvaluationHistoryRequest, GetEvaluationHistoryResponse, EvaluationHistoryItem } from '../use-cases/approval/get-evaluation-history.use-case';
+import {
+  EvaluateApprovalUseCase,
+  EvaluateApprovalRequest,
+  EvaluateApprovalResponse,
+} from '../use-cases/approval/evaluate-approval.use-case';
+import {
+  ConfigureApprovalRuleUseCase,
+  GetApprovalRulesUseCase,
+  DeleteApprovalRuleUseCase,
+  ConfigureApprovalRuleRequest,
+  ConfigureApprovalRuleResponse,
+} from '../use-cases/approval/configure-approval-rule.use-case';
+import {
+  UpdateApprovalRuleUseCase,
+  UpdateApprovalRuleRequest,
+} from '../use-cases/approval/update-approval-rule.use-case';
+import {
+  GetEvaluationHistoryUseCase,
+  GetChapterEvaluationStatsUseCase,
+  GetLatestEvaluationUseCase,
+  GetEvaluationHistoryRequest,
+  GetEvaluationHistoryResponse,
+  EvaluationHistoryItem,
+} from '../use-cases/approval/get-evaluation-history.use-case';
 import { IApprovalMetricsRepository } from '../interfaces/repositories/approval-metrics-repository.interface';
 import { ApprovalMetrics } from '../../domain/entities/approval-metrics.entity';
 import { EvaluationStatus } from '../../domain/entities/approval-evaluation.entity';
@@ -11,11 +31,14 @@ export interface ApprovalEngineStats {
   totalEvaluations: number;
   approvalRate: number;
   averageAttempts: number;
-  chapterStats: Record<string, {
-    evaluations: number;
-    approvalRate: number;
-    averageScore: number;
-  }>;
+  chapterStats: Record<
+    string,
+    {
+      evaluations: number;
+      approvalRate: number;
+      averageScore: number;
+    }
+  >;
 }
 
 export interface UserApprovalSummary {
@@ -29,10 +52,18 @@ export interface UserApprovalSummary {
   lastEvaluation?: EvaluationHistoryItem;
 }
 
+export interface ChapterEvaluationStats {
+  totalEvaluations: number;
+  approvedCount: number;
+  rejectedCount: number;
+  averageScore: number;
+  averageAttempts: number;
+}
+
 @Injectable()
 export class ApprovalEngineService {
   private readonly logger = new Logger(ApprovalEngineService.name);
-  private readonly performanceCache = new Map<string, any>();
+  private readonly performanceCache = new Map<string, { data: unknown; timestamp: number }>();
   private readonly cacheTimeout = 5 * 60 * 1000; // 5 minutes
 
   constructor(
@@ -60,7 +91,7 @@ export class ApprovalEngineService {
 
     try {
       const result = await this.evaluateApprovalUseCase.execute(request);
-      
+
       const processingTime = Date.now() - startTime;
       this.logger.log(
         `Approval evaluation completed in ${processingTime}ms. Status: ${result.status}, Score: ${result.adjustedScore}/${result.threshold}`,
@@ -82,9 +113,10 @@ export class ApprovalEngineService {
   /**
    * Batch evaluate multiple users for the same chapter
    */
-  async batchEvaluateApproval(
-    requests: EvaluateApprovalRequest[],
-  ): Promise<{ results: EvaluateApprovalResponse[]; errors: Array<{ request: EvaluateApprovalRequest; error: string }> }> {
+  async batchEvaluateApproval(requests: EvaluateApprovalRequest[]): Promise<{
+    results: EvaluateApprovalResponse[];
+    errors: Array<{ request: EvaluateApprovalRequest; error: string }>;
+  }> {
     this.logger.log(`Processing batch approval evaluation for ${requests.length} requests`);
 
     const results: EvaluateApprovalResponse[] = [];
@@ -95,7 +127,7 @@ export class ApprovalEngineService {
     const chunks = this.chunkArray(requests, concurrencyLimit);
 
     for (const chunk of chunks) {
-      const promises = chunk.map(async (request) => {
+      const promises = chunk.map(async request => {
         try {
           const result = await this.evaluateApproval(request);
           results.push(result);
@@ -120,17 +152,17 @@ export class ApprovalEngineService {
   /**
    * Configure approval rules for a chapter
    */
-  async configureRule(request: ConfigureApprovalRuleRequest): Promise<ConfigureApprovalRuleResponse> {
-    this.logger.log(
-      `Configuring approval rule for chapter: ${request.chapterId || 'global'}`,
-    );
+  async configureRule(
+    request: ConfigureApprovalRuleRequest,
+  ): Promise<ConfigureApprovalRuleResponse> {
+    this.logger.log(`Configuring approval rule for chapter: ${request.chapterId || 'global'}`);
 
     try {
       const result = await this.configureApprovalRuleUseCase.execute(request);
-      
+
       // Clear cache when rules change
       this.clearCache();
-      
+
       return result;
     } catch (error) {
       this.logger.error(
@@ -143,15 +175,18 @@ export class ApprovalEngineService {
   /**
    * Update approval rule
    */
-  async updateRule(ruleId: string, request: UpdateApprovalRuleRequest): Promise<ConfigureApprovalRuleResponse> {
+  async updateRule(
+    ruleId: string,
+    request: UpdateApprovalRuleRequest,
+  ): Promise<ConfigureApprovalRuleResponse> {
     this.logger.log(`Updating approval rule: ${ruleId}`);
 
     try {
       const result = await this.updateApprovalRuleUseCase.execute(ruleId, request);
-      
+
       // Clear cache when rules change
       this.clearCache();
-      
+
       return result;
     } catch (error) {
       this.logger.error(
@@ -166,21 +201,21 @@ export class ApprovalEngineService {
    */
   async getRules(chapterId?: string, isActive?: boolean): Promise<ConfigureApprovalRuleResponse[]> {
     const cacheKey = `rules_${chapterId || 'all'}_${isActive !== undefined ? isActive : 'any'}`;
-    const cached = this.getFromCache(cacheKey);
-    
+    const cached = this.getFromCache<ConfigureApprovalRuleResponse[]>(cacheKey);
+
     if (cached) {
       return cached;
     }
 
     let rules = await this.getApprovalRulesUseCase.execute(chapterId);
-    
+
     // Apply isActive filter if specified
     if (isActive !== undefined) {
       rules = rules.filter(rule => rule.isActive === isActive);
     }
-    
+
     this.setCache(cacheKey, rules);
-    
+
     return rules;
   }
 
@@ -195,31 +230,36 @@ export class ApprovalEngineService {
   /**
    * Get user evaluation history
    */
-  async getUserEvaluationHistory(request: GetEvaluationHistoryRequest): Promise<GetEvaluationHistoryResponse> {
+  async getUserEvaluationHistory(
+    request: GetEvaluationHistoryRequest,
+  ): Promise<GetEvaluationHistoryResponse> {
     return await this.getEvaluationHistoryUseCase.execute(request);
   }
 
   /**
    * Get latest evaluation for user and chapter
    */
-  async getLatestEvaluation(userId: string, chapterId: string): Promise<EvaluationHistoryItem | null> {
+  async getLatestEvaluation(
+    userId: string,
+    chapterId: string,
+  ): Promise<EvaluationHistoryItem | null> {
     return await this.getLatestEvaluationUseCase.execute(userId, chapterId);
   }
 
   /**
    * Get chapter evaluation statistics
    */
-  async getChapterStats(chapterId: string): Promise<any> {
+  async getChapterStats(chapterId: string): Promise<ChapterEvaluationStats> {
     const cacheKey = `chapter_stats_${chapterId}`;
-    const cached = this.getFromCache(cacheKey);
-    
+    const cached = this.getFromCache<ChapterEvaluationStats>(cacheKey);
+
     if (cached) {
       return cached;
     }
 
     const stats = await this.getChapterEvaluationStatsUseCase.execute(chapterId);
     this.setCache(cacheKey, stats);
-    
+
     return stats;
   }
 
@@ -228,8 +268,8 @@ export class ApprovalEngineService {
    */
   async getEngineStats(): Promise<ApprovalEngineStats> {
     const cacheKey = 'engine_stats';
-    const cached = this.getFromCache(cacheKey);
-    
+    const cached = this.getFromCache<ApprovalEngineStats>(cacheKey);
+
     if (cached) {
       return cached;
     }
@@ -261,15 +301,16 @@ export class ApprovalEngineService {
     });
 
     const approvedEvaluations = history.evaluations.filter(
-      (evaluation) => evaluation.status === EvaluationStatus.APPROVED,
+      evaluation => evaluation.status === EvaluationStatus.APPROVED,
     );
 
-    const chaptersCompleted = [...new Set(
-      approvedEvaluations.map((evaluation) => evaluation.chapterId),
-    )];
+    const chaptersCompleted = [
+      ...new Set(approvedEvaluations.map(evaluation => evaluation.chapterId)),
+    ];
 
     const totalScore = history.evaluations.reduce((sum, evaluation) => sum + evaluation.score, 0);
-    const averageScore = history.evaluations.length > 0 ? totalScore / history.evaluations.length : 0;
+    const averageScore =
+      history.evaluations.length > 0 ? totalScore / history.evaluations.length : 0;
 
     // Calculate current streak (consecutive approvals)
     let currentStreak = 0;
@@ -285,9 +326,10 @@ export class ApprovalEngineService {
       userId,
       totalEvaluations: history.evaluations.length,
       approvedEvaluations: approvedEvaluations.length,
-      approvalRate: history.evaluations.length > 0 
-        ? (approvedEvaluations.length / history.evaluations.length) * 100 
-        : 0,
+      approvalRate:
+        history.evaluations.length > 0
+          ? (approvedEvaluations.length / history.evaluations.length) * 100
+          : 0,
       averageScore,
       chaptersCompleted,
       currentStreak,
@@ -298,14 +340,17 @@ export class ApprovalEngineService {
   /**
    * Check if user can attempt a chapter
    */
-  async canUserAttemptChapter(userId: string, chapterId: string): Promise<{
+  async canUserAttemptChapter(
+    userId: string,
+    chapterId: string,
+  ): Promise<{
     canAttempt: boolean;
     reason?: string;
     attemptsRemaining?: number;
     nextAttemptAllowed?: Date;
   }> {
     const latestEvaluation = await this.getLatestEvaluation(userId, chapterId);
-    
+
     if (!latestEvaluation) {
       return { canAttempt: true };
     }
@@ -360,15 +405,15 @@ export class ApprovalEngineService {
   /**
    * Utility methods for caching
    */
-  private getFromCache(key: string): any {
+  private getFromCache<T>(key: string): T | null {
     const cached = this.performanceCache.get(key);
     if (cached && Date.now() - cached.timestamp < this.cacheTimeout) {
-      return cached.data;
+      return cached.data as T;
     }
     return null;
   }
 
-  private setCache(key: string, data: any): void {
+  private setCache(key: string, data: unknown): void {
     this.performanceCache.set(key, {
       data,
       timestamp: Date.now(),

@@ -3,6 +3,7 @@ import { IRefreshTokenRotationService } from '../../interfaces/services/refresh-
 import { IJwtService } from '../../interfaces/services/jwt-service.interface';
 import { IUserRepository } from '../../interfaces/repositories/user-repository.interface';
 import { RefreshResponseDto } from '../../dtos/auth/refresh-response.dto';
+
 import {
   TokenReuseDetectedException,
   TokenFamilyCompromisedException,
@@ -79,6 +80,10 @@ export class RefreshTokenUseCase {
       }
 
       // Get user information for the new access token
+      if (!validationResult.token) {
+        throw new InvalidTokenException('Token validation failed');
+      }
+
       const user = await this.userRepository.findById(validationResult.token.userId);
       if (!user) {
         this.logger.error(`User not found for token rotation: ${validationResult.token.userId}`);
@@ -262,7 +267,17 @@ export class RefreshTokenUseCase {
    * Validate a refresh token without rotating it
    * Used for checking current session information
    */
-  async validateToken(refreshToken: string): Promise<{ isValid: boolean; token?: any }> {
+  async validateToken(refreshToken: string): Promise<{
+    isValid: boolean;
+    token?: {
+      jti: string;
+      familyId: string;
+      userId: string;
+      tokenHash: string;
+      expiresAt: Date;
+      revoked: boolean;
+    };
+  }> {
     this.logger.debug('Validating refresh token');
 
     try {
@@ -271,7 +286,7 @@ export class RefreshTokenUseCase {
 
       return {
         isValid: validationResult.isValid,
-        token: validationResult.token,
+        ...(validationResult.token && { token: validationResult.token }),
       };
     } catch (error: unknown) {
       this.logger.debug(

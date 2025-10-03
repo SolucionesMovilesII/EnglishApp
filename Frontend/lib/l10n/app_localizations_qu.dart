@@ -395,225 +395,51 @@ class AppLocalizationsQu extends AppLocalizations {
   String get repeatChapterTitle => 'Kapituluta kutiy';
 
   @override
+  String get repeatChapterTitle => 'Repeat Chapter';
+
+  @override
   String get repeatChapterWarning =>
-      'Kay kapitulota ña tukurirqanki. Kutiypaqqa mana puntuyki tikranchu, ichaqa yachaykiqa aswan sinchikunqa!';
+      'You\'ve already completed this chapter. Repeating it won\'t affect your current score, but it\'s a great way to reinforce your learning!';
 
   @override
   String currentScore(int score) {
-    return 'Kunan puntu: $score';
+    return 'Current Score: $score points';
   }
 
   @override
   String get repeatChapterBenefit =>
-      'Kutiq praktikaymi sumaq. Kay pacha qampaq yachayta sinchiy.';
+      'Perfect practice makes perfect! Use this opportunity to strengthen your knowledge.';
 
   @override
-  String get repeatChapter => 'Kapituluta kutiy';
+  String get repeatChapter => 'Repeat Chapter';
 
   @override
   String chapterResetForRepetition(String chapterTitle) {
-    return 'Kapitulu «$chapterTitle» kutiypaq kutichisqa. Puntuykikunaqa waqllasqa kachkan!';
+    return 'Chapter \'$chapterTitle\' has been reset for repetition. Your original score is preserved!';
   }
 
   @override
   String get progress => 'Ñawpaqman';
 
   @override
-  String get episodeContent => 'Episodiopa contenido';
+  String get episodeContent => 'Episodio Contenido';
 
   @override
-  String get episodeContentPlaceholder => 'Kaypi episodiopa contenido rikurinqa';
+  String get episodeContentPlaceholder => 'Episodio contenido kaypi rikukunqa';
 
   @override
-  String get replayEpisode => 'Episodiota kutiy';
+  String get replayEpisode => 'Episodio Kutichiy';
 
   @override
-  String get startEpisode => 'Episodiota qallariy';
+  String get startEpisode => 'Episodio Qallariy';
 
   @override
   String startingEpisode(String episodeTitle) {
     return '$episodeTitle qallarikuspa...';
   }
 
-  // ----- Evaluation -----
-
   @override
-  String get evaluationDetails => 'Tupuykunapa willakuy';
-
-  @override
-  String get completedDate => 'Tukusqa p’unchaw';
-
-  @override
-  String get attempts => 'Akllanakuykuna';
-
-  @override
-  String get timeSpent => 'Pacha apachisqa';
-
-  @override
-  String get skillBreakdown => 'Yachay ruwanapa t’aqaq';
-
-  @override
-  String get feedback => 'Kuti willakuy';
-
-  @override
-  String get featureComingSoon => 'Kay rikch’ayninqa utqay hamunqa!';
-
-  @override
-  String get chapter => 'Kapitulu';
-
-  @override
-  String get evaluationInfo => 'Tupuy willakuy';
-
-  @override
-  String get chapterResults => 'Kapitulupa sutinakuy';
-
-  @override
-  String get allChapters => 'Tukuy kapitulukuna';
-
-  @override
-  String get noEvaluationsFound => 'Mana tupuy tariwasqa';
-
-  @override
-  String get completeChaptersToSeeResults =>
-      'Kapitulukunata tukuy, chaymanta sutinakuyta qhaway';
-
-  // ----- Vocabulary Chapters -----
-
-  @override
-  String get vocabularyChaptersTitle => 'Simi kapitulukuna';
-
-  @override
-  String get loadingVocabularyChapters => 'Simi kapitulukuna churachkan...';
-
-  @override
-  String get errorLoadingChapters => 'Kapitulukuna churanapi pantasqa';
-
-  @override
-  String get unknownError => 'Mana riqsisqa pantay';
-
-  @override
-  String get dismiss => 'Wisq’uy';
-
-  @override
-  String get tryAgain => 'Wakmanta';
-
-  @override
-  String get noChaptersAvailable => 'Mana kapitulu kachkan';
-
-  @override
-  String get noChaptersDescription =>
-      'Qhipaman kutiy, simi kapitulukunaqa chayamunqa';
-
-  @override
-  String get yourProgress => 'Qampa ñawpaqman';
-
-  @override
-  String get chaptersCompleted => 'Kapitulukuna tukusqa';
-
-  @override
-  String get unlocked => 'Kichasqa';
-
-  @override
-  String get locked => 'Wichqasqa';
-
-  @override
-  String get completed => 'Tukusqa';
-
-  @override
-  String get continue_ => 'Qatiy';
-
-  @override
-  String get start => 'Qallariy';
-
-  @override
-  String get chapterLocked => 'Kapitulu wichqasqa';
-
-  @override
-  String chapterLockedDescription(int previousChapter) {
-    return 'Kay kapitulu kicharinapaq, ñawpaq kapitulu $previousChapter tukuy';
-  }
-
-  @override
-  String get understood => 'Riqsisqa';
-
-  @override
-  String get chapterCompleted => 'Kapitulu tukusqa';
-
-  @override
-  String get chapterCompletedDescription =>
-      'Kay kapituluqa ña tukusqam. Ima p’unchawpas qhawariyta atinki.';
-
-  @override
-  String completedOn(DateTime date) {
-    final intl.DateFormat dateDateFormat = intl.DateFormat.yMd(localeName);
-    final String dateString = dateDateFormat.format(date);
-    return 'Tukusqa: $dateString';
-  }
-
-  @override
-  String get close => 'Wisq’uy';
-
-  @override
-  String get reviewChapter => 'Kapituluta qhawariy';
-
-  @override
-  String get noLivesTitle => 'Kawsaykuna mana kachkan';
-
-  @override
-  String get noLivesMessage =>
-      'Huk kawsaypachapas munsunki kapituluta qallariypaq. Kawsaykuna p’unchaw p’unchaw kutichikun.';
-
-  @override
-  String nextResetAt(String time) {
-    return 'Qatiq kutichiy: $time';
-  }
-
-  @override
-  String get repeatChapterWarning =>
-      'Are you sure you want to repeat this chapter? Your current progress will be saved.';
-
-  @override
-  String get evaluationHistory => 'View your evaluation history and progress';
-
-  @override
-  String get currentScore => 'Current Score';
-
-  @override
-  String get viewProgress => 'View Progress';
-
-  @override
-  String get benefits => 'Benefits of repeating:';
-
-  @override
-  String get improveScore => '• Improve your score';
-
-  @override
-  String get reinforceLearning => '• Reinforce learning';
-
-  @override
-  String get betterUnderstanding => '• Better understanding';
-
-  @override
-  String get confirm => 'Confirm';
-
-  @override
-  String get chapterResults => 'Chapter Results';
-
-  @override
-  String get allChapters => 'All Chapters';
-
-  @override
-  String get chapter => 'Chapter';
-
-  @override
-  String get noEvaluationsFound => 'No evaluations found';
-
-  @override
-  String get completeChaptersToSeeResults =>
-      'Complete chapters to see your results here';
-
-  @override
-  String get evaluationInfo => 'Evaluation Information';
+  String get evaluationDetails => 'Evaluation Details';
 
   @override
   String get completedDate => 'Completed Date';
@@ -631,8 +457,23 @@ class AppLocalizationsQu extends AppLocalizations {
   String get feedback => 'Feedback';
 
   @override
-  String get featureComingSoon => 'Feature coming soon';
+  String get featureComingSoon => 'This feature is coming soon!';
 
   @override
-  String get repeatChapter => 'Repeat Chapter';
+  String get chapter => 'Chapter';
+
+  @override
+  String get evaluationInfo => 'Evaluation Information';
+
+  @override
+  String get chapterResults => 'Chapter Results';
+
+  @override
+  String get allChapters => 'All Chapters';
+
+  @override
+  String get noEvaluationsFound => 'No evaluations found';
+
+  @override
+  String get completeChaptersToSeeResults => 'Complete chapters to see results';
 }

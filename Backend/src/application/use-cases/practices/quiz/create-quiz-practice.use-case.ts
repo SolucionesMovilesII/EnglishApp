@@ -1,5 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PracticeSession, PracticeType, PracticeStatus } from '../../../../domain/entities/practice-session.entity';
+import {
+  PracticeSession,
+  PracticeType,
+  PracticeStatus,
+} from '../../../../domain/entities/practice-session.entity';
 import { QuizPractice } from '../../../../domain/entities/quiz-practice.entity';
 
 import { IPracticeSessionRepository } from '../../../interfaces/repositories/practice-session-repository.interface';
@@ -15,12 +19,9 @@ export class CreateQuizPracticeUseCase {
     private readonly chapterRepository: IChapterRepository,
   ) {}
 
-  async execute(
-    userId: string,
-    createDto: CreateQuizPracticeDto,
-  ): Promise<QuizPractice> {
+  async execute(userId: string, createDto: CreateQuizPracticeDto): Promise<QuizPractice> {
     let chapter = null;
-    
+
     // Validate chapter exists if provided
     if (createDto.chapterId) {
       chapter = await this.chapterRepository.findById(createDto.chapterId);
@@ -52,7 +53,7 @@ export class CreateQuizPracticeUseCase {
       savedSession,
       createDto.category || '',
       createDto.difficultyLevel || '',
-      createDto.totalQuestions || 10
+      createDto.totalQuestions || 10,
     );
 
     const savedQuizPractice = await this.quizPracticeRepository.create(quizPractice);

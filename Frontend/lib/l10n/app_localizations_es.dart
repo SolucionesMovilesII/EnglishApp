@@ -395,8 +395,6 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get refresh => 'Actualizar';
 
-  // ======================= Repetir Capítulo =======================
-
   @override
   String get repeatChapterTitle => 'Repetir Capítulo';
 
@@ -405,147 +403,79 @@ class AppLocalizationsEs extends AppLocalizations {
       'Ya has completado este capítulo. Repetirlo no afectará tu puntuación actual, ¡pero es una excelente manera de reforzar tu aprendizaje!';
 
   @override
-  String currentScore(int score) => 'Puntuación actual: $score puntos';
+  String currentScore(int score) {
+    return 'Puntuación Actual: $score puntos';
+  }
 
   @override
   String get repeatChapterBenefit =>
-      '¡La práctica lleva a la perfección! Aprovecha esta oportunidad para fortalecer tu conocimiento.';
+      '¡La práctica perfecta hace la perfección! Usa esta oportunidad para fortalecer tu conocimiento.';
 
   @override
   String get repeatChapter => 'Repetir Capítulo';
 
   @override
-  String chapterResetForRepetition(String chapterTitle) =>
-      'El capítulo "$chapterTitle" ha sido reiniciado para repetición. ¡Tu puntuación original se mantiene!';
-
-  // ======================= Capítulos de Vocabulario =======================
-
-  @override
-  String get vocabularyChaptersTitle => 'Capítulos de Vocabulario';
-
-  @override
-  String get loadingVocabularyChapters => 'Cargando capítulos de vocabulario...';
-
-  @override
-  String get errorLoadingChapters => 'Error al cargar capítulos';
-
-  @override
-  String get unknownError => 'Ocurrió un error desconocido';
-
-  @override
-  String get dismiss => 'Descartar';
-
-  @override
-  String get tryAgain => 'Intentar de nuevo';
-
-  @override
-  String get noChaptersAvailable => 'No hay capítulos disponibles';
-
-  @override
-  String get noChaptersDescription => 'Vuelve más tarde para ver nuevos capítulos de vocabulario';
-
-  @override
-  String get yourProgress => 'Tu Progreso';
-
-  @override
-  String get chaptersCompleted => 'Capítulos Completados';
-
-  @override
-  String get unlocked => 'Desbloqueado';
-
-  @override
-  String get locked => 'Bloqueado';
+  String chapterResetForRepetition(String chapterTitle) {
+    return 'El capítulo \'$chapterTitle\' ha sido reiniciado para repetición. ¡Tu puntuación original se mantiene!';
+  }
 
   @override
   String get progress => 'Progreso';
 
   @override
-  String get completed => 'Completado';
+  String get episodeContent => 'Contenido del Episodio';
 
   @override
-  String get continue_ => 'Continuar';
+  String get episodeContentPlaceholder =>
+      'El contenido del episodio se mostrará aquí';
 
   @override
-  String get start => 'Comenzar';
+  String get replayEpisode => 'Repetir Episodio';
 
   @override
-  String get chapterLocked => 'Capítulo Bloqueado';
+  String get startEpisode => 'Iniciar Episodio';
 
   @override
-  String chapterLockedDescription(int previousChapter) =>
-      'Completa el capítulo $previousChapter para desbloquear este capítulo';
-
-  @override
-  String get understood => 'Entendido';
-
-  @override
-  String get chapterCompleted => 'Capítulo Completado';
-
-  @override
-  String get chapterCompletedDescription =>
-      'Ya completaste este capítulo. Puedes repasarlo cuando quieras.';
-
-  @override
-  String completedOn(DateTime date) {
-    final intl.DateFormat dateDateFormat = intl.DateFormat.yMd(localeName);
-    final String dateString = dateDateFormat.format(date);
-    return 'Completado el $dateString';
+  String startingEpisode(String episodeTitle) {
+    return 'Iniciando $episodeTitle...';
   }
 
   @override
-  String get close => 'Cerrar';
+  String get evaluationDetails => 'Evaluation Details';
 
   @override
-  String get reviewChapter => 'Repasar Capítulo';
+  String get completedDate => 'Completed Date';
 
   @override
-  String get noLivesTitle => 'Sin Vidas Disponibles';
+  String get attempts => 'Attempts';
 
   @override
-  String get noLivesMessage =>
-      'Necesitas al menos una vida para comenzar un capítulo. Las vidas se reinician diariamente.';
+  String get timeSpent => 'Time Spent';
 
   @override
-  String nextResetAt(String time) => 'Próximo reinicio a las $time';
-
-  // ======================= Evaluación (hu-006-1) =======================
+  String get skillBreakdown => 'Skill Breakdown';
 
   @override
-  String get evaluationDetails => 'Detalles de la Evaluación';
+  String get feedback => 'Feedback';
 
   @override
-  String get completedDate => 'Fecha de Finalización';
+  String get featureComingSoon => 'This feature is coming soon!';
 
   @override
-  String get attempts => 'Intentos';
+  String get chapter => 'Chapter';
 
   @override
-  String get timeSpent => 'Tiempo Empleado';
+  String get evaluationInfo => 'Evaluation Information';
 
   @override
-  String get skillBreakdown => 'Desglose por Habilidades';
+  String get chapterResults => 'Chapter Results';
 
   @override
-  String get feedback => 'Retroalimentación';
+  String get allChapters => 'All Chapters';
 
   @override
-  String get featureComingSoon => '¡Función próximamente disponible!';
+  String get noEvaluationsFound => 'No evaluations found';
 
   @override
-  String get chapter => 'Capítulo';
-
-  @override
-  String get evaluationInfo => 'Información de la Evaluación';
-
-  @override
-  String get chapterResults => 'Resultados por Capítulo';
-
-  @override
-  String get allChapters => 'Todos los Capítulos';
-
-  @override
-  String get noEvaluationsFound => 'No se encontraron evaluaciones';
-
-  @override
-  String get completeChaptersToSeeResults => 'Completa capítulos para ver resultados';
+  String get completeChaptersToSeeResults => 'Complete chapters to see results';
 }

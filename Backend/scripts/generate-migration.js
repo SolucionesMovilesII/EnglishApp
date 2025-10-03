@@ -24,12 +24,12 @@ exec(command, (error, stdout, stderr) => {
     console.error(`Error: ${error.message}`);
     return;
   }
-  
+
   if (stderr) {
     console.error(`Stderr: ${stderr}`);
     return;
   }
-  
+
   console.log(stdout);
   console.log(`Migration ${migrationName} generated successfully!`);
 });

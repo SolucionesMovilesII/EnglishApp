@@ -397,24 +397,27 @@ class AppLocalizationsRu extends AppLocalizations {
   String get repeatChapterTitle => 'Повторить главу';
 
   @override
+  String get repeatChapterTitle => 'Repeat Chapter';
+
+  @override
   String get repeatChapterWarning =>
-      'Вы уже завершили эту главу. Повтор не повлияет на текущий результат, но поможет закрепить знания!';
+      'You\'ve already completed this chapter. Repeating it won\'t affect your current score, but it\'s a great way to reinforce your learning!';
 
   @override
   String currentScore(int score) {
-    return 'Текущий счёт: $score баллов';
+    return 'Current Score: $score points';
   }
 
   @override
   String get repeatChapterBenefit =>
-      'Практика ведёт к мастерству! Используйте шанс укрепить знания.';
+      'Perfect practice makes perfect! Use this opportunity to strengthen your knowledge.';
 
   @override
-  String get repeatChapter => 'Повторить главу';
+  String get repeatChapter => 'Repeat Chapter';
 
   @override
   String chapterResetForRepetition(String chapterTitle) {
-    return 'Глава «$chapterTitle» сброшена для повтора. Исходный результат сохранён!';
+    return 'Chapter \'$chapterTitle\' has been reset for repetition. Your original score is preserved!';
   }
 
   @override
@@ -438,185 +441,8 @@ class AppLocalizationsRu extends AppLocalizations {
     return 'Запуск $episodeTitle...';
   }
 
-  // ----- Оценивание / Evaluation -----
-
   @override
-  String get evaluationDetails => 'Детали оценки';
-
-  @override
-  String get completedDate => 'Дата завершения';
-
-  @override
-  String get attempts => 'Попытки';
-
-  @override
-  String get timeSpent => 'Затраченное время';
-
-  @override
-  String get skillBreakdown => 'Разбор навыков';
-
-  @override
-  String get feedback => 'Обратная связь';
-
-  @override
-  String get featureComingSoon => 'Эта функция скоро появится!';
-
-  @override
-  String get chapter => 'Глава';
-
-  @override
-  String get evaluationInfo => 'Информация об оценке';
-
-  @override
-  String get chapterResults => 'Результаты главы';
-
-  @override
-  String get allChapters => 'Все главы';
-
-  @override
-  String get noEvaluationsFound => 'Оценки не найдены';
-
-  @override
-  String get completeChaptersToSeeResults =>
-      'Завершайте главы, чтобы увидеть результаты';
-
-  // ----- Главы словаря -----
-
-  @override
-  String get vocabularyChaptersTitle => 'Главы словаря';
-
-  @override
-  String get loadingVocabularyChapters => 'Загрузка глав словаря...';
-
-  @override
-  String get errorLoadingChapters => 'Ошибка загрузки глав';
-
-  @override
-  String get unknownError => 'Произошла неизвестная ошибка';
-
-  @override
-  String get dismiss => 'Закрыть';
-
-  @override
-  String get tryAgain => 'Повторить попытку';
-
-  @override
-  String get noChaptersAvailable => 'Нет доступных глав';
-
-  @override
-  String get noChaptersDescription =>
-      'Загляните позже: появятся новые главы словаря';
-
-  @override
-  String get yourProgress => 'Ваш прогресс';
-
-  @override
-  String get chaptersCompleted => 'Глав завершено';
-
-  @override
-  String get unlocked => 'Разблокировано';
-
-  @override
-  String get locked => 'Заблокировано';
-
-  @override
-  String get completed => 'Завершено';
-
-  @override
-  String get continue_ => 'Продолжить';
-
-  @override
-  String get start => 'Начать';
-
-  @override
-  String get chapterLocked => 'Глава заблокирована';
-
-  @override
-  String chapterLockedDescription(int previousChapter) {
-    return 'Чтобы открыть эту главу, завершите главу $previousChapter';
-  }
-
-  @override
-  String get understood => 'Понятно';
-
-  @override
-  String get chapterCompleted => 'Глава завершена';
-
-  @override
-  String get chapterCompletedDescription =>
-      'Вы уже завершили эту главу. Можно просматривать её в любое время.';
-
-  @override
-  String completedOn(DateTime date) {
-    final intl.DateFormat dateDateFormat = intl.DateFormat.yMd(localeName);
-    final String dateString = dateDateFormat.format(date);
-    return 'Завершено $dateString';
-  }
-
-  @override
-  String get close => 'Закрыть';
-
-  @override
-  String get reviewChapter => 'Просмотреть главу';
-
-  @override
-  String get noLivesTitle => 'Нет жизней';
-
-  @override
-  String get noLivesMessage =>
-      'Чтобы начать главу, нужна хотя бы одна жизнь. Жизни обновляются ежедневно.';
-
-  @override
-  String nextResetAt(String time) {
-    return 'Следующее обновление в $time';
-  }
-
-  @override
-  String get repeatChapterWarning =>
-      'Are you sure you want to repeat this chapter? Your current progress will be saved.';
-
-  @override
-  String get evaluationHistory => 'View your evaluation history and progress';
-
-  @override
-  String get currentScore => 'Current Score';
-
-  @override
-  String get viewProgress => 'View Progress';
-
-  @override
-  String get benefits => 'Benefits of repeating:';
-
-  @override
-  String get improveScore => '• Improve your score';
-
-  @override
-  String get reinforceLearning => '• Reinforce learning';
-
-  @override
-  String get betterUnderstanding => '• Better understanding';
-
-  @override
-  String get confirm => 'Confirm';
-
-  @override
-  String get chapterResults => 'Chapter Results';
-
-  @override
-  String get allChapters => 'All Chapters';
-
-  @override
-  String get chapter => 'Chapter';
-
-  @override
-  String get noEvaluationsFound => 'No evaluations found';
-
-  @override
-  String get completeChaptersToSeeResults =>
-      'Complete chapters to see your results here';
-
-  @override
-  String get evaluationInfo => 'Evaluation Information';
+  String get evaluationDetails => 'Evaluation Details';
 
   @override
   String get completedDate => 'Completed Date';
@@ -634,8 +460,23 @@ class AppLocalizationsRu extends AppLocalizations {
   String get feedback => 'Feedback';
 
   @override
-  String get featureComingSoon => 'Feature coming soon';
+  String get featureComingSoon => 'This feature is coming soon!';
 
   @override
-  String get repeatChapter => 'Repeat Chapter';
+  String get chapter => 'Chapter';
+
+  @override
+  String get evaluationInfo => 'Evaluation Information';
+
+  @override
+  String get chapterResults => 'Chapter Results';
+
+  @override
+  String get allChapters => 'All Chapters';
+
+  @override
+  String get noEvaluationsFound => 'No evaluations found';
+
+  @override
+  String get completeChaptersToSeeResults => 'Complete chapters to see results';
 }

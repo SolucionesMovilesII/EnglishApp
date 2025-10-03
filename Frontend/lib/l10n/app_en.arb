@@ -186,10 +186,22 @@
       }
     }
   },
-
-  "repeatChapterBenefit": "Practice makes perfect! Use this opportunity to strengthen your knowledge.",
+  "livesResetTomorrow": "Lives reset tomorrow",
+  "nextResetTomorrow": "Next reset tomorrow",
+  "refresh": "Refresh",
+  "repeatChapterTitle": "Repeat Chapter",
+  "repeatChapterWarning": "You've already completed this chapter. Repeating it won't affect your current score, but it's a great way to reinforce your learning!",
+  "currentScore": "Current Score: {score} points",
+  "@currentScore": {
+    "placeholders": {
+      "score": {
+        "type": "int",
+        "example": "85"
+      }
+    }
+  },
+  "repeatChapterBenefit": "Perfect practice makes perfect! Use this opportunity to strengthen your knowledge.",
   "repeatChapter": "Repeat Chapter",
-
   "chapterResetForRepetition": "Chapter '{chapterTitle}' has been reset for repetition. Your original score is preserved!",
   "@chapterResetForRepetition": {
     "placeholders": {
@@ -199,13 +211,11 @@
       }
     }
   },
-
   "progress": "Progress",
   "episodeContent": "Episode Content",
   "episodeContentPlaceholder": "Episode content will be displayed here",
   "replayEpisode": "Replay Episode",
   "startEpisode": "Start Episode",
-
   "startingEpisode": "Starting {episodeTitle}...",
   "@startingEpisode": {
     "placeholders": {
@@ -215,59 +225,8 @@
       }
     }
   },
-
-  "vocabularyChaptersTitle": "Vocabulary Chapters",
-  "loadingVocabularyChapters": "Loading vocabulary chapters...",
-  "errorLoadingChapters": "Error loading chapters",
-  "unknownError": "An unknown error occurred",
-  "dismiss": "Dismiss",
-  "tryAgain": "Try Again",
-  "noChaptersAvailable": "No chapters available",
-  "noChaptersDescription": "Check back later for new vocabulary chapters",
-  "yourProgress": "Your Progress",
-  "chaptersCompleted": "Chapters Completed",
-  "unlocked": "Unlocked",
-  "locked": "Locked",
-  "completed": "Completed",
-  "continue_": "Continue",
-  "start": "Start",
-  "chapterLocked": "Chapter Locked",
-  "chapterLockedDescription": "Complete chapter {previousChapter} to unlock this chapter",
-  "@chapterLockedDescription": {
-    "placeholders": {
-      "previousChapter": {
-        "type": "int",
-        "example": 3
-      }
-    }
-  },
-  "understood": "Understood",
-  "chapterCompleted": "Chapter Completed",
-  "chapterCompletedDescription": "You have already completed this chapter. You can review it anytime.",
-  "completedOn": "Completed on {date}",
-  "@completedOn": {
-    "placeholders": {
-      "date": {
-        "type": "String",
-        "example": "12/31/2025"
-      }
-    }
-  },
-  "close": "Close",
-  "reviewChapter": "Review Chapter",
-  "noLivesTitle": "No Lives Available",
-  "noLivesMessage": "You need at least one life to start a chapter. Lives reset daily.",
-  "nextResetAt": "Next reset at {time}",
-  "@nextResetAt": {
-    "placeholders": {
-      "time": {
-        "type": "String",
-        "example": "08:00"
-      }
-    }
-  },
-
   "evaluationDetails": "Evaluation Details",
+  "score": "Score",
   "completedDate": "Completed Date",
   "attempts": "Attempts",
   "timeSpent": "Time Spent",

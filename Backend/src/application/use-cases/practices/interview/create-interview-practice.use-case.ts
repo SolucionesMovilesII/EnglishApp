@@ -1,5 +1,9 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
-import { PracticeSession, PracticeType, PracticeStatus } from '../../../../domain/entities/practice-session.entity';
+import {
+  PracticeSession,
+  PracticeType,
+  PracticeStatus,
+} from '../../../../domain/entities/practice-session.entity';
 import { InterviewPractice } from '../../../../domain/entities/interview-practice.entity';
 import { Chapter } from '../../../../domain/entities/chapter.entity';
 import { IPracticeSessionRepository } from '../../../interfaces/repositories/practice-session-repository.interface';
@@ -15,10 +19,7 @@ export class CreateInterviewPracticeUseCase {
     private readonly chapterRepository: IChapterRepository,
   ) {}
 
-  async execute(
-    userId: string,
-    createDto: CreateInterviewPracticeDto,
-  ): Promise<InterviewPractice> {
+  async execute(userId: string, createDto: CreateInterviewPracticeDto): Promise<InterviewPractice> {
     // Validate chapter exists if provided
     let chapter: Chapter | null = null;
     if (createDto.chapterId) {
@@ -57,7 +58,7 @@ export class CreateInterviewPracticeUseCase {
     const interviewPractice = InterviewPractice.createForSession(
       savedSession,
       createDto.interviewType,
-      createDto.totalQuestions
+      createDto.totalQuestions,
     );
 
     const savedInterviewPractice = await this.interviewPracticeRepository.create(interviewPractice);

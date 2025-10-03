@@ -1,6 +1,10 @@
 import { IsString, IsNumber, IsBoolean, IsOptional, IsObject, Min, Max } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsValidThreshold, IsValidChapterId, IsValidAttemptCount } from '../../../presentation/validators/approval.validators';
+import {
+  IsValidThreshold,
+  IsValidChapterId,
+  IsValidAttemptCount,
+} from '../../../presentation/validators/approval.validators';
 
 export class ConfigureApprovalRuleDto {
   @ApiProperty({
@@ -55,7 +59,7 @@ export class ConfigureApprovalRuleDto {
   })
   @IsOptional()
   @IsObject({ message: 'Special requirements must be an object' })
-  readonly specialRequirements?: Record<string, any>;
+  readonly specialRequirements?: Record<string, unknown>;
 
   @ApiProperty({
     description: 'Description of the rule',
@@ -113,7 +117,7 @@ export class ApprovalRuleResponseDto {
     },
     nullable: true,
   })
-  readonly specialRequirements?: Record<string, any>;
+  readonly specialRequirements?: Record<string, unknown>;
 
   @ApiProperty({
     description: 'Description of the rule',
@@ -190,7 +194,7 @@ export class UpdateApprovalRuleDto {
   })
   @IsOptional()
   @IsObject({ message: 'Special requirements must be an object' })
-  readonly specialRequirements?: Record<string, any>;
+  readonly specialRequirements?: Record<string, unknown>;
 
   @ApiProperty({
     description: 'Description of the rule',

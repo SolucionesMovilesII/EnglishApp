@@ -4,13 +4,11 @@ import { IQuizPracticeRepository } from '../../../interfaces/repositories/quiz-p
 
 @Injectable()
 export class GetQuizPracticeUseCase {
-  constructor(
-    private readonly quizPracticeRepository: IQuizPracticeRepository,
-  ) {}
+  constructor(private readonly quizPracticeRepository: IQuizPracticeRepository) {}
 
   async execute(practiceId: string, userId: string): Promise<QuizPractice> {
     const practice = await this.quizPracticeRepository.findById(practiceId);
-    
+
     if (!practice) {
       throw new NotFoundException('Quiz practice not found');
     }
@@ -25,7 +23,7 @@ export class GetQuizPracticeUseCase {
 
   async getBySessionId(sessionId: string, userId: string): Promise<QuizPractice> {
     const practice = await this.quizPracticeRepository.findByPracticeSessionId(sessionId);
-    
+
     if (!practice) {
       throw new NotFoundException('Quiz practice not found for this session');
     }

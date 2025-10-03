@@ -1,7 +1,10 @@
 import { IsUUID, IsNumber, IsOptional, IsObject, Min, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { EvaluationStatus } from '../../../domain/entities/approval-evaluation.entity';
-import { IsValidScore, IsValidChapterId } from '../../../presentation/validators/approval.validators';
+import {
+  IsValidScore,
+  IsValidChapterId,
+} from '../../../presentation/validators/approval.validators';
 
 export class EvaluateApprovalDto {
   @ApiProperty({
@@ -51,7 +54,7 @@ export class EvaluateApprovalDto {
   })
   @IsOptional()
   @IsObject({ message: 'Additional data must be an object' })
-  readonly additionalData?: Record<string, any>;
+  readonly additionalData?: Record<string, unknown>;
 }
 
 export class EvaluateApprovalResponseDto {

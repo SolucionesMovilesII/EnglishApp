@@ -1,3 +1,4 @@
+/* eslint-disable */
 import {
   Controller,
   Post,
@@ -13,6 +14,15 @@ import {
   ParseUUIDPipe,
   Query,
 } from '@nestjs/common';
+
+interface AuthenticatedRequest {
+  user: {
+    sub: string;
+    role: string;
+    email?: string;
+  };
+}
+
 import {
   ApiTags,
   ApiOperation,
@@ -50,9 +60,7 @@ import {
 export class InterviewPracticeController {
   private readonly logger = new Logger(InterviewPracticeController.name);
 
-  constructor(
-    // TODO: Inject use cases when implemented
-  ) {}
+  constructor() {} // TODO: Inject use cases when implemented
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
@@ -76,11 +84,11 @@ export class InterviewPracticeController {
     description: 'User not authenticated',
   })
   async createInterviewPractice(
-    @Request() req: any,
+    @Request() req: AuthenticatedRequest,
     @Body() _createDto: CreateInterviewPracticeDto,
   ): Promise<InterviewPracticeResponseDto> {
     this.logger.log(`Creating interview practice for user: ${req.user.sub}`);
-    
+
     // TODO: Implement use case
     throw new Error('Not implemented yet');
   }
@@ -112,11 +120,11 @@ export class InterviewPracticeController {
     description: 'User not authenticated',
   })
   async getInterviewPractice(
-    @Request() req: any,
+    @Request() req: AuthenticatedRequest,
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<InterviewPracticeResponseDto> {
     this.logger.log(`Getting interview practice ${id} for user: ${req.user.sub}`);
-    
+
     // TODO: Implement use case
     throw new Error('Not implemented yet');
   }
@@ -148,12 +156,12 @@ export class InterviewPracticeController {
     description: 'User not authenticated',
   })
   async updateInterviewPractice(
-    @Request() _req: any,
+    @Request() _req: AuthenticatedRequest,
     @Param('id', ParseUUIDPipe) id: string,
     @Body() _updateDto: UpdateInterviewPracticeDto,
   ): Promise<InterviewPracticeResponseDto> {
     this.logger.log(`Updating interview practice ${id} for user: ${_req.user.sub}`);
-    
+
     // TODO: Implement use case
     throw new Error('Not implemented yet');
   }
@@ -185,12 +193,12 @@ export class InterviewPracticeController {
     description: 'User not authenticated',
   })
   async answerInterviewQuestion(
-    @Request() _req: any,
+    @Request() _req: AuthenticatedRequest,
     @Param('id', ParseUUIDPipe) id: string,
     @Body() _answerDto: AnswerInterviewQuestionDto,
   ): Promise<InterviewPracticeResponseDto> {
     this.logger.log(`Recording interview answer for practice ${id}, user: ${_req.user.sub}`);
-    
+
     // TODO: Implement use case
     throw new Error('Not implemented yet');
   }
@@ -222,12 +230,12 @@ export class InterviewPracticeController {
     description: 'User not authenticated',
   })
   async updateConversationFlow(
-    @Request() _req: any,
+    @Request() _req: AuthenticatedRequest,
     @Param('id', ParseUUIDPipe) id: string,
     @Body() _conversationDto: ConversationFlowDto,
   ): Promise<InterviewPracticeResponseDto> {
     this.logger.log(`Updating conversation flow for practice ${id}, user: ${_req.user.sub}`);
-    
+
     // TODO: Implement use case
     throw new Error('Not implemented yet');
   }
@@ -259,11 +267,11 @@ export class InterviewPracticeController {
     description: 'User not authenticated',
   })
   async requestAIEvaluation(
-    @Request() _req: any,
+    @Request() _req: AuthenticatedRequest,
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<AIEvaluationDto> {
     this.logger.log(`Requesting AI evaluation for practice ${id}, user: ${_req.user.sub}`);
-    
+
     // TODO: Implement use case
     throw new Error('Not implemented yet');
   }
@@ -326,7 +334,7 @@ export class InterviewPracticeController {
     description: 'User not authenticated',
   })
   async getUserInterviewSessions(
-    @Request() _req: any,
+    @Request() _req: AuthenticatedRequest,
     @Param('userId', ParseUUIDPipe) userId: string,
     @Query('interviewType') _interviewType?: string,
     @Query('completed') _completed?: boolean,
@@ -335,7 +343,7 @@ export class InterviewPracticeController {
     @Query('offset') _offset?: number,
   ): Promise<InterviewPracticeResponseDto[]> {
     this.logger.log(`Getting interview sessions for user: ${userId}`);
-    
+
     // TODO: Implement use case
     throw new Error('Not implemented yet');
   }
@@ -376,13 +384,13 @@ export class InterviewPracticeController {
     description: 'User not authenticated',
   })
   async getUserInterviewStats(
-    @Request() _req: any,
+    @Request() _req: AuthenticatedRequest,
     @Param('userId', ParseUUIDPipe) userId: string,
     @Query('timeframe') _timeframe?: string,
     @Query('interviewType') _interviewType?: string,
   ): Promise<InterviewStatsDto> {
     this.logger.log(`Getting interview stats for user: ${userId}`);
-    
+
     // TODO: Implement use case
     throw new Error('Not implemented yet');
   }
@@ -425,11 +433,21 @@ export class InterviewPracticeController {
     description: 'User not authenticated',
   })
   async getPerformanceSummary(
-    @Request() _req: any,
+    @Request() _req: AuthenticatedRequest,
     @Param('id', ParseUUIDPipe) id: string,
-  ): Promise<any> {
+  ): Promise<{
+    overallScore: number;
+    fluencyScore: number;
+    grammarScore: number;
+    vocabularyScore: number;
+    pronunciationScore: number;
+    confidenceScore: number;
+    strengths: string[];
+    areasForImprovement: string[];
+    recommendations: string[];
+  }> {
     this.logger.log(`Getting performance summary for practice ${id}, user: ${_req.user.sub}`);
-    
+
     // TODO: Implement use case
     throw new Error('Not implemented yet');
   }

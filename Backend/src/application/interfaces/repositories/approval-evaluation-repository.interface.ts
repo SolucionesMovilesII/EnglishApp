@@ -1,4 +1,7 @@
-import { ApprovalEvaluation, EvaluationStatus } from '../../../domain/entities/approval-evaluation.entity';
+import {
+  ApprovalEvaluation,
+  EvaluationStatus,
+} from '../../../domain/entities/approval-evaluation.entity';
 
 export interface IApprovalEvaluationRepository {
   create(evaluation: Partial<ApprovalEvaluation>): Promise<ApprovalEvaluation>;
@@ -7,7 +10,11 @@ export interface IApprovalEvaluationRepository {
   findByUserAndChapter(userId: string, chapterId: string): Promise<ApprovalEvaluation[]>;
   findLatestByUserAndChapter(userId: string, chapterId: string): Promise<ApprovalEvaluation | null>;
   findByStatus(status: EvaluationStatus): Promise<ApprovalEvaluation[]>;
-  findPreviousAttempts(userId: string, chapterId: string, currentAttempt: number): Promise<ApprovalEvaluation[]>;
+  findPreviousAttempts(
+    userId: string,
+    chapterId: string,
+    currentAttempt: number,
+  ): Promise<ApprovalEvaluation[]>;
   countAttempts(userId: string, chapterId: string): Promise<number>;
   update(id: string, updateData: Partial<ApprovalEvaluation>): Promise<ApprovalEvaluation>;
   delete(id: string): Promise<void>;

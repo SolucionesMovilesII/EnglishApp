@@ -11,10 +11,10 @@ import {
   Body,
   ParseUUIDPipe,
 } from '@nestjs/common';
-import { 
-  ApiTags, 
-  ApiOperation, 
-  ApiResponse, 
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
   ApiBearerAuth,
   ApiExtraModels,
   ApiParam,
@@ -52,7 +52,8 @@ export class ChaptersController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Get user chapters status',
-    description: 'Retrieve all chapters with their unlock status, progress, and completion information for the authenticated user',
+    description:
+      'Retrieve all chapters with their unlock status, progress, and completion information for the authenticated user',
   })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -73,7 +74,9 @@ export class ChaptersController {
       },
     },
   })
-  async getChaptersStatus(@Request() req: AuthenticatedRequest): Promise<ChaptersStatusResponseDto> {
+  async getChaptersStatus(
+    @Request() req: AuthenticatedRequest,
+  ): Promise<ChaptersStatusResponseDto> {
     try {
       const userId = req.user.userId;
       this.logger.log(`Getting chapters status for user: ${userId}`);
@@ -86,7 +89,10 @@ export class ChaptersController {
         message: 'Chapters status retrieved successfully',
       };
     } catch (error) {
-      this.logger.error(`Error getting chapters status:`, error instanceof Error ? error.message : String(error));
+      this.logger.error(
+        `Error getting chapters status:`,
+        error instanceof Error ? error.message : String(error),
+      );
       throw error;
     }
   }
@@ -101,7 +107,8 @@ export class ChaptersController {
   })
   @ApiOperation({
     summary: 'Complete a chapter',
-    description: 'Mark a chapter as completed for the authenticated user. This will unlock the next chapter if available.',
+    description:
+      'Mark a chapter as completed for the authenticated user. This will unlock the next chapter if available.',
   })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -132,7 +139,10 @@ export class ChaptersController {
       type: 'object',
       properties: {
         success: { type: 'boolean', example: false },
-        message: { type: 'string', example: 'Cannot complete chapter. Not all vocabulary items have been learned.' },
+        message: {
+          type: 'string',
+          example: 'Cannot complete chapter. Not all vocabulary items have been learned.',
+        },
         code: { type: 'string', example: 'REQUIREMENTS_NOT_MET' },
       },
     },
@@ -182,7 +192,11 @@ export class ChaptersController {
       const userId = req.user.userId;
       this.logger.log(`Completing chapter ${chapterId} for user: ${userId}`);
 
-      const result = await this.completeChapterUseCase.execute(userId, chapterId, completeChapterDto);
+      const result = await this.completeChapterUseCase.execute(
+        userId,
+        chapterId,
+        completeChapterDto,
+      );
 
       return {
         success: result.success,
@@ -194,7 +208,10 @@ export class ChaptersController {
         message: result.message,
       };
     } catch (error) {
-      this.logger.error(`Error completing chapter ${chapterId}:`, error instanceof Error ? error.message : String(error));
+      this.logger.error(
+        `Error completing chapter ${chapterId}:`,
+        error instanceof Error ? error.message : String(error),
+      );
       throw error;
     }
   }

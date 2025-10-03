@@ -1,16 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-
 import '../models/chapter_evaluation.dart';
 import '../l10n/app_localizations.dart';
 
 class EvaluationDetailsScreen extends StatelessWidget {
   final ChapterEvaluation evaluation;
 
-  const EvaluationDetailsScreen({
-    super.key,
-    required this.evaluation,
-  });
+  const EvaluationDetailsScreen({super.key, required this.evaluation});
 
   @override
   Widget build(BuildContext context) {
@@ -109,16 +105,16 @@ class EvaluationDetailsScreen extends StatelessWidget {
                                     '${evaluation.score}',
                                     style: theme.textTheme.headlineLarge
                                         ?.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                      color: evaluation.statusColor,
-                                    ),
+                                          fontWeight: FontWeight.bold,
+                                          color: evaluation.statusColor,
+                                        ),
                                   ),
                                   Text(
                                     '/${evaluation.maxScore}',
                                     style: theme.textTheme.titleMedium
                                         ?.copyWith(
-                                      color: theme.colorScheme.outline,
-                                    ),
+                                          color: theme.colorScheme.outline,
+                                        ),
                                   ),
                                 ],
                               ),
@@ -230,8 +226,8 @@ class EvaluationDetailsScreen extends StatelessWidget {
                         width: double.infinity,
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color:
-                              theme.colorScheme.surfaceVariant.withOpacity(0.5),
+                          color: theme.colorScheme.surfaceContainerHighest
+                              .withOpacity(0.5),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
@@ -329,7 +325,7 @@ class _SkillCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceVariant.withOpacity(0.3),
+        color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: color.withOpacity(0.3)),
       ),
@@ -359,7 +355,7 @@ class _SkillCard extends StatelessWidget {
           const SizedBox(height: 8),
           LinearProgressIndicator(
             value: percentage / 100,
-            backgroundColor: theme.colorScheme.surfaceVariant,
+            backgroundColor: theme.colorScheme.surfaceContainerHighest,
             valueColor: AlwaysStoppedAnimation<Color>(color),
             minHeight: 6,
           ),

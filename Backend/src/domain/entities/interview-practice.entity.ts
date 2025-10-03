@@ -1,10 +1,4 @@
-import {
-  Entity,
-  Column,
-  OneToOne,
-  JoinColumn,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Entity, Column, OneToOne, JoinColumn, PrimaryGeneratedColumn } from 'typeorm';
 import { PracticeSession, PracticeType } from './practice-session.entity';
 
 export enum InterviewType {
@@ -31,11 +25,11 @@ export class InterviewPractice {
   @JoinColumn({ name: 'practice_session_id' })
   practiceSession!: PracticeSession;
 
-  @Column({ 
-    name: 'interview_type', 
-    type: 'enum', 
-    enum: InterviewType, 
-    default: InterviewType.CASUAL_CONVERSATION 
+  @Column({
+    name: 'interview_type',
+    type: 'enum',
+    enum: InterviewType,
+    default: InterviewType.CASUAL_CONVERSATION,
   })
   interviewType!: InterviewType;
 
@@ -45,7 +39,13 @@ export class InterviewPractice {
   @Column({ name: 'questions_answered', type: 'int', default: 0 })
   questionsAnswered!: number;
 
-  @Column({ name: 'average_response_time', type: 'decimal', precision: 8, scale: 2, nullable: true })
+  @Column({
+    name: 'average_response_time',
+    type: 'decimal',
+    precision: 8,
+    scale: 2,
+    nullable: true,
+  })
   averageResponseTime?: number;
 
   @Column({ name: 'fluency_score', type: 'decimal', precision: 5, scale: 2, default: 0 })
@@ -72,14 +72,16 @@ export class InterviewPractice {
     question: string;
     userResponse: string;
     responseTime: number;
-    aiEvaluation?: {
-      fluency: number;
-      pronunciation: number;
-      grammar: number;
-      vocabulary: number;
-      overall: ResponseQuality;
-      feedback: string;
-    } | undefined;
+    aiEvaluation?:
+      | {
+          fluency: number;
+          pronunciation: number;
+          grammar: number;
+          vocabulary: number;
+          overall: ResponseQuality;
+          feedback: string;
+        }
+      | undefined;
     timestamp: Date;
   }>;
 
@@ -91,13 +93,18 @@ export class InterviewPractice {
 
   // Business methods
   getOverallScore(): number {
-    const scores = [this.fluencyScore, this.pronunciationScore, this.grammarScore, this.vocabularyScore];
+    const scores = [
+      this.fluencyScore,
+      this.pronunciationScore,
+      this.grammarScore,
+      this.vocabularyScore,
+    ];
     const validScores = scores.filter(score => score > 0);
-    
+
     if (validScores.length === 0) {
       return 0;
     }
-    
+
     return Math.round(validScores.reduce((a, b) => a + b, 0) / validScores.length);
   }
 
@@ -120,7 +127,7 @@ export class InterviewPractice {
       vocabulary: number;
       overall: ResponseQuality;
       feedback: string;
-    }
+    },
   ): void {
     this.questionsAnswered++;
     this.lastQuestionAnswered = question;
@@ -129,7 +136,7 @@ export class InterviewPractice {
     if (!this.conversationFlow) {
       this.conversationFlow = [];
     }
-    
+
     this.conversationFlow.push({
       questionIndex,
       question,
@@ -164,10 +171,11 @@ export class InterviewPractice {
     const weight = 1 / totalResponses;
     const previousWeight = (totalResponses - 1) / totalResponses;
 
-    this.fluencyScore = (this.fluencyScore * previousWeight) + (evaluation.fluency * weight);
-    this.pronunciationScore = (this.pronunciationScore * previousWeight) + (evaluation.pronunciation * weight);
-    this.grammarScore = (this.grammarScore * previousWeight) + (evaluation.grammar * weight);
-    this.vocabularyScore = (this.vocabularyScore * previousWeight) + (evaluation.vocabulary * weight);
+    this.fluencyScore = this.fluencyScore * previousWeight + evaluation.fluency * weight;
+    this.pronunciationScore =
+      this.pronunciationScore * previousWeight + evaluation.pronunciation * weight;
+    this.grammarScore = this.grammarScore * previousWeight + evaluation.grammar * weight;
+    this.vocabularyScore = this.vocabularyScore * previousWeight + evaluation.vocabulary * weight;
   }
 
   addAreaForImprovement(area: string): void {
@@ -221,9 +229,9 @@ export class InterviewPractice {
   }
 
   static createForSession(
-    practiceSession: PracticeSession, 
-    interviewType: InterviewType, 
-    totalQuestions: number
+    practiceSession: PracticeSession,
+    interviewType: InterviewType,
+    totalQuestions: number,
   ): InterviewPractice {
     const interviewPractice = new InterviewPractice();
     interviewPractice.practiceSession = practiceSession;

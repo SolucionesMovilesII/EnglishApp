@@ -8,10 +8,10 @@ import {
   HttpStatus,
   HttpCode,
 } from '@nestjs/common';
-import { 
-  ApiTags, 
-  ApiOperation, 
-  ApiResponse, 
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
   ApiBearerAuth,
   ApiExtraModels,
   getSchemaPath,
@@ -49,7 +49,8 @@ export class DailyLivesController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Get user lives status',
-    description: 'Retrieves the current lives status for the authenticated user including available lives and next reset time',
+    description:
+      'Retrieves the current lives status for the authenticated user including available lives and next reset time',
   })
   @ApiResponse({
     status: 200,
@@ -60,9 +61,7 @@ export class DailyLivesController {
     status: 401,
     description: 'Unauthorized - Invalid or missing JWT token',
   })
-  async getLivesStatus(
-    @Request() req: AuthenticatedRequest,
-  ): Promise<DailyLivesResponseDto> {
+  async getLivesStatus(@Request() req: AuthenticatedRequest): Promise<DailyLivesResponseDto> {
     this.logger.log(`Getting lives status for user: ${req.user.userId}`);
 
     try {
@@ -79,7 +78,8 @@ export class DailyLivesController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Consume a life',
-    description: 'Consumes one life when the user makes an error. Returns updated lives count or error if no lives available.',
+    description:
+      'Consumes one life when the user makes an error. Returns updated lives count or error if no lives available.',
   })
   @ApiResponse({
     status: 200,
@@ -101,30 +101,32 @@ export class DailyLivesController {
     status: 429,
     description: 'Too many requests - rate limit exceeded',
   })
-  async consumeLife(
-    @Request() req: AuthenticatedRequest,
-  ): Promise<ConsumeLifeResponseDto> {
+  async consumeLife(@Request() req: AuthenticatedRequest): Promise<ConsumeLifeResponseDto> {
     this.logger.log(`Consuming life for user: ${req.user.userId}`);
 
     // Add audit logging
-    this.logger.log(`AUDIT: User ${req.user.userId} (${req.user.email}) attempting to consume life`);
+    this.logger.log(
+      `AUDIT: User ${req.user.userId} (${req.user.email}) attempting to consume life`,
+    );
 
     try {
       const result = await this.consumeLifeUseCase.execute(req.user.userId);
-      
+
       // Audit successful consumption
-      this.logger.log(`AUDIT: Life consumed successfully for user ${req.user.userId}. Lives remaining: ${result.currentLives}`);
-      
+      this.logger.log(
+        `AUDIT: Life consumed successfully for user ${req.user.userId}. Lives remaining: ${result.currentLives}`,
+      );
+
       return result;
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
-      
+
       // Audit failed consumption attempts
-      this.logger.warn(`AUDIT: Failed to consume life for user ${req.user.userId}: ${errorMessage}`);
-      
-      this.logger.error(
-        `Error consuming life: ${errorMessage}`,
+      this.logger.warn(
+        `AUDIT: Failed to consume life for user ${req.user.userId}: ${errorMessage}`,
       );
+
+      this.logger.error(`Error consuming life: ${errorMessage}`);
       throw error;
     }
   }

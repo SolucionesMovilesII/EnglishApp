@@ -22,7 +22,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     let status: number;
     let message: string;
     let code: string | undefined;
-    let details: any = null;
+    let details: Record<string, unknown> | null = null;
 
     if (exception instanceof DomainError) {
       status = exception.statusCode;
@@ -34,8 +34,11 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       message =
         typeof exceptionResponse === 'string'
           ? exceptionResponse
-          : (exceptionResponse as any).message;
-      details = typeof exceptionResponse === 'object' ? exceptionResponse : null;
+          : ((exceptionResponse as Record<string, unknown>).message as string);
+      details =
+        typeof exceptionResponse === 'object' && exceptionResponse !== null
+          ? (exceptionResponse as Record<string, unknown>)
+          : null;
     } else if (exception instanceof QueryFailedError) {
       status = HttpStatus.BAD_REQUEST;
       message = 'Database operation failed';

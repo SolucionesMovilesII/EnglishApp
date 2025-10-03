@@ -11,10 +11,10 @@ export class ChapterStatusDto {
   @ApiProperty({ description: 'Chapter description', example: 'Learn basic animal vocabulary' })
   description!: string | null;
 
-  @ApiProperty({ 
-    description: 'Chapter difficulty level', 
+  @ApiProperty({
+    description: 'Chapter difficulty level',
     enum: ChapterLevel,
-    example: ChapterLevel.BASIC 
+    example: ChapterLevel.BASIC,
   })
   level!: ChapterLevel;
 
@@ -50,9 +50,9 @@ export class ChaptersStatusResponseDto {
   @ApiProperty({ description: 'Success indicator', example: true })
   success!: boolean;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'List of chapters with their status',
-    type: [ChapterStatusDto]
+    type: [ChapterStatusDto],
   })
   data!: {
     chapters: ChapterStatusDto[];

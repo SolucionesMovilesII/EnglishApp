@@ -17,17 +17,18 @@ exec(revertCommand, (error, stdout, stderr) => {
     console.error(`Error reverting migration: ${error.message}`);
     return;
   }
-  
+
   if (stderr) {
     console.error(`Stderr: ${stderr}`);
     return;
   }
-  
+
   console.log(stdout);
-  
+
   // Get the most recent migration file
   try {
-    const files = fs.readdirSync(migrationsDir)
+    const files = fs
+      .readdirSync(migrationsDir)
       .filter(file => file.endsWith('.ts'))
       .sort((a, b) => {
         // Extract timestamp from filename
@@ -35,11 +36,11 @@ exec(revertCommand, (error, stdout, stderr) => {
         const timestampB = parseInt(b.split('-')[0]);
         return timestampB - timestampA; // Sort in descending order (newest first)
       });
-    
+
     if (files.length > 0) {
       const latestMigration = files[0];
       const migrationPath = path.join(migrationsDir, latestMigration);
-      
+
       // Remove the migration file
       fs.unlinkSync(migrationPath);
       console.log(`Migration file removed: ${latestMigration}`);

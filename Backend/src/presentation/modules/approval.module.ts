@@ -13,13 +13,12 @@ import {
   GetLatestEvaluationUseCase,
 } from '../../application/use-cases/approval';
 import { UpdateApprovalRuleUseCase } from '../../application/use-cases/approval/update-approval-rule.use-case';
-import { ApprovalExceptionFilter, ApprovalHttpExceptionFilter } from '../filters/approval-exception.filter';
-import { ApprovalAuditInterceptor } from '../interceptors/approval-audit.interceptor';
 import {
-  ApprovalRule,
-  ApprovalEvaluation,
-  ApprovalMetrics,
-} from '../../domain/entities';
+  ApprovalExceptionFilter,
+  ApprovalHttpExceptionFilter,
+} from '../filters/approval-exception.filter';
+import { ApprovalAuditInterceptor } from '../interceptors/approval-audit.interceptor';
+import { ApprovalRule, ApprovalEvaluation, ApprovalMetrics } from '../../domain/entities';
 import {
   ApprovalRuleRepository,
   ApprovalEvaluationRepository,
@@ -30,19 +29,12 @@ import { UserRepository } from '../../infrastructure/repositories/user.repositor
 import { User } from '../../domain/entities/user.entity';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([
-      ApprovalRule,
-      ApprovalEvaluation,
-      ApprovalMetrics,
-      User,
-    ]),
-  ],
+  imports: [TypeOrmModule.forFeature([ApprovalRule, ApprovalEvaluation, ApprovalMetrics, User])],
   controllers: [ApprovalController],
   providers: [
     // Service
     ApprovalEngineService,
-    
+
     // Use Cases
     EvaluateApprovalUseCase,
     ConfigureApprovalRuleUseCase,

@@ -1,5 +1,13 @@
-import { Injectable, NotFoundException, BadRequestException, ForbiddenException } from '@nestjs/common';
-import { InterviewPractice, ResponseQuality } from '../../../../domain/entities/interview-practice.entity';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+  ForbiddenException,
+} from '@nestjs/common';
+import {
+  InterviewPractice,
+  ResponseQuality,
+} from '../../../../domain/entities/interview-practice.entity';
 import { PracticeStatus } from '../../../../domain/entities/practice-session.entity';
 import { IInterviewPracticeRepository } from '../../../interfaces/repositories/interview-practice-repository.interface';
 import { IPracticeSessionRepository } from '../../../interfaces/repositories/practice-session-repository.interface';
@@ -18,7 +26,7 @@ export class AnswerQuestionUseCase {
     answerDto: AnswerQuestionDto,
   ): Promise<InterviewPractice> {
     const practice = await this.interviewPracticeRepository.findById(practiceId);
-    
+
     if (!practice) {
       throw new NotFoundException('Interview practice not found');
     }
@@ -43,28 +51,28 @@ export class AnswerQuestionUseCase {
         grammar: answerDto.grammarScore || 0,
         vocabulary: answerDto.vocabularyScore || 0,
         overall: answerDto.responseQuality || ResponseQuality.POOR,
-        feedback: 'AI evaluation feedback'
-      }
+        feedback: 'AI evaluation feedback',
+      },
     );
 
     // Update practice
-    const updatedPractice = await this.interviewPracticeRepository.update(
-      practice.id,
-      {
-        questionsAnswered: practice.questionsAnswered,
-        ...(practice.averageResponseTime !== undefined && { averageResponseTime: practice.averageResponseTime }),
-        fluencyScore: practice.fluencyScore,
-        pronunciationScore: practice.pronunciationScore,
-        grammarScore: practice.grammarScore,
-        vocabularyScore: practice.vocabularyScore,
-        ...(practice.conversationFlow && { conversationFlow: practice.conversationFlow }),
-      }
-    );
+    const updatedPractice = await this.interviewPracticeRepository.update(practice.id, {
+      questionsAnswered: practice.questionsAnswered,
+      ...(practice.averageResponseTime !== undefined && {
+        averageResponseTime: practice.averageResponseTime,
+      }),
+      fluencyScore: practice.fluencyScore,
+      pronunciationScore: practice.pronunciationScore,
+      grammarScore: practice.grammarScore,
+      vocabularyScore: practice.vocabularyScore,
+      ...(practice.conversationFlow && { conversationFlow: practice.conversationFlow }),
+    });
 
     // Update session progress and score
     const newProgress = practice.getCompletionPercentage();
     const newScore = practice.getOverallScore();
-    const totalTimeSpent = practice.practiceSession.timeSpentSeconds + answerDto.responseTimeSeconds;
+    const totalTimeSpent =
+      practice.practiceSession.timeSpentSeconds + answerDto.responseTimeSeconds;
 
     await this.practiceSessionRepository.update(practice.practiceSession.id, {
       progress: newProgress,

@@ -18,8 +18,6 @@ describe('ApprovalEngineService', () => {
     execute: jest.fn(),
   };
 
-
-
   const configureApprovalRuleUseCase = {
     execute: jest.fn(),
   };
@@ -31,8 +29,6 @@ describe('ApprovalEngineService', () => {
   const deleteApprovalRuleUseCase = {
     execute: jest.fn(),
   };
-
-
 
   const updateApprovalRuleUseCase = {
     execute: jest.fn(),
@@ -112,7 +108,7 @@ describe('ApprovalEngineService', () => {
         userId: 'user-123',
         chapterId: '1',
         score: 85,
-        errors: []
+        errors: [],
       };
 
       evaluateApprovalUseCase.execute.mockResolvedValue({
@@ -127,7 +123,7 @@ describe('ApprovalEngineService', () => {
         errors: [],
         evaluatedAt: new Date(),
         nextAttemptAllowed: true,
-        remainingAttempts: 2
+        remainingAttempts: 2,
       });
 
       // Act
@@ -146,7 +142,7 @@ describe('ApprovalEngineService', () => {
         userId: 'user-123',
         chapterId: '1',
         score: 75,
-        errors: []
+        errors: [],
       };
 
       evaluateApprovalUseCase.execute.mockResolvedValue({
@@ -161,7 +157,7 @@ describe('ApprovalEngineService', () => {
         errors: [],
         evaluatedAt: new Date(),
         nextAttemptAllowed: true,
-        remainingAttempts: 2
+        remainingAttempts: 2,
       });
 
       // Act
@@ -179,7 +175,7 @@ describe('ApprovalEngineService', () => {
         userId: 'user-123',
         chapterId: '4',
         score: 95,
-        errors: []
+        errors: [],
       };
 
       evaluateApprovalUseCase.execute.mockResolvedValue({
@@ -194,7 +190,7 @@ describe('ApprovalEngineService', () => {
         errors: [],
         evaluatedAt: new Date(),
         nextAttemptAllowed: true,
-        remainingAttempts: 2
+        remainingAttempts: 2,
       });
 
       // Act
@@ -211,7 +207,7 @@ describe('ApprovalEngineService', () => {
         userId: 'user-123',
         chapterId: '1',
         score: 82,
-        errors: [{ type: 'grammar', description: 'Verb tense error' }]
+        errors: [{ type: 'grammar', description: 'Verb tense error' }],
       };
 
       evaluateApprovalUseCase.execute.mockResolvedValue({
@@ -226,7 +222,7 @@ describe('ApprovalEngineService', () => {
         errors: [{ type: 'grammar', description: 'Verb tense error' }],
         evaluatedAt: new Date(),
         nextAttemptAllowed: true,
-        remainingAttempts: 1
+        remainingAttempts: 1,
       });
 
       // Act
@@ -243,15 +239,13 @@ describe('ApprovalEngineService', () => {
         userId: 'invalid-user',
         chapterId: '1',
         score: 80,
-        errors: []
+        errors: [],
       };
 
       evaluateApprovalUseCase.execute.mockRejectedValue(new NotFoundException('User not found'));
 
       // Act & Assert
-      await expect(
-        service.evaluateApproval(request)
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.evaluateApproval(request)).rejects.toThrow(NotFoundException);
     });
 
     it('should throw NotFoundException when approval rule not found', async () => {
@@ -260,15 +254,15 @@ describe('ApprovalEngineService', () => {
         userId: 'user-123',
         chapterId: '999',
         score: 80,
-        errors: []
+        errors: [],
       };
 
-      evaluateApprovalUseCase.execute.mockRejectedValue(new NotFoundException('Approval rule not found'));
+      evaluateApprovalUseCase.execute.mockRejectedValue(
+        new NotFoundException('Approval rule not found'),
+      );
 
       // Act & Assert
-      await expect(
-        service.evaluateApproval(request)
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.evaluateApproval(request)).rejects.toThrow(NotFoundException);
     });
 
     it('should throw BadRequestException for invalid score', async () => {
@@ -277,30 +271,24 @@ describe('ApprovalEngineService', () => {
         userId: 'user-123',
         chapterId: '1',
         score: -5,
-        errors: []
+        errors: [],
       };
-      
+
       const invalidRequest2 = {
         userId: 'user-123',
         chapterId: '1',
         score: 105,
-        errors: []
+        errors: [],
       };
 
       evaluateApprovalUseCase.execute.mockRejectedValue(new BadRequestException('Invalid score'));
 
       // Act & Assert
-      await expect(
-        service.evaluateApproval(invalidRequest1)
-      ).rejects.toThrow(BadRequestException);
+      await expect(service.evaluateApproval(invalidRequest1)).rejects.toThrow(BadRequestException);
 
-      await expect(
-        service.evaluateApproval(invalidRequest2)
-      ).rejects.toThrow(BadRequestException);
+      await expect(service.evaluateApproval(invalidRequest2)).rejects.toThrow(BadRequestException);
     });
   });
-
-
 
   describe('configureRule', () => {
     it('should create new rule when none exists', async () => {
@@ -311,7 +299,7 @@ describe('ApprovalEngineService', () => {
         maxAttempts: 5,
         allowErrorCarryover: false,
         isActive: true,
-        description: 'Test rule'
+        description: 'Test rule',
       };
 
       configureApprovalRuleUseCase.execute.mockResolvedValue({
@@ -323,7 +311,7 @@ describe('ApprovalEngineService', () => {
         isActive: true,
         description: 'Test rule',
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       });
 
       // Act
@@ -344,7 +332,7 @@ describe('ApprovalEngineService', () => {
         maxAttempts: 5,
         allowErrorCarryover: false,
         isActive: true,
-        description: 'Updated rule'
+        description: 'Updated rule',
       };
 
       configureApprovalRuleUseCase.execute.mockResolvedValue({
@@ -356,7 +344,7 @@ describe('ApprovalEngineService', () => {
         isActive: true,
         description: 'Updated rule',
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       });
 
       // Act
