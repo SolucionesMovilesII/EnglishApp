@@ -8,7 +8,6 @@ import {
 } from '@nestjs/common';
 import { IChapterRepository } from '../../interfaces/repositories/chapter-repository.interface';
 import { CompleteChapterDto } from '../../dtos/chapters/complete-chapter.dto';
-import { UserProgress } from '../../../domain/entities/user-progress.entity';
 
 @Injectable()
 export class CompleteChapterUseCase {
@@ -27,7 +26,7 @@ export class CompleteChapterUseCase {
     success: boolean;
     chapterCompleted: boolean;
     nextChapterUnlocked: boolean;
-    userProgress: UserProgress | null;
+    userProgress: import('../../../domain/entities/user-progress.entity').UserProgress;
     message: string;
   }> {
     try {

@@ -9,6 +9,7 @@ import {
   Query,
   BadRequestException,
   ForbiddenException,
+  Headers,
 } from '@nestjs/common';
 import { SkipCSRF } from '../../../shared/guards/csrf.guard';
 import { UseRateLimit, RATE_LIMITS } from '../../../shared/guards/rate-limit.guard';
@@ -22,16 +23,6 @@ import {
 } from '@nestjs/swagger';
 import { Request } from 'express';
 import { BaseAuthController } from './base-auth.controller';
-
-interface AuthenticatedRequest extends Request {
-  user?: {
-    userId: string;
-    sub?: string;
-    email?: string;
-    role?: string;
-    familyId?: string;
-  };
-}
 
 // Use Cases
 import { GetActiveSessionsUseCase } from '../../../application/use-cases/auth/get-active-sessions.use-case';
@@ -81,12 +72,15 @@ export class SessionManagementController extends BaseAuthController {
     description: 'Too many requests',
   })
   async getActiveSessions(
-    @Req() request: AuthenticatedRequest,
+    @Req() request: Request,
+    @Headers('authorization') _authorization?: string,
     @Query('currentFamilyId') currentFamilyId?: string,
   ): Promise<ActiveSessionsResponseDto> {
     try {
       // Extract user ID from JWT token (should be available via guards)
-      const userId = request.user?.userId || request.user?.sub;
+      const userId =
+        (request as { user?: { userId?: string; sub?: string } }).user?.userId ||
+        (request as { user?: { userId?: string; sub?: string } }).user?.sub;
 
       if (!userId) {
         this.logger.warn('Active sessions request without valid user context');
@@ -149,11 +143,14 @@ export class SessionManagementController extends BaseAuthController {
   })
   async revokeSession(
     @Param('familyId') familyId: string,
-    @Req() request: AuthenticatedRequest,
+    @Req() request: Request,
+    @Headers('authorization') _authorization?: string,
   ): Promise<SessionRevocationResponseDto> {
     try {
       // Extract user ID from JWT token (should be available via guards)
-      const userId = request.user?.userId || request.user?.sub;
+      const userId =
+        (request as { user?: { userId?: string; sub?: string } }).user?.userId ||
+        (request as { user?: { userId?: string; sub?: string } }).user?.sub;
 
       if (!userId) {
         this.logger.warn('Session revocation request without valid user context');
@@ -171,7 +168,7 @@ export class SessionManagementController extends BaseAuthController {
       this.logger.log(`Session revocation attempt for family: ${familyId}, user: ${userId}`);
 
       // Check if the user is trying to revoke their current session
-      const currentFamilyId = request.user?.familyId;
+      const currentFamilyId = (request as { user?: { familyId?: string } }).user?.familyId;
       if (familyId === currentFamilyId) {
         this.logger.warn(`User ${userId} attempting to revoke current session: ${familyId}`);
         throw new ForbiddenException(

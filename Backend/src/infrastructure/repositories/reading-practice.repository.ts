@@ -101,13 +101,15 @@ export class ReadingPracticeRepository implements IReadingPracticeRepository {
   }
 
   async update(id: string, updates: Partial<ReadingPractice>): Promise<ReadingPractice> {
-    const existing = await this.repository.findOne({ where: { id } });
-    if (!existing) {
-      throw new Error('Reading practice not found');
+    // Exclude relation properties from updates to avoid TypeORM issues
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { practiceSession, ...updateData } = updates;
+    await this.repository.update(id, updateData);
+    const updated = await this.findById(id);
+    if (!updated) {
+      throw new Error('Reading practice not found after update');
     }
-
-    const updated = this.repository.merge(existing, updates);
-    return await this.repository.save(updated);
+    return updated;
   }
 
   async delete(id: string): Promise<void> {
@@ -160,13 +162,13 @@ export class ReadingPracticeRepository implements IReadingPracticeRepository {
           practicesWithQuestions.length
         : 0;
 
-    const categoriesRead = [
-      ...new Set(
+    const categoriesRead = Array.from(
+      new Set(
         practices
           .map(p => p.textCategory)
           .filter((category): category is string => Boolean(category)),
       ),
-    ];
+    );
 
     const vocabularyEncountered = practices.reduce(
       (sum, p) => sum + (p.vocabularyEncountered?.length || 0),

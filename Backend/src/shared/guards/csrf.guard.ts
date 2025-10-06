@@ -8,13 +8,10 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Reflector } from '@nestjs/core';
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import * as crypto from 'crypto';
 import { SecurityConfig } from '../../infrastructure/config/security/security.config';
-
-interface RequestWithRealIP extends Request {
-  realIP?: string;
-}
+import { ExtendedRequest } from '../types/request.types';
 
 // Decorator to skip CSRF protection
 export const SkipCSRF = () => SetMetadata('skipCSRF', true);
@@ -32,7 +29,7 @@ export class CSRFGuard implements CanActivate {
   }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const request = context.switchToHttp().getRequest<Request>();
+    const request = context.switchToHttp().getRequest<ExtendedRequest>();
     const response = context.switchToHttp().getResponse<Response>();
 
     // Skip if CSRF is disabled globally
@@ -63,7 +60,7 @@ export class CSRFGuard implements CanActivate {
   /**
    * Validate CSRF token for state-changing requests
    */
-  private validateCSRFToken(request: RequestWithRealIP, response: Response): boolean {
+  private validateCSRFToken(request: ExtendedRequest, response: Response): boolean {
     const { csrf } = this.securityConfig;
 
     // Check for X-Requested-With header (AJAX indicator)

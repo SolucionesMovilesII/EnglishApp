@@ -7,14 +7,6 @@ import { PracticeType, PracticeStatus } from '../../../../domain/entities/practi
 import { IInterviewPracticeRepository } from '../../../interfaces/repositories/interview-practice-repository.interface';
 import { GetInterviewSessionsDto } from '../../../dtos/interview-practice.dto';
 
-interface QueryOptions {
-  userId: string;
-  practiceType: PracticeType;
-  chapterId?: string;
-  interviewType?: InterviewType;
-  status?: PracticeStatus | PracticeStatus[];
-}
-
 @Injectable()
 export class GetInterviewSessionsUseCase {
   constructor(private readonly interviewPracticeRepository: IInterviewPracticeRepository) {}
@@ -23,7 +15,12 @@ export class GetInterviewSessionsUseCase {
     userId: string,
     filters: GetInterviewSessionsDto,
   ): Promise<{ sessions: InterviewPractice[]; total: number }> {
-    const queryOptions: QueryOptions = {
+    const queryOptions: Partial<{
+      userId: string;
+      practiceType: PracticeType;
+      chapterId: string;
+      interviewType: InterviewType;
+    }> = {
       userId,
       practiceType: PracticeType.INTERVIEW,
     };
@@ -37,18 +34,21 @@ export class GetInterviewSessionsUseCase {
       queryOptions.interviewType = filters.interviewType;
     }
 
-    if (filters.completed !== undefined) {
-      queryOptions.status = filters.completed
-        ? PracticeStatus.COMPLETED
-        : [PracticeStatus.STARTED, PracticeStatus.IN_PROGRESS];
-    }
-
     // TODO: Implement findByFilters method in repository
-    const sessions = await this.interviewPracticeRepository.findByUserId(
+    let sessions = await this.interviewPracticeRepository.findByUserId(
       userId,
       filters.limit || 10,
       filters.offset || 0,
     );
+
+    // Apply completion filter after fetching (until repository supports complex filters)
+    if (filters.completed !== undefined) {
+      sessions = sessions.filter(session => {
+        const isCompleted = session.practiceSession.status === PracticeStatus.COMPLETED;
+        return filters.completed ? isCompleted : !isCompleted;
+      });
+    }
+
     const total = sessions.length;
 
     return { sessions, total };
@@ -89,11 +89,12 @@ export class GetInterviewSessionsUseCase {
       totalQuestionsAnswered: 0,
       averageResponseTime: 0,
       totalTimeSpent: 0,
-      interviewTypeStats: {} as {
-        [key in InterviewType]: {
-          sessions: number;
-          averageScore: number;
-        };
+      interviewTypeStats: {
+        job_interview: { sessions: 0, averageScore: 0 },
+        casual_conversation: { sessions: 0, averageScore: 0 },
+        business_meeting: { sessions: 0, averageScore: 0 },
+        academic_interview: { sessions: 0, averageScore: 0 },
+        phone_interview: { sessions: 0, averageScore: 0 },
       },
     };
   }

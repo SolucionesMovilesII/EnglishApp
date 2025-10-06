@@ -44,8 +44,8 @@ export class LogoutUserUseCase {
         try {
           const validationResult =
             await this.refreshTokenRotationService.validateAndRotateToken(refreshToken);
-          if (validationResult.isValid && validationResult.token) {
-            targetFamilyId = validationResult.token.familyId;
+          if (validationResult.isValid && validationResult.rotation) {
+            targetFamilyId = validationResult.rotation.oldToken.familyId;
           }
         } catch (error: unknown) {
           this.logger.warn(

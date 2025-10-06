@@ -8,12 +8,9 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Reflector } from '@nestjs/core';
-import { Request } from 'express';
-import { SecurityConfig } from '../../infrastructure/config/security/security.config';
 
-interface RequestWithRealIP extends Request {
-  realIP?: string;
-}
+import { SecurityConfig } from '../../infrastructure/config/security/security.config';
+import { ExtendedRequest } from '../types/request.types';
 
 // Decorator to skip origin validation
 export const SkipOriginValidation = () => SetMetadata('skipOriginValidation', true);
@@ -34,7 +31,7 @@ export class OriginValidationGuard implements CanActivate {
   }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const request = context.switchToHttp().getRequest<Request>();
+    const request = context.switchToHttp().getRequest<ExtendedRequest>();
 
     // Skip if explicitly marked to skip origin validation
     const skipOriginValidation = this.reflector.getAllAndOverride<boolean>('skipOriginValidation', [
@@ -61,7 +58,7 @@ export class OriginValidationGuard implements CanActivate {
   /**
    * Validate the request origin
    */
-  private validateOrigin(context: ExecutionContext, request: RequestWithRealIP): boolean {
+  private validateOrigin(context: ExecutionContext, request: ExtendedRequest): boolean {
     const origin = request.headers.origin as string;
     const referer = request.headers.referer as string;
     const { originValidation } = this.securityConfig;
@@ -194,7 +191,7 @@ export class OriginValidationGuard implements CanActivate {
   /**
    * Check if the request is same-origin
    */
-  private isSameOrigin(origin: string, request: RequestWithRealIP): boolean {
+  private isSameOrigin(origin: string, request: ExtendedRequest): boolean {
     try {
       const requestUrl = new URL(`${request.protocol}://${request.get('host')}`);
       const originUrl = new URL(origin);
@@ -208,7 +205,7 @@ export class OriginValidationGuard implements CanActivate {
   /**
    * Perform additional security checks for cross-origin requests
    */
-  private performCrossOriginSecurityChecks(request: RequestWithRealIP, origin: string): void {
+  private performCrossOriginSecurityChecks(request: ExtendedRequest, origin: string): void {
     // Check for suspicious patterns in cross-origin requests
     const userAgent = request.headers['user-agent'] as string;
     const contentType = request.headers['content-type'] as string;

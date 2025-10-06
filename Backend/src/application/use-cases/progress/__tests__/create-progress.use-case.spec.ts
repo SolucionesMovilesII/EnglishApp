@@ -5,6 +5,9 @@ import { IUserProgressRepository } from '../../../interfaces/repositories/user-p
 import { IUserRepository } from '../../../interfaces/repositories/user-repository.interface';
 import { CreateProgressDto } from '../../../dtos/progress/create-progress.dto';
 import { User } from '../../../../domain/entities/user.entity';
+import { Person } from '../../../../domain/entities/person.entity';
+import { Chapter } from '../../../../domain/entities/chapter.entity';
+import { UserProgress } from '../../../../domain/entities/user-progress.entity';
 
 describe('CreateProgressUseCase', () => {
   let useCase: CreateProgressUseCase;
@@ -12,19 +15,25 @@ describe('CreateProgressUseCase', () => {
   let mockUserRepository: jest.Mocked<IUserRepository>;
 
   beforeEach(async () => {
-    const mockUserProgressRepo: jest.Mocked<IUserProgressRepository> = {
+    const mockUserProgressRepo = {
       createOrUpdate: jest.fn(),
-    } as any;
+    };
 
-    const mockUserRepo: jest.Mocked<IUserRepository> = {
+    const mockUserRepo = {
       findById: jest.fn(),
-    } as any;
+    };
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         CreateProgressUseCase,
-        { provide: 'IUserProgressRepository', useValue: mockUserProgressRepo },
-        { provide: 'IUserRepository', useValue: mockUserRepo },
+        {
+          provide: 'IUserProgressRepository',
+          useValue: mockUserProgressRepo,
+        },
+        {
+          provide: 'IUserRepository',
+          useValue: mockUserRepo,
+        },
       ],
     }).compile();
 
@@ -43,10 +52,65 @@ describe('CreateProgressUseCase', () => {
       extraData: { vocab: { chapter: 2, lastWord: 'apple' } },
     };
 
+    const mockPerson: Person = {
+      id: 'person-123',
+      fullName: 'Test User',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
     const mockUser = {
       id: mockUserId,
       email: 'test@example.com',
+      isEmailVerified: true,
+      password: 'hashedPassword',
+      authProvider: 'EMAIL_PASSWORD',
+      providerUserId: null,
+      role: 'STUDENT',
+      isActive: true,
+      lastLoginAt: null,
+      emailVerificationToken: null,
+      passwordResetToken: null,
+      passwordResetTokenExpires: null,
+      personId: 'person-123',
+      person: mockPerson,
+      refreshTokens: [],
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      get isGoogleAuth() {
+        return false;
+      },
+      get isAppleAuth() {
+        return false;
+      },
+      get isEmailPasswordAuth() {
+        return true;
+      },
+      get isAdmin() {
+        return false;
+      },
+      get isSuperAdmin() {
+        return false;
+      },
     } as User;
+
+    const mockChapter: Chapter = {
+      id: mockChapterId,
+      title: 'Test Chapter',
+      level: 1,
+      order: 1,
+      isUnlocked: true,
+      description: 'Test chapter description',
+      imageUrl: null,
+      metadata: null,
+      vocabularyItems: [],
+      userProgresses: [],
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      canBeUnlocked: jest.fn().mockReturnValue(true),
+      getDisplayLevel: jest.fn().mockReturnValue('Basic'),
+      isFirstChapter: jest.fn().mockReturnValue(true),
+    };
 
     const mockProgress = {
       id: 'progress-789',
@@ -56,20 +120,21 @@ describe('CreateProgressUseCase', () => {
       lastActivity: new Date(),
       chapterCompleted: false,
       chapterCompletionDate: null,
-      vocabularyItemsLearned: 10,
+      vocabularyItemsLearned: 5,
       totalVocabularyItems: 20,
       extraData: { vocab: { chapter: 2, lastWord: 'apple' } },
-      user: mockUser,
-      chapter: null,
       createdAt: new Date(),
       updatedAt: new Date(),
-      // Métodos de dominio mockeados
-      getProgressPercentage: jest.fn().mockReturnValue(50),
+      // Relations
+      user: mockUser,
+      chapter: mockChapter,
+      // Business methods
+      getProgressPercentage: jest.fn().mockReturnValue(25),
       markChapterCompleted: jest.fn(),
       incrementVocabularyLearned: jest.fn(),
       isChapterInProgress: jest.fn().mockReturnValue(true),
       canCompleteChapter: jest.fn().mockReturnValue(false),
-    } as any;
+    } as UserProgress;
 
     it('should create progress successfully when user exists', async () => {
       mockUserRepository.findById.mockResolvedValue(mockUser);
@@ -82,18 +147,16 @@ describe('CreateProgressUseCase', () => {
         mockUserId,
         validCreateProgressDto,
       );
-
-      // Verificamos los campos principales devueltos por el use case
-      expect(result).toMatchObject({
+      expect(result).toEqual({
         id: mockProgress.id,
         userId: mockProgress.userId,
         chapterId: mockProgress.chapterId,
         score: mockProgress.score,
+        lastActivity: mockProgress.lastActivity,
         extraData: mockProgress.extraData,
+        createdAt: mockProgress.createdAt,
+        updatedAt: mockProgress.updatedAt,
       });
-      expect(result.lastActivity).toBeInstanceOf(Date);
-      expect(result.createdAt).toBeInstanceOf(Date);
-      expect(result.updatedAt).toBeInstanceOf(Date);
     });
 
     it('should throw NotFoundException when user does not exist', async () => {
@@ -107,7 +170,7 @@ describe('CreateProgressUseCase', () => {
       expect(mockUserProgressRepository.createOrUpdate).not.toHaveBeenCalled();
     });
 
-    it('should throw BadRequestException when score is out of range (>100)', async () => {
+    it('should throw BadRequestException when score is out of range', async () => {
       const invalidDto = { ...validCreateProgressDto, score: 150 };
       mockUserRepository.findById.mockResolvedValue(mockUser);
 
@@ -122,17 +185,20 @@ describe('CreateProgressUseCase', () => {
     });
 
     it('should handle progress without score', async () => {
-      const dtoWithoutScore = { chapterId: mockChapterId } as CreateProgressDto;
-
+      const dtoWithoutScore = { chapterId: mockChapterId };
       const progressWithoutScore = {
         ...mockProgress,
         score: null,
-        getProgressPercentage: jest.fn().mockReturnValue(50),
+        // Relations
+        user: mockUser,
+        chapter: mockChapter,
+        // Ensure all methods are properly mocked
+        getProgressPercentage: jest.fn().mockReturnValue(25),
         markChapterCompleted: jest.fn(),
         incrementVocabularyLearned: jest.fn(),
         isChapterInProgress: jest.fn().mockReturnValue(true),
         canCompleteChapter: jest.fn().mockReturnValue(false),
-      } as any;
+      };
 
       mockUserRepository.findById.mockResolvedValue(mockUser);
       mockUserProgressRepository.createOrUpdate.mockResolvedValue(progressWithoutScore);

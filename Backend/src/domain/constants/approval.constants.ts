@@ -154,10 +154,10 @@ export class ApprovalUtils {
   /**
    * Sanitiza datos sensibles para logging
    */
-  static sanitizeForLogging(data: Record<string, unknown>): Record<string, unknown> {
+  static sanitizeForLogging(data: unknown): unknown {
     if (!data || typeof data !== 'object') return data;
 
-    const sanitized = { ...data };
+    const sanitized = { ...data } as Record<string, unknown>;
     APPROVAL_CONSTANTS.LOGGING.SENSITIVE_FIELDS.forEach(field => {
       if (sanitized[field]) {
         sanitized[field] = '***';

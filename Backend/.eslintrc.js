@@ -18,7 +18,7 @@ module.exports = {
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/no-explicit-any': 'error',
-    '@typescript-eslint/no-unused-vars': 'error',
+    '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
     '@typescript-eslint/prefer-readonly': 'error',
     '@typescript-eslint/prefer-readonly-parameter-types': 'off',
     '@typescript-eslint/strict-boolean-expressions': 'off',

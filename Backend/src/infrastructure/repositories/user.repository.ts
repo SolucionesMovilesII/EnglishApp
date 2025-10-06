@@ -145,7 +145,6 @@ export class UserRepository implements IUserRepository {
     return result.affected !== 0;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async updateRefreshToken(_id: string, _refreshToken: string | null): Promise<boolean> {
     // Note: Refresh tokens are managed through RefreshToken entity, not directly on User
     // This method signature exists for interface compliance but should be implemented

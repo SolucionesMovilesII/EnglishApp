@@ -10,7 +10,6 @@ import {
   EvaluationStatus,
 } from '../../../domain/entities/approval-evaluation.entity';
 import { User } from '../../../domain/entities/user.entity';
-import { Person } from '../../../domain/entities/person.entity';
 import { ApprovalRule } from '../../../domain/entities/approval-rule.entity';
 
 // Helper functions for creating mock objects
@@ -29,7 +28,7 @@ function createMockUser(overrides: Partial<User> = {}): User {
     passwordResetToken: null,
     passwordResetTokenExpires: null,
     personId: 'person-123',
-    person: {} as Person,
+    person: {} as unknown,
     refreshTokens: [],
     createdAt: new Date(),
     updatedAt: new Date(),

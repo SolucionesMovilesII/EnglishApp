@@ -13,7 +13,7 @@ import { EvaluationStatus } from '../../../domain/entities/approval-evaluation.e
 
 describe('ApprovalController', () => {
   let controller: ApprovalController;
-  let approvalEngineService: Partial<ApprovalEngineService>;
+  let approvalEngineService: jest.Mocked<ApprovalEngineService>;
 
   const mockRequest = {
     user: {
@@ -52,19 +52,19 @@ describe('ApprovalController', () => {
     approvalEngineService = {
       evaluateApproval: jest.fn(),
       batchEvaluateApproval: jest.fn(),
-      getUserEvaluationHistory: jest.fn(),
-      getUserApprovalSummary: jest.fn(),
-      getChapterStats: jest.fn(),
       configureRule: jest.fn(),
-      getRules: jest.fn(),
       updateRule: jest.fn(),
+      getRules: jest.fn(),
       deleteRule: jest.fn(),
-      canUserAttemptChapter: jest.fn(),
+      getUserEvaluationHistory: jest.fn(),
       getLatestEvaluation: jest.fn(),
+      getChapterStats: jest.fn(),
       getEngineStats: jest.fn(),
-    };
+      getUserApprovalSummary: jest.fn(),
+      canUserAttemptChapter: jest.fn(),
+    } as unknown as jest.Mocked<ApprovalEngineService>;
 
-    controller = new ApprovalController(approvalEngineService as ApprovalEngineService);
+    controller = new ApprovalController(approvalEngineService);
   });
 
   it('should be defined', () => {
@@ -81,9 +81,7 @@ describe('ApprovalController', () => {
         additionalData: { timeSpent: 300 },
       };
 
-      (approvalEngineService.evaluateApproval as jest.Mock).mockResolvedValue(
-        mockEvaluationResponse,
-      );
+      approvalEngineService.evaluateApproval.mockResolvedValue(mockEvaluationResponse);
 
       // Act
       const result = await controller.evaluateApproval(dto, mockRequest);
@@ -108,7 +106,7 @@ describe('ApprovalController', () => {
         errorsCarriedOver: 5,
       };
 
-      (approvalEngineService.evaluateApproval as jest.Mock).mockResolvedValue(rejectedResponse);
+      approvalEngineService.evaluateApproval.mockResolvedValue(rejectedResponse);
 
       // Act
       const result = await controller.evaluateApproval(dto, mockRequest);
@@ -126,7 +124,7 @@ describe('ApprovalController', () => {
         score: -5,
       };
 
-      (approvalEngineService.evaluateApproval as jest.Mock).mockRejectedValue(
+      approvalEngineService.evaluateApproval.mockRejectedValue(
         new BadRequestException('Invalid score'),
       );
 
@@ -144,7 +142,7 @@ describe('ApprovalController', () => {
         score: 80,
       };
 
-      (approvalEngineService.evaluateApproval as jest.Mock).mockRejectedValue(
+      approvalEngineService.evaluateApproval.mockRejectedValue(
         new NotFoundException('Chapter not found'),
       );
 
@@ -174,7 +172,7 @@ describe('ApprovalController', () => {
         ],
       };
 
-      (approvalEngineService.batchEvaluateApproval as jest.Mock).mockResolvedValue(batchResult);
+      approvalEngineService.batchEvaluateApproval.mockResolvedValue(batchResult);
 
       // Act
       const result = await controller.batchEvaluateApproval(batchRequest, mockRequest);

@@ -12,16 +12,11 @@ export interface TokenRotationResult {
   };
 }
 
+import { JwtPayload } from '../../../shared/services/jwt.service';
+
 export interface TokenValidationResult {
   isValid: boolean;
-  token?: {
-    jti: string;
-    familyId: string;
-    userId: string;
-    tokenHash: string;
-    expiresAt: Date;
-    revoked: boolean;
-  };
+  token?: JwtPayload;
   reason?: string;
   shouldRevokeFamily?: boolean;
 }

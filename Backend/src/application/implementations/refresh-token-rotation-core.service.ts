@@ -38,7 +38,7 @@ export class RefreshTokenRotationCoreService {
     const startTime = Date.now();
     this.logger.debug(`Starting token rotation for hash: ${oldTokenHash.substring(0, 10)}...`);
 
-    return await this.dataSource.transaction(async () => {
+    return await this.dataSource.transaction(async _transactionalEntityManager => {
       try {
         // Find the existing token
         const existingToken = await this.refreshTokenRepository.findByTokenHash(oldTokenHash);
@@ -172,14 +172,6 @@ export class RefreshTokenRotationCoreService {
           isValid: false,
           reason: 'TOKEN_REVOKED',
           shouldRevokeFamily: true,
-          token: {
-            jti: token.jti,
-            familyId: token.familyId,
-            userId: token.userId,
-            tokenHash: token.tokenHash,
-            expiresAt: token.expiresAt,
-            revoked: token.isRevoked(),
-          },
         };
       }
 
@@ -189,14 +181,6 @@ export class RefreshTokenRotationCoreService {
           isValid: false,
           reason: 'TOKEN_EXPIRED',
           shouldRevokeFamily: false,
-          token: {
-            jti: token.jti,
-            familyId: token.familyId,
-            userId: token.userId,
-            tokenHash: token.tokenHash,
-            expiresAt: token.expiresAt,
-            revoked: token.isRevoked(),
-          },
         };
       }
 
@@ -210,17 +194,19 @@ export class RefreshTokenRotationCoreService {
 
       return {
         isValid: true,
+        token: {
+          sub: token.userId,
+          iss: 'english-app-backend',
+          aud: 'english-app-client',
+          jti: token.jti,
+          iat: Math.floor(token.createdAt.getTime() / 1000),
+          exp: Math.floor(token.expiresAt.getTime() / 1000),
+          type: 'refresh' as const,
+          role: '', // This will be populated from user data if needed
+        },
         reason: 'VALID_AND_ROTATED',
         shouldRevokeFamily: false,
-        token: {
-          jti: token.jti,
-          familyId: token.familyId,
-          userId: token.userId,
-          tokenHash: token.tokenHash,
-          expiresAt: token.expiresAt,
-          revoked: token.isRevoked(),
-        },
-        rotation: rotation,
+        rotation,
       };
     } catch (error: unknown) {
       this.logger.error(

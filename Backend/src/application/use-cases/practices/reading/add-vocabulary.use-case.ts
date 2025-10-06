@@ -31,14 +31,7 @@ export class AddVocabularyUseCase {
     );
 
     // Update practice
-    const updateData: Partial<{
-      vocabularyEncountered: Array<{
-        word: string;
-        definition?: string | undefined;
-        context: string;
-        position: number;
-      }>;
-    }> = {};
+    const updateData: Partial<ReadingPractice> = {};
     if (practice.vocabularyEncountered) {
       updateData.vocabularyEncountered = practice.vocabularyEncountered;
     }
@@ -71,14 +64,7 @@ export class AddVocabularyUseCase {
     }
 
     // Update practice
-    const updateData: Partial<{
-      vocabularyEncountered: Array<{
-        word: string;
-        definition?: string | undefined;
-        context: string;
-        position: number;
-      }>;
-    }> = {};
+    const updateData: Partial<ReadingPractice> = {};
     if (practice.vocabularyEncountered) {
       updateData.vocabularyEncountered = practice.vocabularyEncountered;
     }

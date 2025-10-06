@@ -79,7 +79,11 @@ export class RefreshTokenRepository implements IRefreshTokenRepository {
   }
 
   async revokeToken(id: string, reason?: string, replacedBy?: string): Promise<void> {
-    const updateData: Partial<RefreshToken> = {
+    const updateData: Partial<{
+      revokedAt: Date;
+      reason: string;
+      replacedBy: string;
+    }> = {
       revokedAt: new Date(),
     };
 
@@ -95,7 +99,10 @@ export class RefreshTokenRepository implements IRefreshTokenRepository {
   }
 
   async revokeByUserId(userId: string, reason?: string): Promise<void> {
-    const updateData: Partial<RefreshToken> = {
+    const updateData: Partial<{
+      revokedAt: Date;
+      reason: string;
+    }> = {
       revokedAt: new Date(),
     };
 
@@ -107,7 +114,10 @@ export class RefreshTokenRepository implements IRefreshTokenRepository {
   }
 
   async revokeByFamilyId(familyId: string, reason?: string): Promise<void> {
-    const updateData: Partial<RefreshToken> = {
+    const updateData: Partial<{
+      revokedAt: Date;
+      reason: string;
+    }> = {
       revokedAt: new Date(),
     };
 

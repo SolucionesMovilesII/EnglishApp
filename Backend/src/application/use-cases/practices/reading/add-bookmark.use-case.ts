@@ -26,9 +26,7 @@ export class AddBookmarkUseCase {
     practice.addBookmark(bookmarkDto.position, bookmarkDto.note);
 
     // Update practice
-    const updateData: Partial<{
-      bookmarks: Array<{ position: number; note?: string | undefined; timestamp: Date }>;
-    }> = {};
+    const updateData: Partial<ReadingPractice> = {};
     if (practice.bookmarks) {
       updateData.bookmarks = practice.bookmarks;
     }
@@ -59,9 +57,7 @@ export class AddBookmarkUseCase {
     }
 
     // Update practice
-    const updateData: Partial<{
-      bookmarks: Array<{ position: number; note?: string | undefined; timestamp: Date }>;
-    }> = {};
+    const updateData: Partial<ReadingPractice> = {};
     if (practice.bookmarks) {
       updateData.bookmarks = practice.bookmarks;
     }

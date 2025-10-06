@@ -2,11 +2,7 @@ import { Injectable, Logger, NestMiddleware } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Request, Response, NextFunction } from 'express';
 import { SecurityConfig } from '../../infrastructure/config/security/security.config';
-
-// Extended request interface with real IP
-interface RequestWithRealIP extends Request {
-  realIP: string;
-}
+import { ExtendedRequest } from '../types/request.types';
 
 @Injectable()
 export class SecurityMiddleware implements NestMiddleware {
@@ -17,7 +13,7 @@ export class SecurityMiddleware implements NestMiddleware {
     this.securityConfig = this.configService.get<SecurityConfig>('security')!;
   }
 
-  use(req: RequestWithRealIP, res: Response, next: NextFunction): void {
+  use(req: ExtendedRequest, res: Response, next: NextFunction): void {
     // Extract real IP address
     this.extractRealIP(req);
 
@@ -38,7 +34,7 @@ export class SecurityMiddleware implements NestMiddleware {
   /**
    * Extract the real IP address from the request
    */
-  private extractRealIP(req: RequestWithRealIP): void {
+  private extractRealIP(req: ExtendedRequest): void {
     let realIP = req.ip;
 
     if (
@@ -65,8 +61,10 @@ export class SecurityMiddleware implements NestMiddleware {
       }
     }
 
-    // Store real IP for later use (ensure it's never undefined)
-    req.realIP = realIP || 'unknown';
+    // Store real IP for later use
+    if (realIP) {
+      req.realIP = realIP;
+    }
   }
 
   /**
@@ -114,7 +112,7 @@ export class SecurityMiddleware implements NestMiddleware {
   /**
    * Validate origin and referer headers
    */
-  private validateOriginAndReferer(req: RequestWithRealIP, res: Response): boolean {
+  private validateOriginAndReferer(req: Request, res: Response): boolean {
     const { originValidation } = this.securityConfig;
 
     if (!originValidation.strict) {
@@ -203,7 +201,7 @@ export class SecurityMiddleware implements NestMiddleware {
   /**
    * Log security-focused request information
    */
-  private logSecurityInfo(req: RequestWithRealIP): void {
+  private logSecurityInfo(req: ExtendedRequest): void {
     const { logging } = this.securityConfig;
 
     if (!logging.enabled || !logging.logRequests) {
@@ -240,11 +238,11 @@ export class SecurityMiddleware implements NestMiddleware {
         'x-real-ip',
         'cf-connecting-ip',
       ];
-      logData.headers = {} as Record<string, unknown>;
+      logData.headers = {} as Record<string, string | string[]>;
       securityHeaders.forEach(header => {
         const value = req.headers[header];
         if (value) {
-          (logData.headers as Record<string, unknown>)[header] = value;
+          (logData.headers as Record<string, string | string[]>)[header] = value;
         }
       });
     }
@@ -287,13 +285,13 @@ export class SecurityMiddleware implements NestMiddleware {
   /**
    * Sanitize sensitive data from logs
    */
-  private sanitizeLogData(data: Record<string, unknown>, maxSize: number): Record<string, unknown> {
-    if (!data || typeof data !== 'object') {
+  private sanitizeLogData(data: unknown, maxSize: number): Record<string, unknown> | unknown {
+    if (!data || typeof data !== 'object' || data === null) {
       return data;
     }
 
     const sensitiveFields = ['password', 'token', 'secret', 'key', 'authorization'];
-    const sanitized = { ...data };
+    const sanitized = { ...(data as Record<string, unknown>) };
 
     // Remove sensitive fields
     sensitiveFields.forEach(field => {
