@@ -1,9 +1,10 @@
-import { Injectable, Inject, Logger } from '@nestjs/common';
+import { Injectable, Logger, Inject } from '@nestjs/common';
 import { IApprovalEvaluationRepository } from '../../interfaces/repositories/approval-evaluation-repository.interface';
 import {
   ApprovalEvaluation,
   EvaluationStatus,
 } from '../../../domain/entities/approval-evaluation.entity';
+import { ChapterEvaluationStatsDto } from '../../dtos/approval/evaluation-history.dto';
 
 export interface GetEvaluationHistoryRequest {
   userId: string;
@@ -154,13 +155,7 @@ export class GetChapterEvaluationStatsUseCase {
     private readonly approvalEvaluationRepository: IApprovalEvaluationRepository,
   ) {}
 
-  async execute(chapterId: string): Promise<{
-    totalEvaluations: number;
-    approvedCount: number;
-    rejectedCount: number;
-    averageScore: number;
-    averageAttempts: number;
-  }> {
+  async execute(chapterId: string): Promise<ChapterEvaluationStatsDto> {
     this.logger.log(`Getting evaluation stats for chapter: ${chapterId}`);
 
     try {
@@ -168,7 +163,21 @@ export class GetChapterEvaluationStatsUseCase {
 
       this.logger.log(`Retrieved stats for chapter: ${chapterId}`);
 
-      return stats;
+      // Map repository result to DTO
+      const result: ChapterEvaluationStatsDto = {
+        chapterId,
+        totalEvaluations: stats.totalEvaluations,
+        approvedCount: stats.approvedCount,
+        failedCount: stats.rejectedCount,
+        pendingCount: 0, // Repository doesn't track pending, so default to 0
+        averageScore: stats.averageScore,
+        averageAdjustedScore: stats.averageScore, // Using same value as repository doesn't track adjusted scores
+        approvalRate:
+          stats.totalEvaluations > 0 ? (stats.approvedCount / stats.totalEvaluations) * 100 : 0,
+        averageAttempts: stats.averageAttempts,
+      };
+
+      return result;
     } catch (error) {
       this.logger.error(
         `Error getting chapter evaluation stats: ${error instanceof Error ? error.message : String(error)}`,

@@ -56,7 +56,7 @@ export class PracticeSessionRepository implements IPracticeSessionRepository {
     chapterId: string,
     practiceType?: PracticeType,
   ): Promise<PracticeSession[]> {
-    const where: { userId: string; chapterId: string; practiceType?: PracticeType } = {
+    const where: Partial<{ userId: string; chapterId: string; practiceType: PracticeType }> = {
       userId,
       chapterId,
     };
@@ -72,13 +72,18 @@ export class PracticeSessionRepository implements IPracticeSessionRepository {
   }
 
   async update(id: string, updates: Partial<PracticeSession>): Promise<PracticeSession> {
-    const existing = await this.repository.findOne({ where: { id } });
-    if (!existing) {
-      throw new Error('Practice session not found');
-    }
+    // Exclude relation properties and handle extraData type conversion
+    const { chapter, ...updateData } = updates;
 
-    const updated = this.repository.merge(existing, updates);
-    return await this.repository.save(updated);
+    // Create the final update object with proper typing
+    const finalUpdateData: any = { ...updateData };
+
+    await this.repository.update(id, finalUpdateData);
+    const updated = await this.findById(id);
+    if (!updated) {
+      throw new Error('Practice session not found after update');
+    }
+    return updated;
   }
 
   async delete(id: string): Promise<void> {

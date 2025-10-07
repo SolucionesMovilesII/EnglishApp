@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_tts/flutter_tts.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 class AudioService {
   static final AudioService _instance = AudioService._internal();
@@ -9,12 +10,14 @@ class AudioService {
   AudioService._internal();
   
   FlutterTts? _flutterTts;
+  AudioPlayer? _audioPlayer;
   bool _isInitialized = false;
   
   Future<void> _initTts() async {
     if (_isInitialized) return;
     
     _flutterTts = FlutterTts();
+    _audioPlayer = AudioPlayer();
     
     if (kIsWeb) {
       // Web-specific configuration
@@ -29,6 +32,15 @@ class AudioService {
     _isInitialized = true;
   }
   
+  // Static methods for backward compatibility
+  static Future<bool> speak(String text, {String? language}) async {
+    return await _instance.speakText(text, language: language);
+  }
+  
+  static Future<void> playFromUrl(String url) async {
+    await _instance.playAudioFromUrl(url);
+  }
+  
   Future<bool> speakText(String text, {String? language}) async {
     try {
       await _initTts();
@@ -37,7 +49,8 @@ class AudioService {
       
       // Set language if provided
       if (language != null) {
-        await _flutterTts!.setLanguage(language);
+        final supportedLanguage = getSupportedLanguage(language);
+        await _flutterTts!.setLanguage(supportedLanguage);
       }
       
       // Speak the text
@@ -52,15 +65,37 @@ class AudioService {
     }
   }
   
+  Future<void> playAudioFromUrl(String url) async {
+    try {
+      await _initTts();
+      
+      if (_audioPlayer == null) return;
+      
+      await _audioPlayer!.play(UrlSource(url));
+    } catch (e) {
+      if (kDebugMode) {
+        print('AudioService playFromUrl error: $e');
+      }
+      // Fallback to TTS if URL playback fails
+      rethrow;
+    }
+  }
+  
   Future<void> stop() async {
     if (_flutterTts != null) {
       await _flutterTts!.stop();
+    }
+    if (_audioPlayer != null) {
+      await _audioPlayer!.stop();
     }
   }
   
   Future<void> pause() async {
     if (_flutterTts != null) {
       await _flutterTts!.pause();
+    }
+    if (_audioPlayer != null) {
+      await _audioPlayer!.pause();
     }
   }
   
@@ -122,6 +157,8 @@ class AudioService {
   
   void dispose() {
     _flutterTts = null;
+    _audioPlayer?.dispose();
+    _audioPlayer = null;
     _isInitialized = false;
   }
 }

@@ -9,18 +9,7 @@ import {
 import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
 import { JwtService, JwtPayload } from '../services/jwt.service';
-
-interface RequestWithRealIP extends Request {
-  realIP?: string;
-  user?: {
-    id: string;
-    role: string;
-    email?: string;
-    tokenId: string;
-    issuedAt: Date;
-    expiresAt: Date;
-  };
-}
+import { ExtendedRequest, AuthenticatedUser } from '../types/request.types';
 
 interface ExtendedJwtPayload extends JwtPayload {
   nbf?: number; // Not before claim
@@ -52,7 +41,7 @@ export class EnhancedJwtGuard implements CanActivate {
       return true;
     }
 
-    const request = context.switchToHttp().getRequest<RequestWithRealIP>();
+    const request = context.switchToHttp().getRequest<ExtendedRequest>();
 
     // Extract and validate JWT token
     const token = this.extractTokenFromHeader(request);
@@ -128,14 +117,19 @@ export class EnhancedJwtGuard implements CanActivate {
       }
 
       // Store user information in request for downstream use
-      request.user = {
+      const user: AuthenticatedUser = {
         id: payload.sub,
-        role: payload.role,
-        ...(payload.email && { email: payload.email }),
         tokenId: payload.jti,
-        issuedAt: new Date(payload.iat * 1000),
-        expiresAt: new Date(payload.exp * 1000),
       };
+
+      // Add optional properties only if they exist
+      if (payload.sub) user.userId = payload.sub;
+      if (payload.role) user.role = payload.role;
+      if (payload.email) user.email = payload.email;
+      if (payload.iat) user.issuedAt = new Date(payload.iat * 1000);
+      if (payload.exp) user.expiresAt = new Date(payload.exp * 1000);
+
+      request.user = user;
 
       // Log successful authentication
       this.logger.debug('JWT validation successful', {
@@ -196,7 +190,7 @@ export class EnhancedJwtGuard implements CanActivate {
   /**
    * Extract Bearer token from Authorization header
    */
-  private extractTokenFromHeader(request: RequestWithRealIP): string | undefined {
+  private extractTokenFromHeader(request: Request): string | undefined {
     const authHeader = request.headers.authorization;
     if (!authHeader) {
       return undefined;

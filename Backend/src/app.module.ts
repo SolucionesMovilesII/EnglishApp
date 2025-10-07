@@ -15,12 +15,14 @@ import { VocabularyItem } from './domain/entities/vocabulary-item.entity';
 import { ApprovalRule } from './domain/entities/approval-rule.entity';
 import { ApprovalEvaluation } from './domain/entities/approval-evaluation.entity';
 import { ApprovalMetrics } from './domain/entities/approval-metrics.entity';
+import { Translation } from './domain/entities/translation.entity';
 import { AuthModule } from './presentation/modules/auth.module';
 import { ApprovalModule } from './presentation/modules/approval.module';
 import { ProgressModule } from './presentation/modules/progress.module';
 import { LivesModule } from './presentation/modules/lives.module';
 import { ChaptersModule } from './presentation/modules/chapters.module';
 import { AdminModule } from './presentation/modules/admin.module';
+import { TranslationModule } from './application/modules/translation.module';
 import { CronModule } from './application/modules/cron.module';
 import { SecurityModule } from './shared/security.module';
 import { ThrottlerModule } from '@nestjs/throttler';
@@ -66,6 +68,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
           ApprovalRule,
           ApprovalEvaluation,
           ApprovalMetrics,
+          Translation,
         ],
         migrations: ['dist/infrastructure/database/migrations/*{.ts,.js}'],
         migrationsTableName: 'migrations',
@@ -83,6 +86,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
     ChaptersModule,
     AdminModule,
     ApprovalModule,
+    TranslationModule,
     CronModule,
   ],
 })

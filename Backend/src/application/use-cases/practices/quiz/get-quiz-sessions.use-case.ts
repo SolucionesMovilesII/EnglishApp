@@ -13,14 +13,7 @@ export class GetQuizSessionsUseCase {
     return this.quizPracticeRepository.findByUserId(userId, limit, offset);
   }
 
-  async getStats(userId: string): Promise<{
-    totalSessions: number;
-    totalQuestions: number;
-    totalCorrectAnswers: number;
-    averageAccuracy: number;
-    averageTimePerQuestion: number;
-    categoriesPlayed: string[];
-  }> {
+  async getStats(userId: string): Promise<unknown> {
     return this.quizPracticeRepository.getStatsByUserId(userId);
   }
 

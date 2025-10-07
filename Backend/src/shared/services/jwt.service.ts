@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as jwt from 'jsonwebtoken';
-import { SignOptions, VerifyOptions, Algorithm } from 'jsonwebtoken';
-import { StringValue } from 'ms';
+import { SignOptions, VerifyOptions } from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';
+import type { StringValue } from 'ms';
 import { IJwtService } from '../../application/interfaces/services/jwt-service.interface';
 
 export interface JwtPayload {
@@ -27,7 +27,7 @@ export class JwtService implements IJwtService {
   private readonly issuer: string;
   private readonly audience: string;
   private readonly keyId?: string | undefined;
-  private readonly algorithm: Algorithm;
+  private readonly algorithm: string;
 
   constructor(private readonly configService: ConfigService) {
     this.accessTokenSecret =
@@ -40,7 +40,7 @@ export class JwtService implements IJwtService {
     this.issuer = this.configService.get<string>('jwt.issuer') || 'english-app-backend';
     this.audience = this.configService.get<string>('jwt.audience') || 'english-app-client';
     this.keyId = this.configService.get<string>('jwt.keyId');
-    this.algorithm = (this.configService.get<string>('jwt.algorithm') || 'HS256') as Algorithm;
+    this.algorithm = this.configService.get<string>('jwt.algorithm') || 'HS256';
   }
 
   /**
@@ -63,7 +63,7 @@ export class JwtService implements IJwtService {
     };
 
     const signOptions: SignOptions = {
-      algorithm: this.algorithm,
+      algorithm: this.algorithm as jwt.Algorithm,
       ...(this.keyId && { keyid: this.keyId }),
     };
 
@@ -90,7 +90,7 @@ export class JwtService implements IJwtService {
     };
 
     const signOptions: SignOptions = {
-      algorithm: this.algorithm,
+      algorithm: this.algorithm as jwt.Algorithm,
       ...(this.keyId && { keyid: this.keyId }),
     };
 
@@ -100,11 +100,11 @@ export class JwtService implements IJwtService {
   /**
    * Legacy method for backward compatibility
    */
-  async sign(payload: Record<string, unknown>, options?: { expiresIn?: string }): Promise<string> {
+  async sign(payload: object, options?: { expiresIn?: string }): Promise<string> {
     const expiresIn = options?.expiresIn || this.accessTokenExpiresIn;
     const signOptions: SignOptions = {
       expiresIn: expiresIn as StringValue,
-      algorithm: this.algorithm,
+      algorithm: this.algorithm as jwt.Algorithm,
       ...(this.keyId && { keyid: this.keyId }),
     };
     return jwt.sign(payload, this.accessTokenSecret, signOptions);
@@ -118,7 +118,7 @@ export class JwtService implements IJwtService {
       const verifyOptions: VerifyOptions = {
         issuer: this.issuer,
         audience: this.audience,
-        algorithms: [this.algorithm],
+        algorithms: [this.algorithm as jwt.Algorithm],
       };
       return jwt.verify(token, this.accessTokenSecret, verifyOptions) as JwtPayload;
     } catch (error: unknown) {
@@ -135,7 +135,7 @@ export class JwtService implements IJwtService {
       const verifyOptions: VerifyOptions = {
         issuer: this.issuer,
         audience: this.audience,
-        algorithms: [this.algorithm],
+        algorithms: [this.algorithm as jwt.Algorithm],
       };
       const payload = jwt.verify(token, this.refreshTokenSecret, verifyOptions) as JwtPayload;
 
@@ -153,7 +153,7 @@ export class JwtService implements IJwtService {
   /**
    * Decode a token without verification (for debugging/inspection)
    */
-  decode(token: string): unknown {
+  decode(token: string): jwt.Jwt | null {
     return jwt.decode(token, { complete: true });
   }
 

@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { UserService } from '@/application/implementations/user.service';
-import { UpdateUserDto } from '@/application/dtos/user/update-user.dto';
-import { UserResponseDto } from '@/application/dtos/user/user-response.dto';
-import { UpdatePersonDto } from '@/application/dtos/person/update-person.dto';
+import { UserService } from '../../implementations/user.service';
+import { UpdateUserDto } from '../../dtos/user/update-user.dto';
+import { UserResponseDto } from '../../dtos/user/user-response.dto';
 
 @Injectable()
 export class UpdateUserUseCase {
@@ -133,7 +132,9 @@ export class UpdateUserUseCase {
     }
   }
 
-  private validatePersonData(person: UpdatePersonDto): void {
+  private validatePersonData(
+    person: import('../../dtos/person/update-person.dto').UpdatePersonDto,
+  ): void {
     if (person.fullName !== undefined) {
       if (person.fullName.trim().length < 2) {
         throw new Error('Full name must be at least 2 characters long');

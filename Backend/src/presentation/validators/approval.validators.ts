@@ -132,14 +132,24 @@ export function IsValidErrorArray(validationOptions?: ValidationOptions) {
             return false;
           }
 
-          return value.every(
-            error =>
-              typeof error === 'object' &&
-              typeof error.type === 'string' &&
-              typeof error.description === 'string' &&
-              (error.weight === undefined ||
-                (typeof error.weight === 'number' && error.weight >= 0 && error.weight <= 1)),
-          );
+          return value.every((error: unknown) => {
+            if (typeof error !== 'object' || error === null) {
+              return false;
+            }
+
+            const errorObj = error as Record<string, unknown>;
+
+            return (
+              'type' in errorObj &&
+              'description' in errorObj &&
+              typeof errorObj.type === 'string' &&
+              typeof errorObj.description === 'string' &&
+              (!('weight' in errorObj) ||
+                (typeof errorObj.weight === 'number' &&
+                  errorObj.weight >= 0 &&
+                  errorObj.weight <= 1))
+            );
+          });
         },
         defaultMessage(args: ValidationArguments) {
           return `${args.property} must be an array of valid error objects with type, description, and optional weight (0-1)`;

@@ -3,7 +3,6 @@ import { UserProgressListDto } from '../../dtos/progress/user-progress-list.dto'
 import { ProgressResponseDto } from '../../dtos/progress/progress-response.dto';
 import { IUserProgressRepository } from '../../interfaces/repositories/user-progress-repository.interface';
 import { IUserRepository } from '../../interfaces/repositories/user-repository.interface';
-import { UserProgress } from '../../../domain/entities/user-progress.entity';
 
 @Injectable()
 export class GetUserProgressUseCase {
@@ -58,7 +57,9 @@ export class GetUserProgressUseCase {
     }
   }
 
-  private mapToResponseDto(progress: UserProgress): ProgressResponseDto {
+  private mapToResponseDto(
+    progress: import('../../../domain/entities/user-progress.entity').UserProgress,
+  ): ProgressResponseDto {
     return {
       id: progress.id,
       userId: progress.userId,

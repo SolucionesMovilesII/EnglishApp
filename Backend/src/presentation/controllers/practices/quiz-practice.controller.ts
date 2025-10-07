@@ -1,4 +1,3 @@
-/* eslint-disable */
 import {
   Controller,
   Post,
@@ -14,15 +13,6 @@ import {
   ParseUUIDPipe,
   Query,
 } from '@nestjs/common';
-
-interface AuthenticatedRequest {
-  user: {
-    sub: string;
-    role: string;
-    email?: string;
-  };
-}
-
 import {
   ApiTags,
   ApiOperation,
@@ -35,6 +25,7 @@ import {
 } from '@nestjs/swagger';
 import { ThrottlerGuard } from '@nestjs/throttler';
 import { EnhancedJwtGuard } from '../../../shared/guards/enhanced-jwt.guard';
+import { AuthenticatedRequest } from '../../../shared/types/request.types';
 
 // DTOs
 import {
@@ -80,7 +71,7 @@ export class QuizPracticeController {
     @Request() _req: AuthenticatedRequest,
     @Body() _createDto: CreateQuizPracticeDto,
   ): Promise<QuizPracticeResponseDto> {
-    this.logger.log(`Creating quiz practice for user: ${_req.user.sub}`);
+    this.logger.log(`Creating quiz practice for user: ${_req.user.userId}`);
 
     // TODO: Implement use case
     throw new Error('Not implemented yet');
@@ -116,7 +107,7 @@ export class QuizPracticeController {
     @Request() _req: AuthenticatedRequest,
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<QuizPracticeResponseDto> {
-    this.logger.log(`Getting quiz practice ${id} for user: ${_req.user.sub}`);
+    this.logger.log(`Getting quiz practice ${id} for user: ${_req.user.userId}`);
 
     // TODO: Implement use case
     throw new Error('Not implemented yet');
@@ -153,7 +144,7 @@ export class QuizPracticeController {
     @Param('id', ParseUUIDPipe) id: string,
     @Body() _updateDto: UpdateQuizPracticeDto,
   ): Promise<QuizPracticeResponseDto> {
-    this.logger.log(`Updating quiz practice ${id} for user: ${_req.user.sub}`);
+    this.logger.log(`Updating quiz practice ${id} for user: ${_req.user.userId}`);
 
     // TODO: Implement use case
     throw new Error('Not implemented yet');
@@ -195,7 +186,7 @@ export class QuizPracticeController {
     @Body() _answerDto: AnswerQuizQuestionDto,
   ): Promise<QuizPracticeResponseDto> {
     this.logger.log(
-      `Recording answer for quiz ${id}, question ${_answerDto.questionIndex}, user: ${_req.user.sub}`,
+      `Recording answer for quiz ${id}, question ${_answerDto.questionIndex}, user: ${_req.user.userId}`,
     );
 
     // TODO: Implement use case
@@ -359,7 +350,7 @@ export class QuizPracticeController {
       totalQuizzes: number;
     }>
   > {
-    this.logger.log(`Getting quiz categories for user: ${_req.user.sub}`);
+    this.logger.log(`Getting quiz categories for user: ${_req.user.userId}`);
 
     // TODO: Implement use case
     throw new Error('Not implemented yet');

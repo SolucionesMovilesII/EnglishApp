@@ -103,9 +103,13 @@ export class ApprovalSwaggerConfig {
    */
   private static customizeDocument(document: OpenAPIObject): void {
     // Agregar ejemplos personalizados
-    document.components = document.components || {};
-    const components = document.components as Record<string, unknown>;
-    components.examples = {
+    if (!document.components) {
+      document.components = {};
+    }
+    if (!document.components.examples) {
+      document.components.examples = {};
+    }
+    document.components.examples = {
       EvaluationSuccess: {
         summary: 'Evaluación exitosa',
         description: 'Ejemplo de una evaluación aprobada',
@@ -119,54 +123,45 @@ export class ApprovalSwaggerConfig {
           errors: [],
           evaluatedAt: '2024-01-15T10:30:00Z',
           nextAttemptAllowed: true,
-          attemptNumber: 1,
-          maxAttempts: 3,
-          threshold: 80,
-          adjustedScore: 85,
-          errorsCarriedOver: 0,
+          remainingAttempts: 2,
         },
       },
-      EvaluationRejected: {
-        summary: 'Evaluación rechazada',
-        description: 'Ejemplo de una evaluación que no cumple el umbral',
+      EvaluationFailure: {
+        summary: 'Evaluación fallida',
+        description: 'Ejemplo de una evaluación rechazada',
         value: {
           id: '123e4567-e89b-12d3-a456-426614174001',
           userId: 1,
           chapterId: 4,
-          score: 65,
+          score: 75,
           status: 'rejected',
           feedback: 'Necesitas mejorar en las siguientes áreas',
           errors: [
             {
               type: 'grammar',
               description: 'Error en tiempo verbal',
-              position: 'question_3',
-            },
-            {
-              type: 'vocabulary',
-              description: 'Palabra incorrecta',
-              position: 'question_7',
+              severity: 'high',
             },
           ],
           evaluatedAt: '2024-01-15T10:30:00Z',
           nextAttemptAllowed: true,
-          attemptNumber: 1,
-          maxAttempts: 3,
-          threshold: 100,
-          adjustedScore: 65,
-          errorsCarriedOver: 2,
+          remainingAttempts: 1,
         },
       },
-      RuleConfiguration: {
-        summary: 'Configuración de regla',
-        description: 'Ejemplo de configuración de regla de aprobación',
+      ApprovalRule: {
+        summary: 'Regla de aprobación',
+        description: 'Ejemplo de una regla de aprobación configurada',
         value: {
-          id: 1,
+          id: '123e4567-e89b-12d3-a456-426614174002',
           chapterId: 4,
           minScoreThreshold: 100,
           maxAttempts: 3,
-          allowErrorCarryover: true,
+          allowErrorCarryover: false,
           isActive: true,
+          specialRequirements: {
+            requiresPerfectGrammar: true,
+            requiresPerfectPronunciation: true,
+          },
           description: 'Regla especial para capítulo crítico 4',
           createdAt: '2024-01-15T10:30:00Z',
           updatedAt: '2024-01-15T10:30:00Z',
@@ -175,9 +170,10 @@ export class ApprovalSwaggerConfig {
     };
 
     // Agregar esquemas de error personalizados
-    components.schemas = (components.schemas as Record<string, unknown>) || {};
-    const schemas = components.schemas as Record<string, unknown>;
-    schemas.ApprovalError = {
+    if (!document.components.schemas) {
+      document.components.schemas = {};
+    }
+    document.components.schemas.ApprovalError = {
       type: 'object',
       properties: {
         statusCode: {
@@ -190,7 +186,7 @@ export class ApprovalSwaggerConfig {
         },
         error: {
           type: 'string',
-          example: 'Bad Request',
+          example: 'ApprovalRequirementsNotMetException',
         },
         timestamp: {
           type: 'string',
@@ -222,7 +218,9 @@ export class ApprovalSwaggerConfig {
     };
 
     // Agregar información de seguridad
-    components.securitySchemes = (components.securitySchemes as Record<string, unknown>) || {};
+    if (!document.components.securitySchemes) {
+      document.components.securitySchemes = {};
+    }
     document.security = [{ 'JWT-auth': [] }];
   }
 

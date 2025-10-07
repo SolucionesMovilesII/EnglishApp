@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../models/translation.dart';
 import '../models/favorite_word.dart';
@@ -16,6 +17,7 @@ class TranslationTooltipWidget extends StatefulWidget {
   final String? context;
   final bool showOnTap;
   final bool showOnLongPress;
+  final bool showOnHover;
   final VoidCallback? onTranslationLoaded;
   final EdgeInsetsGeometry? tooltipPadding;
   final Color? tooltipBackgroundColor;
@@ -24,6 +26,10 @@ class TranslationTooltipWidget extends StatefulWidget {
   final bool enableFavorites;
   final bool enablePronunciation;
   final bool enableExpandedView;
+  final bool enableCopy;
+  final bool enableSmartPositioning;
+  final Duration animationDuration;
+  final Duration autoHideDelay;
 
   const TranslationTooltipWidget({
     super.key,
@@ -34,6 +40,7 @@ class TranslationTooltipWidget extends StatefulWidget {
     this.context,
     this.showOnTap = true,
     this.showOnLongPress = true,
+    this.showOnHover = false,
     this.onTranslationLoaded,
     this.tooltipPadding,
     this.tooltipBackgroundColor,
@@ -42,6 +49,10 @@ class TranslationTooltipWidget extends StatefulWidget {
     this.enableFavorites = true,
     this.enablePronunciation = true,
     this.enableExpandedView = true,
+    this.enableCopy = true,
+    this.enableSmartPositioning = true,
+    this.animationDuration = const Duration(milliseconds: 300),
+    this.autoHideDelay = const Duration(seconds: 5),
   });
 
   @override
@@ -49,7 +60,7 @@ class TranslationTooltipWidget extends StatefulWidget {
 }
 
 class _TranslationTooltipWidgetState extends State<TranslationTooltipWidget>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   final TranslationService _translationService = TranslationService();
   final GlobalKey _tooltipKey = GlobalKey();
   
@@ -58,22 +69,52 @@ class _TranslationTooltipWidgetState extends State<TranslationTooltipWidget>
   String? _error;
   OverlayEntry? _overlayEntry;
   AnimationController? _animationController;
+  AnimationController? _scaleController;
   Animation<double>? _fadeAnimation;
+  Animation<double>? _scaleAnimation;
+  Animation<Offset>? _slideAnimation;
   bool _isTooltipVisible = false;
+  bool _isHovering = false;
 
   @override
   void initState() {
     super.initState();
+    _setupAnimations();
+  }
+
+  void _setupAnimations() {
     _animationController = AnimationController(
-      duration: const Duration(milliseconds: 200),
+      duration: widget.animationDuration,
       vsync: this,
     );
+    
+    _scaleController = AnimationController(
+      duration: const Duration(milliseconds: 150),
+      vsync: this,
+    );
+
     _fadeAnimation = Tween<double>(
       begin: 0.0,
       end: 1.0,
     ).animate(CurvedAnimation(
       parent: _animationController!,
-      curve: Curves.easeInOut,
+      curve: Curves.easeOutCubic,
+    ));
+
+    _scaleAnimation = Tween<double>(
+      begin: 0.8,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _animationController!,
+      curve: Curves.elasticOut,
+    ));
+
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, -0.2),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _animationController!,
+      curve: Curves.easeOutCubic,
     ));
   }
 
@@ -81,6 +122,7 @@ class _TranslationTooltipWidgetState extends State<TranslationTooltipWidget>
   void dispose() {
     _hideTooltip();
     _animationController?.dispose();
+    _scaleController?.dispose();
     super.dispose();
   }
 
@@ -110,15 +152,20 @@ class _TranslationTooltipWidgetState extends State<TranslationTooltipWidget>
           _error = null;
         });
         widget.onTranslationLoaded?.call();
+        
+        // Add haptic feedback for successful translation
+        HapticFeedback.lightImpact();
       } else {
         setState(() {
           _error = result.error ?? 'Translation failed';
         });
+        HapticFeedback.selectionClick();
       }
     } catch (e) {
       setState(() {
         _error = 'Translation error: $e';
       });
+      HapticFeedback.selectionClick();
     } finally {
       setState(() {
         _isLoading = false;
@@ -131,19 +178,58 @@ class _TranslationTooltipWidgetState extends State<TranslationTooltipWidget>
 
     _loadTranslation();
     
-    final RenderBox renderBox = context.findRenderObject() as RenderBox;
+    final RenderBox? renderBox = context.findRenderObject() as RenderBox?;
+    if (renderBox == null) return;
+    
     final size = renderBox.size;
     final offset = renderBox.localToGlobal(Offset.zero);
+    final screenSize = MediaQuery.of(context).size;
+    
+    // Smart positioning
+    double left = offset.dx;
+    double top = offset.dy + size.height + 8;
+    bool showAbove = false;
+    
+    if (widget.enableSmartPositioning) {
+      // Check if tooltip would go off screen
+      const tooltipHeight = 200.0; // Estimated height
+      const tooltipWidth = 300.0;
+      
+      // Adjust horizontal position
+      if (left + tooltipWidth > screenSize.width) {
+        left = screenSize.width - tooltipWidth - 16;
+      }
+      if (left < 16) {
+        left = 16;
+      }
+      
+      // Check if should show above
+      if (top + tooltipHeight > screenSize.height - 100) {
+        showAbove = true;
+        top = offset.dy - tooltipHeight - 8;
+      }
+    }
     
     _overlayEntry = OverlayEntry(
       builder: (context) => Positioned(
-        left: offset.dx,
-        top: offset.dy + size.height + 8,
+        left: left,
+        top: top,
         child: Material(
           color: Colors.transparent,
-          child: FadeTransition(
-            opacity: _fadeAnimation!,
-            child: _buildTooltipContent(),
+          child: AnimatedBuilder(
+            animation: _animationController!,
+            builder: (context, child) {
+              return Transform.scale(
+                scale: _scaleAnimation!.value,
+                child: SlideTransition(
+                  position: _slideAnimation!,
+                  child: FadeTransition(
+                    opacity: _fadeAnimation!,
+                    child: _buildTooltipContent(showAbove),
+                  ),
+                ),
+              );
+            },
           ),
         ),
       ),
@@ -152,6 +238,13 @@ class _TranslationTooltipWidgetState extends State<TranslationTooltipWidget>
     Overlay.of(context).insert(_overlayEntry!);
     _animationController!.forward();
     _isTooltipVisible = true;
+    
+    // Auto-hide after delay
+    Future.delayed(widget.autoHideDelay, () {
+      if (_isTooltipVisible && !_isHovering) {
+        _hideTooltip();
+      }
+    });
   }
 
   void _hideTooltip() {
@@ -164,37 +257,51 @@ class _TranslationTooltipWidgetState extends State<TranslationTooltipWidget>
     });
   }
 
-  Widget _buildTooltipContent() {
-    return Container(
-      constraints: const BoxConstraints(
-        maxWidth: 300,
-        minWidth: 200,
-      ),
-      padding: widget.tooltipPadding ?? const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: widget.tooltipBackgroundColor ?? Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(widget.tooltipBorderRadius ?? 8),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-        border: Border.all(
-          color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+  Widget _buildTooltipContent(bool showAbove) {
+    return MouseRegion(
+      onEnter: (_) => _isHovering = true,
+      onExit: (_) => _isHovering = false,
+      child: Container(
+        constraints: const BoxConstraints(
+          maxWidth: 320,
+          minWidth: 220,
+          maxHeight: 400,
         ),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildHeader(),
-          const SizedBox(height: 8),
-          _buildContent(),
-          if (widget.enableFavorites || widget.enableExpandedView)
-            _buildActions(),
-        ],
+        padding: widget.tooltipPadding ?? const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: widget.tooltipBackgroundColor ?? 
+                 Theme.of(context).colorScheme.surface,
+          borderRadius: BorderRadius.circular(widget.tooltipBorderRadius ?? 12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.15),
+              blurRadius: 20,
+              offset: const Offset(0, 8),
+              spreadRadius: 0,
+            ),
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 6,
+              offset: const Offset(0, 2),
+              spreadRadius: 0,
+            ),
+          ],
+          border: Border.all(
+            color: Theme.of(context).colorScheme.outline.withOpacity(0.1),
+            width: 1,
+          ),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildHeader(),
+            const SizedBox(height: 12),
+            _buildContent(),
+            if (_shouldShowActions())
+              _buildActions(),
+          ],
+        ),
       ),
     );
   }
@@ -202,25 +309,38 @@ class _TranslationTooltipWidgetState extends State<TranslationTooltipWidget>
   Widget _buildHeader() {
     return Row(
       children: [
-        Expanded(
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.primaryContainer,
+            borderRadius: BorderRadius.circular(6),
+          ),
           child: Text(
-            widget.text,
-            style: widget.tooltipTextStyle?.copyWith(
-              fontWeight: FontWeight.bold,
-            ) ?? Theme.of(context).textTheme.titleSmall?.copyWith(
-              fontWeight: FontWeight.bold,
+            '${widget.sourceLanguage.toUpperCase()} → ${widget.targetLanguage.toUpperCase()}',
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+              color: Theme.of(context).colorScheme.onPrimaryContainer,
+              fontWeight: FontWeight.w600,
             ),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
           ),
         ),
+        const Spacer(),
         IconButton(
-          icon: const Icon(Icons.close, size: 18),
+          icon: Icon(
+            Icons.close,
+            size: 18,
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+          ),
           onPressed: _hideTooltip,
           padding: EdgeInsets.zero,
           constraints: const BoxConstraints(
-            minWidth: 24,
-            minHeight: 24,
+            minWidth: 28,
+            minHeight: 28,
+          ),
+          style: IconButton.styleFrom(
+            backgroundColor: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.5),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(6),
+            ),
           ),
         ),
       ],
@@ -229,226 +349,533 @@ class _TranslationTooltipWidgetState extends State<TranslationTooltipWidget>
 
   Widget _buildContent() {
     if (_isLoading) {
-      return const Row(
-        children: [
-          SizedBox(
-            width: 16,
-            height: 16,
-            child: CircularProgressIndicator(strokeWidth: 2),
-          ),
-          SizedBox(width: 8),
-          Text('Translating...'),
-        ],
+      return Container(
+        padding: const EdgeInsets.symmetric(vertical: 20),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                valueColor: AlwaysStoppedAnimation<Color>(
+                  Theme.of(context).colorScheme.primary,
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Text(
+              'Translating...',
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+              ),
+            ),
+          ],
+        ),
       );
     }
 
     if (_error != null) {
-      return Row(
-        children: [
-          Icon(
-            Icons.error_outline,
-            size: 16,
-            color: Theme.of(context).colorScheme.error,
+      return Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.errorContainer.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: Theme.of(context).colorScheme.error.withOpacity(0.2),
           ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              _error!,
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.error,
-                fontSize: 12,
+        ),
+        child: Row(
+          children: [
+            Icon(
+              Icons.error_outline,
+              size: 20,
+              color: Theme.of(context).colorScheme.error,
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                _error!,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.error,
+                  fontSize: 13,
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       );
     }
 
     if (_translation == null) {
-      return const Text(
-        'Tap to translate',
-        style: TextStyle(fontSize: 12, fontStyle: FontStyle.italic),
+      return Container(
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        child: Center(
+          child: Text(
+            'Tap to translate',
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              fontStyle: FontStyle.italic,
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+            ),
+          ),
+        ),
       );
     }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Original text
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Text(
+            widget.text,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              fontWeight: FontWeight.w500,
+            ),
+            maxLines: 3,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+        
+        const SizedBox(height: 12),
+        
+        // Translation
         Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
               child: Text(
                 _translation!.translatedText,
-                style: widget.tooltipTextStyle ?? Theme.of(context).textTheme.bodyMedium,
+                style: widget.tooltipTextStyle ?? 
+                       Theme.of(context).textTheme.bodyLarge?.copyWith(
+                         fontWeight: FontWeight.w600,
+                         color: Theme.of(context).colorScheme.primary,
+                       ),
               ),
             ),
             if (widget.enablePronunciation && _translation!.pronunciation != null)
-              IconButton(
-                icon: const Icon(Icons.volume_up, size: 18),
-                onPressed: () => _playPronunciation(),
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(
-                  minWidth: 24,
-                  minHeight: 24,
-                ),
-              ),
+              _buildPronunciationButton(),
           ],
         ),
+        
+        // Pronunciation
         if (_translation!.pronunciation != null) ...[
-          const SizedBox(height: 4),
-          Text(
-            '/${_translation!.pronunciation}/',
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              fontStyle: FontStyle.italic,
-              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+          const SizedBox(height: 8),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.3),
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: Text(
+              '/${_translation!.pronunciation}/',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                fontStyle: FontStyle.italic,
+                color: Theme.of(context).colorScheme.onSecondaryContainer,
+              ),
             ),
           ),
         ],
+        
+        // Examples
         if (_translation!.examples.isNotEmpty) ...[
-          const SizedBox(height: 8),
-          Text(
-            'Example:',
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              fontWeight: FontWeight.w500,
+          const SizedBox(height: 12),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.tertiaryContainer.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: Theme.of(context).colorScheme.tertiary.withOpacity(0.2),
+              ),
             ),
-          ),
-          const SizedBox(height: 2),
-          Text(
-            _translation!.examples!.first,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              fontStyle: FontStyle.italic,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(
+                      Icons.lightbulb_outline,
+                      size: 16,
+                      color: Theme.of(context).colorScheme.tertiary,
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      'Example:',
+                      style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: Theme.of(context).colorScheme.tertiary,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  _translation!.examples!.first,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    fontStyle: FontStyle.italic,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
             ),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
           ),
         ],
       ],
     );
   }
 
+  Widget _buildPronunciationButton() {
+    return Container(
+      margin: const EdgeInsets.only(left: 8),
+      child: IconButton(
+        icon: const Icon(Icons.volume_up, size: 20),
+        onPressed: _playPronunciation,
+        style: IconButton.styleFrom(
+          backgroundColor: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.5),
+          foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
+          padding: const EdgeInsets.all(8),
+          minimumSize: const Size(36, 36),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+        ),
+        tooltip: 'Play pronunciation',
+      ),
+    );
+  }
+
+  bool _shouldShowActions() {
+    return (widget.enableFavorites || widget.enableExpandedView || widget.enableCopy) 
+           && _translation != null;
+  }
+
   Widget _buildActions() {
-    return Padding(
-      padding: const EdgeInsets.only(top: 8),
+    return Container(
+      margin: const EdgeInsets.only(top: 16),
+      padding: const EdgeInsets.only(top: 12),
+      decoration: BoxDecoration(
+        border: Border(
+          top: BorderSide(
+            color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+          ),
+        ),
+      ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          if (widget.enableFavorites && _translation != null)
-            Consumer<FavoritesProvider>(builder: (context, favoritesProvider, child) {
-              final isFavorite = favoritesProvider.isFavorite(widget.text);
-              return IconButton(
-                icon: Icon(
-                  isFavorite ? Icons.favorite : Icons.favorite_border,
-                  size: 18,
+          if (widget.enableCopy)
+            _buildActionButton(
+              icon: Icons.copy,
+              label: 'Copy',
+              onPressed: _copyTranslation,
+            ),
+          if (widget.enableFavorites)
+            Consumer<FavoritesProvider>(
+              builder: (context, favoritesProvider, child) {
+                final isFavorite = favoritesProvider.isFavorite(widget.text);
+                return _buildActionButton(
+                  icon: isFavorite ? Icons.favorite : Icons.favorite_border,
+                  label: isFavorite ? 'Saved' : 'Save',
+                  onPressed: () => _toggleFavorite(favoritesProvider),
                   color: isFavorite ? Colors.red : null,
-                ),
-                onPressed: () => _toggleFavorite(favoritesProvider),
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(
-                  minWidth: 24,
-                  minHeight: 24,
-                ),
-              );
-            }),
-          if (widget.enableExpandedView && _translation != null)
-            IconButton(
-              icon: const Icon(Icons.open_in_full, size: 18),
+                );
+              },
+            ),
+          if (widget.enableExpandedView)
+            _buildActionButton(
+              icon: Icons.open_in_full,
+              label: 'Expand',
               onPressed: _showExpandedView,
-              padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(
-                minWidth: 24,
-                minHeight: 24,
-              ),
             ),
         ],
       ),
     );
   }
 
-  void _playPronunciation() async {
+  Widget _buildActionButton({
+    required IconData icon,
+    required String label,
+    required VoidCallback onPressed,
+    Color? color,
+  }) {
+    return InkWell(
+      onTap: onPressed,
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              size: 18,
+              color: color ?? Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                color: color ?? Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _copyTranslation() {
     if (_translation == null) return;
     
-    final audioService = AudioService();
+    Clipboard.setData(ClipboardData(text: _translation!.translatedText));
+    HapticFeedback.selectionClick();
+    
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.check_circle, color: Colors.white, size: 20),
+            SizedBox(width: 8),
+            Text('Translation copied to clipboard'),
+          ],
+        ),
+        duration: const Duration(seconds: 2),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _playPronunciation() async {
+    if (_translation == null) return;
     
     try {
-      // Try to speak the original text with pronunciation
-      final textToSpeak = _translation!.pronunciation != null 
-          ? widget.text 
-          : _translation!.translatedText;
+      HapticFeedback.selectionClick();
       
-      final language = _translation!.pronunciation != null 
-          ? widget.sourceLanguage 
-          : widget.targetLanguage;
-      
-      final success = await audioService.speakText(
-        textToSpeak,
-        language: audioService.getSupportedLanguage(language),
-      );
-      
-      if (!success) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Audio playback failed'),
-            duration: Duration(seconds: 2),
-          ),
+      // Try to play translated text pronunciation first
+      if (_translation!.audioUrl != null) {
+        await AudioService.playFromUrl(_translation!.audioUrl!);
+      } else {
+        // Fallback to TTS for translated text
+        await AudioService.speak(
+          _translation!.translatedText,
+          language: widget.targetLanguage,
         );
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Audio error: $e'),
-          duration: const Duration(seconds: 2),
-        ),
-      );
+      // If translation audio fails, try original text
+      try {
+        await AudioService.speak(
+          widget.text,
+          language: widget.sourceLanguage,
+        );
+      } catch (e2) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.volume_off, color: Colors.white, size: 20),
+                  const SizedBox(width: 8),
+                  const Text('Audio not available'),
+                ],
+              ),
+              duration: const Duration(seconds: 2),
+              behavior: SnackBarBehavior.floating,
+              backgroundColor: Theme.of(context).colorScheme.error,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+          );
+        }
+      }
     }
   }
 
-  Future<void> _toggleFavorite(FavoritesProvider favoritesProvider) async {
+  void _toggleFavorite(FavoritesProvider favoritesProvider) async {
     if (_translation == null) return;
 
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final token = authProvider.token;
-
-    final isFavorite = favoritesProvider.isFavorite(widget.text);
-    
-    if (isFavorite) {
-      final favoriteWord = favoritesProvider.getFavoriteByWord(widget.text);
-      if (favoriteWord != null) {
-        await favoritesProvider.removeFromFavorites(favoriteWord.id, token: token);
-      }
-    } else {
-      final favoriteWord = FavoriteWord(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        word: widget.text,
-        translation: _translation!.translatedText,
-        language: widget.sourceLanguage,
-        pronunciation: _translation!.pronunciation,
-        definition: null,
-        examples: _translation!.examples,
-        audioUrl: _translation!.audioUrl,
-        category: widget.context,
-        difficultyLevel: null,
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
-        isSynced: false,
-        serverId: null,
-      );
+    try {
+      HapticFeedback.mediumImpact();
       
-      await favoritesProvider.addToFavorites(favoriteWord, token: token);
+      final isFavorite = favoritesProvider.isFavorite(widget.text);
+      
+      if (isFavorite) {
+        // Get the favorite word to get its ID
+        final favoriteWord = favoritesProvider.getFavoriteByWord(widget.text);
+        if (favoriteWord != null) {
+          await favoritesProvider.removeFromFavorites(favoriteWord.id);
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.heart_broken, color: Colors.white, size: 20),
+                    SizedBox(width: 8),
+                    Text('Removed from favorites'),
+                  ],
+                ),
+                duration: const Duration(seconds: 2),
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+            );
+          }
+        }
+      } else {
+        final now = DateTime.now();
+        final favoriteWord = FavoriteWord(
+          id: DateTime.now().millisecondsSinceEpoch.toString(),
+          word: widget.text,
+          translation: _translation!.translatedText,
+          language: widget.targetLanguage,
+          pronunciation: _translation!.pronunciation,
+          definition: _translation!.definition,
+          examples: _translation!.examples,
+          createdAt: now,
+          updatedAt: now,
+        );
+
+        await favoritesProvider.addToFavorites(favoriteWord);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.favorite, color: Colors.red, size: 20),
+                  SizedBox(width: 8),
+                  Text('Added to favorites'),
+                ],
+              ),
+              duration: const Duration(seconds: 2),
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.error_outline, color: Colors.white, size: 20),
+                const SizedBox(width: 8),
+                Text('Failed to update favorites: ${e.toString()}'),
+              ],
+            ),
+            backgroundColor: Theme.of(context).colorScheme.error,
+            duration: const Duration(seconds: 3),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+        );
+      }
     }
   }
 
   void _showExpandedView() {
     if (_translation == null) return;
 
+    HapticFeedback.lightImpact();
     _hideTooltip();
-    
-    showDialog(
+
+    showModalBottomSheet(
       context: context,
-      builder: (context) => TranslationPanelWidget(
-        translation: _translation!,
-        originalText: widget.text,
-        sourceLanguage: widget.sourceLanguage,
-        targetLanguage: widget.targetLanguage,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => DraggableScrollableSheet(
+        initialChildSize: 0.7,
+        minChildSize: 0.5,
+        maxChildSize: 0.95,
+        builder: (context, scrollController) => Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surface,
+            borderRadius: const BorderRadius.vertical(
+              top: Radius.circular(20),
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 10,
+                offset: const Offset(0, -2),
+              ),
+            ],
+          ),
+          child: Column(
+            children: [
+              // Handle bar
+              Container(
+                margin: const EdgeInsets.only(top: 12, bottom: 8),
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              // Header
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                child: Row(
+                  children: [
+                    Text(
+                      'Translation Details',
+                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const Spacer(),
+                    IconButton(
+                      icon: const Icon(Icons.close),
+                      onPressed: () => Navigator.of(context).pop(),
+                      style: IconButton.styleFrom(
+                        backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              // Content
+              Expanded(
+                child: TranslationPanelWidget(
+                  translation: _translation!,
+                  originalText: widget.text,
+                  sourceLanguage: widget.sourceLanguage,
+                  targetLanguage: widget.targetLanguage,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -456,31 +883,39 @@ class _TranslationTooltipWidgetState extends State<TranslationTooltipWidget>
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: widget.showOnTap ? () {
-        if (_isTooltipVisible) {
-          _hideTooltip();
-        } else {
-          _showTooltip();
-        }
-      } : null,
-      onLongPress: widget.showOnLongPress ? () {
-        if (!_isTooltipVisible) {
-          _showTooltip();
-        }
-      } : null,
-      child: widget.child,
+      onTap: widget.showOnTap ? _showTooltip : null,
+      onLongPress: widget.showOnLongPress ? _showTooltip : null,
+      child: MouseRegion(
+        onEnter: widget.showOnHover ? (_) => _showTooltip() : null,
+        onExit: widget.showOnHover ? (_) => _hideTooltip() : null,
+        child: widget.child,
+      ),
     );
   }
 }
 
-// Helper widget for wrapping text with translation tooltips
+/// A convenient widget that wraps text with translation tooltip functionality
 class TranslatableText extends StatelessWidget {
   final String text;
   final TextStyle? style;
   final String sourceLanguage;
   final String targetLanguage;
   final String? context;
-  final bool enableTranslation;
+  final bool showOnTap;
+  final bool showOnLongPress;
+  final bool showOnHover;
+  final bool enableFavorites;
+  final bool enablePronunciation;
+  final bool enableExpandedView;
+  final bool enableCopy;
+  final bool enableSmartPositioning;
+  final Duration animationDuration;
+  final Duration autoHideDelay;
+  final VoidCallback? onTranslationLoaded;
+  final EdgeInsetsGeometry? tooltipPadding;
+  final Color? tooltipBackgroundColor;
+  final TextStyle? tooltipTextStyle;
+  final double? tooltipBorderRadius;
   final int? maxLines;
   final TextOverflow? overflow;
   final TextAlign? textAlign;
@@ -492,32 +927,55 @@ class TranslatableText extends StatelessWidget {
     this.sourceLanguage = 'en',
     this.targetLanguage = 'es',
     this.context,
-    this.enableTranslation = true,
+    this.showOnTap = true,
+    this.showOnLongPress = true,
+    this.showOnHover = false,
+    this.enableFavorites = true,
+    this.enablePronunciation = true,
+    this.enableExpandedView = true,
+    this.enableCopy = true,
+    this.enableSmartPositioning = true,
+    this.animationDuration = const Duration(milliseconds: 300),
+    this.autoHideDelay = const Duration(seconds: 5),
+    this.onTranslationLoaded,
+    this.tooltipPadding,
+    this.tooltipBackgroundColor,
+    this.tooltipTextStyle,
+    this.tooltipBorderRadius,
     this.maxLines,
     this.overflow,
     this.textAlign,
   });
 
   @override
-  Widget build(BuildContext context) {
-    final textWidget = Text(
-      text,
-      style: style,
-      maxLines: maxLines,
-      overflow: overflow,
-      textAlign: textAlign,
-    );
-
-    if (!enableTranslation) {
-      return textWidget;
-    }
-
+  Widget build(BuildContext buildContext) {
     return TranslationTooltipWidget(
       text: text,
       sourceLanguage: sourceLanguage,
       targetLanguage: targetLanguage,
-      context: this.context,
-      child: textWidget,
+      context: context,
+      showOnTap: showOnTap,
+      showOnLongPress: showOnLongPress,
+      showOnHover: showOnHover,
+      enableFavorites: enableFavorites,
+      enablePronunciation: enablePronunciation,
+      enableExpandedView: enableExpandedView,
+      enableCopy: enableCopy,
+      enableSmartPositioning: enableSmartPositioning,
+      animationDuration: animationDuration,
+      autoHideDelay: autoHideDelay,
+      onTranslationLoaded: onTranslationLoaded,
+      tooltipPadding: tooltipPadding,
+      tooltipBackgroundColor: tooltipBackgroundColor,
+      tooltipTextStyle: tooltipTextStyle,
+      tooltipBorderRadius: tooltipBorderRadius,
+      child: Text(
+        text,
+        style: style,
+        maxLines: maxLines,
+        overflow: overflow,
+        textAlign: textAlign,
+      ),
     );
   }
 }

@@ -13,13 +13,7 @@ export class GetVocabularySessionsUseCase {
     return this.vocabularyPracticeRepository.findByUserId(userId, limit, offset);
   }
 
-  async getStats(userId: string): Promise<{
-    totalSessions: number;
-    totalWordsStudied: number;
-    totalWordsLearned: number;
-    averageAccuracy: number;
-    currentStreak: number;
-  }> {
+  async getStats(userId: string): Promise<unknown> {
     return this.vocabularyPracticeRepository.getStatsByUserId(userId);
   }
 

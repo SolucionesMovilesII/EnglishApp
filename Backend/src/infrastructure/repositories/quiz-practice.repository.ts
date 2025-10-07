@@ -76,13 +76,15 @@ export class QuizPracticeRepository implements IQuizPracticeRepository {
   }
 
   async update(id: string, updates: Partial<QuizPractice>): Promise<QuizPractice> {
-    const existing = await this.repository.findOne({ where: { id } });
-    if (!existing) {
-      throw new Error('Quiz practice not found');
+    // Exclude relation properties from updates to avoid TypeORM issues
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { practiceSession, ...updateData } = updates;
+    await this.repository.update(id, updateData);
+    const updated = await this.findById(id);
+    if (!updated) {
+      throw new Error('Quiz practice not found after update');
     }
-
-    const updated = this.repository.merge(existing, updates);
-    return await this.repository.save(updated);
+    return updated;
   }
 
   async delete(id: string): Promise<void> {
@@ -122,13 +124,13 @@ export class QuizPracticeRepository implements IQuizPracticeRepository {
     const totalTimeSpent = practices.reduce((sum, p) => sum + (p.averageTimePerQuestion || 0), 0);
     const averageTimePerQuestion = practices.length > 0 ? totalTimeSpent / practices.length : 0;
 
-    const categoriesPlayed = [
-      ...new Set(
+    const categoriesPlayed = Array.from(
+      new Set(
         practices
           .map(p => p.quizCategory)
           .filter((category): category is string => Boolean(category)),
       ),
-    ];
+    );
 
     return {
       totalSessions,

@@ -37,7 +37,7 @@ export class ApprovalExceptionFilter implements ExceptionFilter {
     });
 
     // Respuesta personalizada según el tipo de excepción
-    const errorResponse = this.buildErrorResponse(exception, request);
+    const errorResponse = this.buildErrorResponse(exception);
 
     response.status(status).json({
       statusCode: status,
@@ -50,8 +50,7 @@ export class ApprovalExceptionFilter implements ExceptionFilter {
     });
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  private buildErrorResponse(exception: ApprovalException, _request: Request) {
+  private buildErrorResponse(exception: ApprovalException) {
     const baseResponse = {
       success: false,
       data: null,

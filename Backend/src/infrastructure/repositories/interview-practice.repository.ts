@@ -58,13 +58,15 @@ export class InterviewPracticeRepository implements IInterviewPracticeRepository
   }
 
   async update(id: string, updates: Partial<InterviewPractice>): Promise<InterviewPractice> {
-    const existing = await this.repository.findOne({ where: { id } });
-    if (!existing) {
-      throw new Error('Interview practice not found');
+    // Exclude relation properties from updates to avoid TypeORM issues
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { practiceSession, ...updateData } = updates;
+    await this.repository.update(id, updateData);
+    const updated = await this.findById(id);
+    if (!updated) {
+      throw new Error('Interview practice not found after update');
     }
-
-    const updated = this.repository.merge(existing, updates);
-    return await this.repository.save(updated);
+    return updated;
   }
 
   async delete(id: string): Promise<void> {
@@ -124,15 +126,15 @@ export class InterviewPracticeRepository implements IInterviewPracticeRepository
           practicesWithResponseTime.length
         : 0;
 
-    const interviewTypesCompleted = [...new Set(practices.map(p => p.interviewType))];
+    const interviewTypesCompleted = Array.from(new Set(practices.map(p => p.interviewType)));
 
     // Collect all areas for improvement and strengths
     const allAreasForImprovement = practices.flatMap(p => p.areasForImprovement || []);
     const allStrengthsIdentified = practices.flatMap(p => p.strengthsIdentified || []);
 
     // Get unique areas and strengths
-    const areasForImprovement = [...new Set(allAreasForImprovement)];
-    const strengthsIdentified = [...new Set(allStrengthsIdentified)];
+    const areasForImprovement = Array.from(new Set(allAreasForImprovement));
+    const strengthsIdentified = Array.from(new Set(allStrengthsIdentified));
 
     return {
       totalSessions,

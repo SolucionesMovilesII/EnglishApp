@@ -3,7 +3,6 @@ import { IRefreshTokenRotationService } from '../../interfaces/services/refresh-
 import { IJwtService } from '../../interfaces/services/jwt-service.interface';
 import { IUserRepository } from '../../interfaces/repositories/user-repository.interface';
 import { RefreshResponseDto } from '../../dtos/auth/refresh-response.dto';
-
 import {
   TokenReuseDetectedException,
   TokenFamilyCompromisedException,
@@ -81,12 +80,13 @@ export class RefreshTokenUseCase {
 
       // Get user information for the new access token
       if (!validationResult.token) {
-        throw new InvalidTokenException('Token validation failed');
+        this.logger.error('Token validation succeeded but token payload is missing');
+        throw new InvalidTokenException('Token payload missing');
       }
 
-      const user = await this.userRepository.findById(validationResult.token.userId);
+      const user = await this.userRepository.findById(validationResult.token.sub);
       if (!user) {
-        this.logger.error(`User not found for token rotation: ${validationResult.token.userId}`);
+        this.logger.error(`User not found for token rotation: ${validationResult.token.sub}`);
         throw new InvalidTokenException('User not found');
       }
 
@@ -269,14 +269,7 @@ export class RefreshTokenUseCase {
    */
   async validateToken(refreshToken: string): Promise<{
     isValid: boolean;
-    token?: {
-      jti: string;
-      familyId: string;
-      userId: string;
-      tokenHash: string;
-      expiresAt: Date;
-      revoked: boolean;
-    };
+    token?: import('../../../shared/services/jwt.service').JwtPayload;
   }> {
     this.logger.debug('Validating refresh token');
 
@@ -284,10 +277,18 @@ export class RefreshTokenUseCase {
       const validationResult =
         await this.refreshTokenRotationService.validateAndRotateToken(refreshToken);
 
-      return {
+      const result: {
+        isValid: boolean;
+        token?: import('../../../shared/services/jwt.service').JwtPayload;
+      } = {
         isValid: validationResult.isValid,
-        ...(validationResult.token && { token: validationResult.token }),
       };
+
+      if (validationResult.token) {
+        result.token = validationResult.token;
+      }
+
+      return result;
     } catch (error: unknown) {
       this.logger.debug(
         `Token validation failed: ${error instanceof Error ? error.message : String(error)}`,

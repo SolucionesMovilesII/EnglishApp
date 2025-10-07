@@ -40,13 +40,15 @@ export class VocabularyPracticeRepository implements IVocabularyPracticeReposito
   }
 
   async update(id: string, updates: Partial<VocabularyPractice>): Promise<VocabularyPractice> {
-    const existing = await this.repository.findOne({ where: { id } });
-    if (!existing) {
-      throw new Error('Vocabulary practice not found');
+    // Exclude relation properties from updates to avoid TypeORM issues
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { practiceSession, ...updateData } = updates;
+    await this.repository.update(id, updateData);
+    const updated = await this.findById(id);
+    if (!updated) {
+      throw new Error('Vocabulary practice not found after update');
     }
-
-    const updated = this.repository.merge(existing, updates);
-    return await this.repository.save(updated);
+    return updated;
   }
 
   async delete(id: string): Promise<void> {

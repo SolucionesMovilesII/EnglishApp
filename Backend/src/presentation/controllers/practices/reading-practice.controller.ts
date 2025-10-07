@@ -1,4 +1,3 @@
-/* eslint-disable */
 import {
   Controller,
   Post,
@@ -14,14 +13,6 @@ import {
   ParseUUIDPipe,
   Query,
 } from '@nestjs/common';
-
-interface AuthenticatedRequest {
-  user: {
-    sub: string;
-    role: string;
-    email?: string;
-  };
-}
 import {
   ApiTags,
   ApiOperation,
@@ -34,6 +25,7 @@ import {
 } from '@nestjs/swagger';
 import { ThrottlerGuard } from '@nestjs/throttler';
 import { EnhancedJwtGuard } from '../../../shared/guards/enhanced-jwt.guard';
+import { AuthenticatedRequest } from '../../../shared/types/request.types';
 
 // DTOs
 import {
@@ -87,7 +79,7 @@ export class ReadingPracticeController {
     @Request() _req: AuthenticatedRequest,
     @Body() _createDto: CreateReadingPracticeDto,
   ): Promise<ReadingPracticeResponseDto> {
-    this.logger.log(`Creating reading practice for user: ${_req.user.sub}`);
+    this.logger.log(`Creating reading practice for user: ${_req.user.userId}`);
 
     // TODO: Implement use case
     throw new Error('Not implemented yet');
@@ -123,7 +115,7 @@ export class ReadingPracticeController {
     @Request() _req: AuthenticatedRequest,
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<ReadingPracticeResponseDto> {
-    this.logger.log(`Getting reading practice ${id} for user: ${_req.user.sub}`);
+    this.logger.log(`Getting reading practice ${id} for user: ${_req.user.userId}`);
 
     // TODO: Implement use case
     throw new Error('Not implemented yet');
@@ -160,7 +152,7 @@ export class ReadingPracticeController {
     @Param('id', ParseUUIDPipe) id: string,
     @Body() _updateDto: UpdateReadingPracticeDto,
   ): Promise<ReadingPracticeResponseDto> {
-    this.logger.log(`Updating reading practice ${id} for user: ${_req.user.sub}`);
+    this.logger.log(`Updating reading practice ${id} for user: ${_req.user.userId}`);
 
     // TODO: Implement use case
     throw new Error('Not implemented yet');
@@ -197,7 +189,7 @@ export class ReadingPracticeController {
     @Param('id', ParseUUIDPipe) id: string,
     @Body() _progressDto: UpdateReadingProgressDto,
   ): Promise<ReadingPracticeResponseDto> {
-    this.logger.log(`Updating reading progress for practice ${id}, user: ${_req.user.sub}`);
+    this.logger.log(`Updating reading progress for practice ${id}, user: ${_req.user.userId}`);
 
     // TODO: Implement use case
     throw new Error('Not implemented yet');
@@ -234,7 +226,7 @@ export class ReadingPracticeController {
     @Param('id', ParseUUIDPipe) id: string,
     @Body() _answerDto: AnswerComprehensionQuestionDto,
   ): Promise<ReadingPracticeResponseDto> {
-    this.logger.log(`Recording comprehension answer for practice ${id}, user: ${_req.user.sub}`);
+    this.logger.log(`Recording comprehension answer for practice ${id}, user: ${_req.user.userId}`);
 
     // TODO: Implement use case
     throw new Error('Not implemented yet');
@@ -271,7 +263,7 @@ export class ReadingPracticeController {
     @Param('id', ParseUUIDPipe) id: string,
     @Body() _bookmarkDto: AddBookmarkDto,
   ): Promise<ReadingPracticeResponseDto> {
-    this.logger.log(`Adding bookmark for practice ${id}, user: ${_req.user.sub}`);
+    this.logger.log(`Adding bookmark for practice ${id}, user: ${_req.user.userId}`);
 
     // TODO: Implement use case
     throw new Error('Not implemented yet');
@@ -308,7 +300,7 @@ export class ReadingPracticeController {
     @Param('id', ParseUUIDPipe) id: string,
     @Body() _vocabularyDto: AddVocabularyWordDto,
   ): Promise<ReadingPracticeResponseDto> {
-    this.logger.log(`Adding vocabulary word for practice ${id}, user: ${_req.user.sub}`);
+    this.logger.log(`Adding vocabulary word for practice ${id}, user: ${_req.user.userId}`);
 
     // TODO: Implement use case
     throw new Error('Not implemented yet');

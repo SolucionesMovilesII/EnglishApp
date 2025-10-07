@@ -23,6 +23,7 @@ import {
   GetEvaluationHistoryResponse,
   EvaluationHistoryItem,
 } from '../use-cases/approval/get-evaluation-history.use-case';
+import { ChapterEvaluationStatsDto } from '../dtos/approval/evaluation-history.dto';
 import { IApprovalMetricsRepository } from '../interfaces/repositories/approval-metrics-repository.interface';
 import { ApprovalMetrics } from '../../domain/entities/approval-metrics.entity';
 import { EvaluationStatus } from '../../domain/entities/approval-evaluation.entity';
@@ -52,18 +53,15 @@ export interface UserApprovalSummary {
   lastEvaluation?: EvaluationHistoryItem;
 }
 
-export interface ChapterEvaluationStats {
-  totalEvaluations: number;
-  approvedCount: number;
-  rejectedCount: number;
-  averageScore: number;
-  averageAttempts: number;
+interface CacheEntry {
+  data: unknown;
+  timestamp: number;
 }
 
 @Injectable()
 export class ApprovalEngineService {
   private readonly logger = new Logger(ApprovalEngineService.name);
-  private readonly performanceCache = new Map<string, { data: unknown; timestamp: number }>();
+  private readonly performanceCache = new Map<string, CacheEntry>();
   private readonly cacheTimeout = 5 * 60 * 1000; // 5 minutes
 
   constructor(
@@ -201,7 +199,7 @@ export class ApprovalEngineService {
    */
   async getRules(chapterId?: string, isActive?: boolean): Promise<ConfigureApprovalRuleResponse[]> {
     const cacheKey = `rules_${chapterId || 'all'}_${isActive !== undefined ? isActive : 'any'}`;
-    const cached = this.getFromCache<ConfigureApprovalRuleResponse[]>(cacheKey);
+    const cached = this.getFromCache(cacheKey) as ConfigureApprovalRuleResponse[] | null;
 
     if (cached) {
       return cached;
@@ -249,26 +247,27 @@ export class ApprovalEngineService {
   /**
    * Get chapter evaluation statistics
    */
-  async getChapterStats(chapterId: string): Promise<ChapterEvaluationStats> {
+  async getChapterStats(chapterId: string): Promise<ChapterEvaluationStatsDto> {
     const cacheKey = `chapter_stats_${chapterId}`;
-    const cached = this.getFromCache<ChapterEvaluationStats>(cacheKey);
+    const cached = this.getFromCache(cacheKey) as ChapterEvaluationStatsDto | null;
 
     if (cached) {
       return cached;
     }
 
     const stats = await this.getChapterEvaluationStatsUseCase.execute(chapterId);
+
     this.setCache(cacheKey, stats);
 
     return stats;
   }
 
   /**
-   * Get overall approval engine statistics
+   * Get approval engine statistics
    */
   async getEngineStats(): Promise<ApprovalEngineStats> {
     const cacheKey = 'engine_stats';
-    const cached = this.getFromCache<ApprovalEngineStats>(cacheKey);
+    const cached = this.getFromCache(cacheKey) as ApprovalEngineStats | null;
 
     if (cached) {
       return cached;
@@ -276,8 +275,7 @@ export class ApprovalEngineService {
 
     this.logger.log('Calculating approval engine statistics');
 
-    // This would require additional repository methods to get aggregated data
-    // For now, return a placeholder structure
+    // TODO: Implement actual stats calculation
     const stats: ApprovalEngineStats = {
       totalEvaluations: 0,
       approvalRate: 0,
@@ -286,6 +284,7 @@ export class ApprovalEngineService {
     };
 
     this.setCache(cacheKey, stats);
+
     return stats;
   }
 
@@ -405,10 +404,10 @@ export class ApprovalEngineService {
   /**
    * Utility methods for caching
    */
-  private getFromCache<T>(key: string): T | null {
+  private getFromCache(key: string): unknown {
     const cached = this.performanceCache.get(key);
     if (cached && Date.now() - cached.timestamp < this.cacheTimeout) {
-      return cached.data as T;
+      return cached.data;
     }
     return null;
   }

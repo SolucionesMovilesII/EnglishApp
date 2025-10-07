@@ -41,7 +41,7 @@ export class ApprovalAuditInterceptor implements NestInterceptor {
     });
 
     // Log específico según el tipo de operación
-    this.logOperationSpecifics(url, method, body, user || {}, requestId);
+    this.logOperationSpecifics(url, method, body, user, requestId);
 
     return next.handle().pipe(
       tap(response => {
@@ -63,7 +63,7 @@ export class ApprovalAuditInterceptor implements NestInterceptor {
         );
 
         // Log específico de resultado
-        this.logOperationResult(url, method, response, user || {}, requestId, duration);
+        this.logOperationResult(url, method, response, user, requestId, duration);
       }),
       catchError(error => {
         const duration = Date.now() - startTime;
@@ -120,7 +120,7 @@ export class ApprovalAuditInterceptor implements NestInterceptor {
     url: string,
     method: string,
     body: Record<string, unknown>,
-    user: Record<string, unknown>,
+    user: Record<string, unknown> | undefined,
     requestId: string,
   ): void {
     if (url.includes('/evaluate') && method === 'POST') {
@@ -176,7 +176,7 @@ export class ApprovalAuditInterceptor implements NestInterceptor {
     url: string,
     method: string,
     response: Record<string, unknown>,
-    user: Record<string, unknown>,
+    user: Record<string, unknown> | undefined,
     requestId: string,
     duration: number,
   ): void {
