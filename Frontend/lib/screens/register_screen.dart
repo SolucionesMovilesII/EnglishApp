@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import '../widgets/settings_button.dart';
-import '../widgets/app_banner.dart';
 import '../widgets/register_form_fields.dart';
 import '../widgets/register_button_section.dart';
 import '../widgets/social_register_section.dart';
@@ -122,15 +121,7 @@ class _RegisterScreenState extends State<RegisterScreen>
                   padding: const EdgeInsets.symmetric(horizontal: 24.0),
                   child: Column(
                     children: [
-                      const SizedBox(height: 40),
-                      
-                      // App Banner
-                      AppBanner(
-                        title: AppLocalizations.of(context)!.appTitle,
-                        livesText: AppLocalizations.of(context)!.livesRemaining(5),
-                      ),
-                      
-                      const SizedBox(height: 40),
+                      const SizedBox(height: 60),
                       
                       // Welcome Text
                       Text(

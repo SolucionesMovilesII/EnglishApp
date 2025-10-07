@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
@@ -57,21 +58,10 @@ class FavoritesProvider with ChangeNotifier {
           )
         ''');
 
-        await db.execute('''
-          CREATE INDEX idx_favorite_words_word ON favorite_words(word)
-        ''');
-
-        await db.execute('''
-          CREATE INDEX idx_favorite_words_language ON favorite_words(language)
-        ''');
-
-        await db.execute('''
-          CREATE INDEX idx_favorite_words_category ON favorite_words(category)
-        ''');
-
-        await db.execute('''
-          CREATE INDEX idx_favorite_words_sync ON favorite_words(is_synced)
-        ''');
+        await db.execute('CREATE INDEX idx_favorite_words_word ON favorite_words(word)');
+        await db.execute('CREATE INDEX idx_favorite_words_language ON favorite_words(language)');
+        await db.execute('CREATE INDEX idx_favorite_words_category ON favorite_words(category)');
+        await db.execute('CREATE INDEX idx_favorite_words_sync ON favorite_words(is_synced)');
       },
     );
   }
@@ -124,7 +114,7 @@ class FavoritesProvider with ChangeNotifier {
       _favorites.insert(0, favoriteWord);
       notifyListeners();
 
-      // Try to sync with server
+      // Try to sync with server (fire & forget)
       _syncToServer(favoriteWord, token);
 
       return true;
@@ -180,7 +170,7 @@ class FavoritesProvider with ChangeNotifier {
       return _favorites.firstWhere(
         (f) => f.word.toLowerCase() == word.toLowerCase(),
       );
-    } catch (e) {
+    } catch (_) {
       return null;
     }
   }
@@ -191,8 +181,10 @@ class FavoritesProvider with ChangeNotifier {
   }
 
   // Get favorites by language
-  List<FavoriteWord> getFavoritesByLanguage(String language) {
-    return _favorites.where((f) => f.language == language).toList();
+  List<String> getLanguages() {
+    final languages = _favorites.map((f) => f.language).toSet().toList();
+    languages.sort();
+    return languages;
   }
 
   // Search favorites
@@ -281,7 +273,6 @@ class FavoritesProvider with ChangeNotifier {
   // Sync unsynced local favorites to server
   Future<void> _syncUnsyncedToServer(String? token) async {
     final unsyncedFavorites = _favorites.where((f) => !f.isSynced).toList();
-
     for (final favorite in unsyncedFavorites) {
       await _syncToServer(favorite, token);
     }
@@ -306,6 +297,7 @@ class FavoritesProvider with ChangeNotifier {
           _favorites[index] = _favorites[index].copyWith(
             serverId: serverFavorite.serverId,
             isSynced: true,
+            updatedAt: serverFavorite.updatedAt,
           );
 
           // Update in database
@@ -373,13 +365,6 @@ class FavoritesProvider with ChangeNotifier {
         .toList();
     categories.sort();
     return categories;
-  }
-
-  // Get languages
-  List<String> getLanguages() {
-    final languages = _favorites.map((f) => f.language).toSet().toList();
-    languages.sort();
-    return languages;
   }
 
   // Helper methods

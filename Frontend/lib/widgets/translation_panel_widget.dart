@@ -36,7 +36,7 @@ class _TranslationPanelWidgetState extends State<TranslationPanelWidget>
     with TickerProviderStateMixin {
   final TranslationService _translationService = TranslationService();
   late TabController _tabController;
-  
+
   List<Translation> _relatedTranslations = [];
   bool _isLoadingRelated = false;
   bool _isFavorite = false;
@@ -59,7 +59,8 @@ class _TranslationPanelWidgetState extends State<TranslationPanelWidget>
   }
 
   void _checkFavoriteStatus() {
-    final favoritesProvider = Provider.of<FavoritesProvider>(context, listen: false);
+    final favoritesProvider =
+        Provider.of<FavoritesProvider>(context, listen: false);
     setState(() {
       _isFavorite = favoritesProvider.isFavorite(widget.originalText);
     });
@@ -77,7 +78,7 @@ class _TranslationPanelWidgetState extends State<TranslationPanelWidget>
         targetLanguage: widget.targetLanguage,
         limit: 10,
       );
-      
+
       setState(() {
         _relatedTranslations = history
             .where((t) => t.originalText != widget.originalText)
@@ -89,9 +90,11 @@ class _TranslationPanelWidgetState extends State<TranslationPanelWidget>
         _error = 'Failed to load related translations: $e';
       });
     } finally {
-      setState(() {
-        _isLoadingRelated = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoadingRelated = false;
+        });
+      }
     }
   }
 
@@ -139,22 +142,26 @@ class _TranslationPanelWidgetState extends State<TranslationPanelWidget>
               Text(
                 'Translation Details',
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+                      fontWeight: FontWeight.bold,
+                    ),
               ),
               const SizedBox(height: 4),
               Text(
                 '${widget.sourceLanguage.toUpperCase()} → ${widget.targetLanguage.toUpperCase()}',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
-                ),
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withOpacity(0.7),
+                    ),
               ),
             ],
           ),
         ),
         Consumer<FavoritesProvider>(
           builder: (context, favoritesProvider, child) {
-            final isFavorite = favoritesProvider.isFavorite(widget.originalText);
+            final isFavorite =
+                favoritesProvider.isFavorite(widget.originalText);
             return IconButton(
               icon: Icon(
                 isFavorite ? Icons.favorite : Icons.favorite_border,
@@ -175,7 +182,10 @@ class _TranslationPanelWidgetState extends State<TranslationPanelWidget>
   Widget _buildTabBar() {
     return Container(
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.3),
+        color: Theme.of(context)
+            .colorScheme
+            .surfaceContainerHighest
+            .withOpacity(0.3),
         borderRadius: BorderRadius.circular(8),
       ),
       child: TabBar(
@@ -242,7 +252,7 @@ class _TranslationPanelWidgetState extends State<TranslationPanelWidget>
     return Card(
       elevation: 2,
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -251,8 +261,8 @@ class _TranslationPanelWidgetState extends State<TranslationPanelWidget>
                 Text(
                   title,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
+                        fontWeight: FontWeight.w600,
+                      ),
                 ),
                 const Spacer(),
                 Chip(
@@ -276,15 +286,22 @@ class _TranslationPanelWidgetState extends State<TranslationPanelWidget>
                   Icon(
                     Icons.record_voice_over,
                     size: 16,
-                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withOpacity(0.7),
                   ),
                   const SizedBox(width: 8),
                   Text(
                     '/$pronunciation/',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      fontStyle: FontStyle.italic,
-                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
-                    ),
+                    style:
+                        Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              fontStyle: FontStyle.italic,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurface
+                                  .withOpacity(0.7),
+                            ),
                   ),
                   const Spacer(),
                   IconButton(
@@ -316,40 +333,44 @@ class _TranslationPanelWidgetState extends State<TranslationPanelWidget>
     return Card(
       elevation: 2,
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               'Examples',
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
+                    fontWeight: FontWeight.w600,
+                  ),
             ),
             const SizedBox(height: 12),
-            ...widget.translation.examples.map((example) => Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    width: 4,
-                    height: 4,
-                    margin: const EdgeInsets.only(top: 8, right: 8),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.primary,
-                      shape: BoxShape.circle,
+            ...widget.translation.examples.map(
+              (example) => Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: 4,
+                      height: 4,
+                      margin:
+                          const EdgeInsets.only(top: 8, right: 8),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.primary,
+                        shape: BoxShape.circle,
+                      ),
                     ),
-                  ),
-                  Expanded(
-                    child: SelectableText(
-                      example,
-                      style: Theme.of(context).textTheme.bodyMedium,
+                    Expanded(
+                      child: SelectableText(
+                        example,
+                        style:
+                            Theme.of(context).textTheme.bodyMedium,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            )),
+            ),
           ],
         ),
       ),
@@ -363,13 +384,21 @@ class _TranslationPanelWidgetState extends State<TranslationPanelWidget>
           _buildDetailCard(
             'Translation Information',
             [
-              _buildDetailRow('Source Language', widget.sourceLanguage.toUpperCase()),
-              _buildDetailRow('Target Language', widget.targetLanguage.toUpperCase()),
+              _buildDetailRow('Source Language',
+                  widget.sourceLanguage.toUpperCase()),
+              _buildDetailRow('Target Language',
+                  widget.targetLanguage.toUpperCase()),
               if (widget.context != null)
                 _buildDetailRow('Context', widget.context!),
-              _buildDetailRow('Created', _formatDateTime(widget.translation.createdAt)),
+              _buildDetailRow(
+                  'Created',
+                  _formatDateTime(
+                      widget.translation.createdAt)),
               if (widget.translation.expiresAt != null)
-                _buildDetailRow('Expires', _formatDateTime(widget.translation.expiresAt!)),
+                _buildDetailRow(
+                    'Expires',
+                    _formatDateTime(
+                        widget.translation.expiresAt!)),
             ],
           ),
           const SizedBox(height: 16),
@@ -377,12 +406,14 @@ class _TranslationPanelWidgetState extends State<TranslationPanelWidget>
             _buildDetailCard(
               'Audio',
               [
-                _buildDetailRow('Audio URL', widget.translation.audioUrl!),
+                _buildDetailRow(
+                    'Audio URL', widget.translation.audioUrl!),
                 const SizedBox(height: 8),
                 ElevatedButton.icon(
                   icon: const Icon(Icons.play_arrow),
                   label: const Text('Play Audio'),
-                  onPressed: () => _playAudio(widget.translation.audioUrl!),
+                  onPressed: () =>
+                      _playAudio(widget.translation.audioUrl),
                 ),
               ],
             ),
@@ -398,14 +429,12 @@ class _TranslationPanelWidgetState extends State<TranslationPanelWidget>
         Text(
           'Recent Translations',
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
+                fontWeight: FontWeight.w600,
+              ),
         ),
         const SizedBox(height: 16),
         if (_isLoadingRelated)
-          const Center(
-            child: CircularProgressIndicator(),
-          )
+          const Center(child: CircularProgressIndicator())
         else if (_error != null)
           Center(
             child: Column(
@@ -430,11 +459,7 @@ class _TranslationPanelWidgetState extends State<TranslationPanelWidget>
           const Center(
             child: Column(
               children: [
-                Icon(
-                  Icons.history,
-                  size: 48,
-                  color: Colors.grey,
-                ),
+                Icon(Icons.history, size: 48, color: Colors.grey),
                 SizedBox(height: 8),
                 Text(
                   'No recent translations found',
@@ -464,13 +489,15 @@ class _TranslationPanelWidgetState extends State<TranslationPanelWidget>
                     ),
                     trailing: Text(
                       _formatDateTime(translation.createdAt),
-                      style: Theme.of(context).textTheme.bodySmall,
+                      style:
+                          Theme.of(context).textTheme.bodySmall,
                     ),
                     onTap: () {
                       Navigator.of(context).pop();
                       showDialog(
                         context: context,
-                        builder: (context) => TranslationPanelWidget(
+                        builder: (context) =>
+                            TranslationPanelWidget(
                           translation: translation,
                           originalText: translation.originalText,
                           sourceLanguage: widget.sourceLanguage,
@@ -491,15 +518,15 @@ class _TranslationPanelWidgetState extends State<TranslationPanelWidget>
     return Card(
       elevation: 2,
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               title,
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
+                    fontWeight: FontWeight.w600,
+                  ),
             ),
             const SizedBox(height: 12),
             ...children,
@@ -511,7 +538,7 @@ class _TranslationPanelWidgetState extends State<TranslationPanelWidget>
 
   Widget _buildDetailRow(String label, String value) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
+      const EdgeInsets.only(bottom: 8),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -520,8 +547,8 @@ class _TranslationPanelWidgetState extends State<TranslationPanelWidget>
             child: Text(
               label,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.w500,
-              ),
+                    fontWeight: FontWeight.w500,
+                  ),
             ),
           ),
           Expanded(
@@ -561,7 +588,7 @@ class _TranslationPanelWidgetState extends State<TranslationPanelWidget>
   String _formatDateTime(DateTime dateTime) {
     final now = DateTime.now();
     final difference = now.difference(dateTime);
-    
+
     if (difference.inDays > 0) {
       return '${difference.inDays}d ago';
     } else if (difference.inHours > 0) {
@@ -584,7 +611,8 @@ class _TranslationPanelWidgetState extends State<TranslationPanelWidget>
   }
 
   void _copyAllToClipboard() {
-    final text = '${widget.originalText}\n${widget.translation.translatedText}';
+    final text =
+        '${widget.originalText}\n${widget.translation.translatedText}';
     _copyToClipboard(text);
   }
 
@@ -598,36 +626,43 @@ class _TranslationPanelWidgetState extends State<TranslationPanelWidget>
     );
   }
 
-  void _playPronunciation(String text, String language) {
-    // TODO: Implement audio playback using AudioService
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Audio playback will be implemented soon'),
-        duration: Duration(seconds: 2),
-      ),
+  void _playPronunciation(String text, String language) async {
+    final audioService = AudioService();
+    final ok = await audioService.speakText(
+      text,
+      language: audioService.getSupportedLanguage(language),
     );
+    if (!ok && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Audio playback failed'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
   }
 
   void _playAudio(String? audioUrl) async {
     final audioService = AudioService();
-    
+
     try {
-      // Use TTS for audio playback
-      final textToSpeak = widget.translation.pronunciation != null 
-          ? widget.originalText 
-          : widget.translation.translatedText;
-      
-      final language = widget.translation.pronunciation != null 
-          ? widget.sourceLanguage 
-          : widget.targetLanguage;
-      
-      final success = await audioService.speakText(
-        textToSpeak,
-        language: audioService.getSupportedLanguage(language),
-      );
-      
-      if (!success) {
-        if (mounted) {
+      if (audioUrl != null && audioUrl.isNotEmpty) {
+        await audioService.playAudioFromUrl(audioUrl);
+      } else {
+        final textToSpeak = widget.translation.pronunciation != null
+            ? widget.originalText
+            : widget.translation.translatedText;
+
+        final language = widget.translation.pronunciation != null
+            ? widget.sourceLanguage
+            : widget.targetLanguage;
+
+        final success = await audioService.speakText(
+          textToSpeak,
+          language: audioService.getSupportedLanguage(language),
+        );
+
+        if (!success && mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Audio playback failed'),
@@ -648,16 +683,23 @@ class _TranslationPanelWidgetState extends State<TranslationPanelWidget>
     }
   }
 
-  Future<void> _toggleFavorite(FavoritesProvider favoritesProvider) async {
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+  Future<void> _toggleFavorite(
+      FavoritesProvider favoritesProvider) async {
+    final authProvider =
+        Provider.of<AuthProvider>(context, listen: false);
     final token = authProvider.token;
 
-    final isFavorite = favoritesProvider.isFavorite(widget.originalText);
-    
+    final isFavorite =
+        favoritesProvider.isFavorite(widget.originalText);
+
     if (isFavorite) {
-      final favoriteWord = favoritesProvider.getFavoriteByWord(widget.originalText);
+      final favoriteWord =
+          favoritesProvider.getFavoriteByWord(widget.originalText);
       if (favoriteWord != null) {
-        await favoritesProvider.removeFromFavorites(favoriteWord.id, token: token);
+        await favoritesProvider.removeFromFavorites(
+          favoriteWord.id,
+          token: token,
+        );
       }
     } else {
       final favoriteWord = FavoriteWord(
@@ -676,8 +718,11 @@ class _TranslationPanelWidgetState extends State<TranslationPanelWidget>
         isSynced: false,
         serverId: null,
       );
-      
-      await favoritesProvider.addToFavorites(favoriteWord, token: token);
+
+      await favoritesProvider.addToFavorites(
+        favoriteWord,
+        token: token,
+      );
     }
   }
 }
