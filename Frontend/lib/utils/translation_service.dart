@@ -1,3 +1,6 @@
+// ignore: unused_import
+import 'dart:convert';
+
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import '../models/translation.dart';
@@ -154,8 +157,9 @@ class TranslationService {
       }
 
       // If not in cache, call API
-      final endpoint =
-          '${EnvironmentConfig.fullApiUrl}/api/translation/translate';
+      // CORREGIDO: no duplicar /api porque fullApiUrl ya lo contiene (p.ej. .../api/v1)
+      final endpoint = '${EnvironmentConfig.fullApiUrl}/translation/translate';
+
       final body = {
         'text': text,
         'sourceLanguage': sourceLanguage,
@@ -260,20 +264,20 @@ class TranslationService {
       final totalResult = await db.rawQuery(
         'SELECT COUNT(*) as count FROM translation_cache',
       );
-      final total = totalResult.first['count'] as int;
+      final total = (totalResult.first['count'] as int?) ?? 0;
 
       final expiredResult = await db.rawQuery(
         'SELECT COUNT(*) as count FROM translation_cache WHERE expires_at < ?',
         [DateTime.now().millisecondsSinceEpoch],
       );
-      final expired = expiredResult.first['count'] as int;
+      final expired = (expiredResult.first['count'] as int?) ?? 0;
 
       return CacheStats(
         totalEntries: total,
         expiredEntries: expired,
         validEntries: total - expired,
       );
-    } catch (e) {
+    } catch (_) {
       return CacheStats(totalEntries: 0, expiredEntries: 0, validEntries: 0);
     }
   }

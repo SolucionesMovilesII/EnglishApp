@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+
 import '../models/translation.dart';
 import '../models/favorite_word.dart';
+
 import '../providers/auth_provider.dart';
 import '../providers/favorites_provider.dart';
+
 import '../utils/translation_service.dart';
 import '../utils/audio_service.dart';
+
 import 'translation_panel_widget.dart';
 
 class TranslationTooltipWidget extends StatefulWidget {
@@ -19,15 +23,18 @@ class TranslationTooltipWidget extends StatefulWidget {
   final bool showOnLongPress;
   final bool showOnHover;
   final VoidCallback? onTranslationLoaded;
+
   final EdgeInsetsGeometry? tooltipPadding;
   final Color? tooltipBackgroundColor;
   final TextStyle? tooltipTextStyle;
   final double? tooltipBorderRadius;
+
   final bool enableFavorites;
   final bool enablePronunciation;
   final bool enableExpandedView;
   final bool enableCopy;
   final bool enableSmartPositioning;
+
   final Duration animationDuration;
   final Duration autoHideDelay;
 
@@ -56,23 +63,24 @@ class TranslationTooltipWidget extends StatefulWidget {
   });
 
   @override
-  State<TranslationTooltipWidget> createState() => _TranslationTooltipWidgetState();
+  State<TranslationTooltipWidget> createState() =>
+      _TranslationTooltipWidgetState();
 }
 
 class _TranslationTooltipWidgetState extends State<TranslationTooltipWidget>
     with TickerProviderStateMixin {
   final TranslationService _translationService = TranslationService();
-  final GlobalKey _tooltipKey = GlobalKey();
-  
+
   Translation? _translation;
   bool _isLoading = false;
   String? _error;
+
   OverlayEntry? _overlayEntry;
   AnimationController? _animationController;
-  AnimationController? _scaleController;
   Animation<double>? _fadeAnimation;
   Animation<double>? _scaleAnimation;
   Animation<Offset>? _slideAnimation;
+
   bool _isTooltipVisible = false;
   bool _isHovering = false;
 
@@ -87,42 +95,34 @@ class _TranslationTooltipWidgetState extends State<TranslationTooltipWidget>
       duration: widget.animationDuration,
       vsync: this,
     );
-    
-    _scaleController = AnimationController(
-      duration: const Duration(milliseconds: 150),
-      vsync: this,
+
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _animationController!,
+        curve: Curves.easeOutCubic,
+      ),
     );
 
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _animationController!,
-      curve: Curves.easeOutCubic,
-    ));
+    _scaleAnimation = Tween<double>(begin: 0.9, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _animationController!,
+        curve: Curves.easeOutBack,
+      ),
+    );
 
-    _scaleAnimation = Tween<double>(
-      begin: 0.8,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _animationController!,
-      curve: Curves.elasticOut,
-    ));
-
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, -0.2),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _animationController!,
-      curve: Curves.easeOutCubic,
-    ));
+    _slideAnimation =
+        Tween<Offset>(begin: const Offset(0, -0.15), end: Offset.zero).animate(
+      CurvedAnimation(
+        parent: _animationController!,
+        curve: Curves.easeOutCubic,
+      ),
+    );
   }
 
   @override
   void dispose() {
     _hideTooltip();
     _animationController?.dispose();
-    _scaleController?.dispose();
     super.dispose();
   }
 
@@ -152,8 +152,6 @@ class _TranslationTooltipWidgetState extends State<TranslationTooltipWidget>
           _error = null;
         });
         widget.onTranslationLoaded?.call();
-        
-        // Add haptic feedback for successful translation
         HapticFeedback.lightImpact();
       } else {
         setState(() {
@@ -167,9 +165,11 @@ class _TranslationTooltipWidgetState extends State<TranslationTooltipWidget>
       });
       HapticFeedback.selectionClick();
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
@@ -177,59 +177,52 @@ class _TranslationTooltipWidgetState extends State<TranslationTooltipWidget>
     if (_isTooltipVisible) return;
 
     _loadTranslation();
-    
-    final RenderBox? renderBox = context.findRenderObject() as RenderBox?;
+
+    final renderBox = context.findRenderObject() as RenderBox?;
     if (renderBox == null) return;
-    
+
     final size = renderBox.size;
     final offset = renderBox.localToGlobal(Offset.zero);
-    final screenSize = MediaQuery.of(context).size;
-    
-    // Smart positioning
+    final screen = MediaQuery.of(context).size;
+
+    // Posicionamiento inteligente
     double left = offset.dx;
     double top = offset.dy + size.height + 8;
     bool showAbove = false;
-    
+
+    const estHeight = 220.0;
+    const estWidth = 320.0;
+
     if (widget.enableSmartPositioning) {
-      // Check if tooltip would go off screen
-      const tooltipHeight = 200.0; // Estimated height
-      const tooltipWidth = 300.0;
-      
-      // Adjust horizontal position
-      if (left + tooltipWidth > screenSize.width) {
-        left = screenSize.width - tooltipWidth - 16;
+      if (left + estWidth > screen.width - 16) {
+        left = screen.width - estWidth - 16;
       }
-      if (left < 16) {
-        left = 16;
-      }
-      
-      // Check if should show above
-      if (top + tooltipHeight > screenSize.height - 100) {
+      if (left < 16) left = 16;
+
+      if (top + estHeight > screen.height - 100) {
         showAbove = true;
-        top = offset.dy - tooltipHeight - 8;
+        top = offset.dy - estHeight - 8;
       }
     }
-    
+
     _overlayEntry = OverlayEntry(
-      builder: (context) => Positioned(
+      builder: (_) => Positioned(
         left: left,
         top: top,
         child: Material(
           color: Colors.transparent,
           child: AnimatedBuilder(
             animation: _animationController!,
-            builder: (context, child) {
-              return Transform.scale(
-                scale: _scaleAnimation!.value,
-                child: SlideTransition(
-                  position: _slideAnimation!,
-                  child: FadeTransition(
-                    opacity: _fadeAnimation!,
-                    child: _buildTooltipContent(showAbove),
-                  ),
+            builder: (context, child) => Transform.scale(
+              scale: _scaleAnimation!.value,
+              child: SlideTransition(
+                position: _slideAnimation!,
+                child: FadeTransition(
+                  opacity: _fadeAnimation!,
+                  child: _buildTooltipContent(showAbove),
                 ),
-              );
-            },
+              ),
+            ),
           ),
         ),
       ),
@@ -238,18 +231,15 @@ class _TranslationTooltipWidgetState extends State<TranslationTooltipWidget>
     Overlay.of(context).insert(_overlayEntry!);
     _animationController!.forward();
     _isTooltipVisible = true;
-    
-    // Auto-hide after delay
+
+    // Auto-hide
     Future.delayed(widget.autoHideDelay, () {
-      if (_isTooltipVisible && !_isHovering) {
-        _hideTooltip();
-      }
+      if (_isTooltipVisible && !_isHovering) _hideTooltip();
     });
   }
 
   void _hideTooltip() {
     if (!_isTooltipVisible) return;
-
     _animationController!.reverse().then((_) {
       _overlayEntry?.remove();
       _overlayEntry = null;
@@ -265,48 +255,43 @@ class _TranslationTooltipWidgetState extends State<TranslationTooltipWidget>
         constraints: const BoxConstraints(
           maxWidth: 320,
           minWidth: 220,
-          maxHeight: 400,
+          maxHeight: 420,
         ),
         padding: widget.tooltipPadding ?? const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: widget.tooltipBackgroundColor ?? 
-                 Theme.of(context).colorScheme.surface,
+          color: widget.tooltipBackgroundColor ??
+              Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(widget.tooltipBorderRadius ?? 12),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.15),
-              blurRadius: 20,
+              blurRadius: 18,
               offset: const Offset(0, 8),
-              spreadRadius: 0,
             ),
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: Colors.black.withOpacity(0.08),
               blurRadius: 6,
               offset: const Offset(0, 2),
-              spreadRadius: 0,
             ),
           ],
           border: Border.all(
-            color: Theme.of(context).colorScheme.outline.withOpacity(0.1),
-            width: 1,
+            color: Theme.of(context).colorScheme.outline.withOpacity(0.12),
           ),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildHeader(),
+            _buildHeaderBar(),
             const SizedBox(height: 12),
             _buildContent(),
-            if (_shouldShowActions())
-              _buildActions(),
+            if (_shouldShowActions()) _buildActions(),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeaderBar() {
     return Row(
       children: [
         Container(
@@ -318,9 +303,9 @@ class _TranslationTooltipWidgetState extends State<TranslationTooltipWidget>
           child: Text(
             '${widget.sourceLanguage.toUpperCase()} → ${widget.targetLanguage.toUpperCase()}',
             style: Theme.of(context).textTheme.labelSmall?.copyWith(
-              color: Theme.of(context).colorScheme.onPrimaryContainer,
-              fontWeight: FontWeight.w600,
-            ),
+                  color: Theme.of(context).colorScheme.onPrimaryContainer,
+                  fontWeight: FontWeight.w600,
+                ),
           ),
         ),
         const Spacer(),
@@ -328,19 +313,16 @@ class _TranslationTooltipWidgetState extends State<TranslationTooltipWidget>
           icon: Icon(
             Icons.close,
             size: 18,
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
           ),
           onPressed: _hideTooltip,
           padding: EdgeInsets.zero,
-          constraints: const BoxConstraints(
-            minWidth: 28,
-            minHeight: 28,
-          ),
+          constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
           style: IconButton.styleFrom(
-            backgroundColor: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.5),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(6),
-            ),
+            backgroundColor:
+                Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.5),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
           ),
         ),
       ],
@@ -349,7 +331,7 @@ class _TranslationTooltipWidgetState extends State<TranslationTooltipWidget>
 
   Widget _buildContent() {
     if (_isLoading) {
-      return Container(
+      return Padding(
         padding: const EdgeInsets.symmetric(vertical: 20),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -368,8 +350,11 @@ class _TranslationTooltipWidgetState extends State<TranslationTooltipWidget>
             Text(
               'Translating...',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
-              ),
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withOpacity(0.7),
+                  ),
             ),
           ],
         ),
@@ -380,7 +365,10 @@ class _TranslationTooltipWidgetState extends State<TranslationTooltipWidget>
       return Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.errorContainer.withOpacity(0.1),
+          color: Theme.of(context)
+              .colorScheme
+              .errorContainer
+              .withOpacity(0.12),
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
             color: Theme.of(context).colorScheme.error.withOpacity(0.2),
@@ -388,11 +376,8 @@ class _TranslationTooltipWidgetState extends State<TranslationTooltipWidget>
         ),
         child: Row(
           children: [
-            Icon(
-              Icons.error_outline,
-              size: 20,
-              color: Theme.of(context).colorScheme.error,
-            ),
+            Icon(Icons.error_outline,
+                size: 20, color: Theme.of(context).colorScheme.error),
             const SizedBox(width: 8),
             Expanded(
               child: Text(
@@ -409,15 +394,18 @@ class _TranslationTooltipWidgetState extends State<TranslationTooltipWidget>
     }
 
     if (_translation == null) {
-      return Container(
+      return Padding(
         padding: const EdgeInsets.symmetric(vertical: 16),
         child: Center(
           child: Text(
             'Tap to translate',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              fontStyle: FontStyle.italic,
-              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
-            ),
+                  fontStyle: FontStyle.italic,
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withOpacity(0.6),
+                ),
           ),
         ),
       );
@@ -426,75 +414,80 @@ class _TranslationTooltipWidgetState extends State<TranslationTooltipWidget>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Original text
+        // Texto original
         Container(
           width: double.infinity,
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+            color:
+                Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Text(
             widget.text,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              fontWeight: FontWeight.w500,
-            ),
+                  fontWeight: FontWeight.w500,
+                ),
             maxLines: 3,
             overflow: TextOverflow.ellipsis,
           ),
         ),
-        
         const SizedBox(height: 12),
-        
-        // Translation
+        // Traducción + botón de pronunciación
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
               child: Text(
                 _translation!.translatedText,
-                style: widget.tooltipTextStyle ?? 
-                       Theme.of(context).textTheme.bodyLarge?.copyWith(
-                         fontWeight: FontWeight.w600,
-                         color: Theme.of(context).colorScheme.primary,
-                       ),
+                style: widget.tooltipTextStyle ??
+                    Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
               ),
             ),
-            if (widget.enablePronunciation && _translation!.pronunciation != null)
+            if (widget.enablePronunciation &&
+                _translation!.pronunciation != null)
               _buildPronunciationButton(),
           ],
         ),
-        
-        // Pronunciation
         if (_translation!.pronunciation != null) ...[
           const SizedBox(height: 8),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.3),
+              color: Theme.of(context)
+                  .colorScheme
+                  .secondaryContainer
+                  .withOpacity(0.3),
               borderRadius: BorderRadius.circular(6),
             ),
             child: Text(
               '/${_translation!.pronunciation}/',
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                fontStyle: FontStyle.italic,
-                color: Theme.of(context).colorScheme.onSecondaryContainer,
-              ),
+                    fontStyle: FontStyle.italic,
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSecondaryContainer,
+                  ),
             ),
           ),
         ],
-        
-        // Examples
         if (_translation!.examples.isNotEmpty) ...[
           const SizedBox(height: 12),
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.tertiaryContainer.withOpacity(0.2),
+              color: Theme.of(context)
+                  .colorScheme
+                  .tertiaryContainer
+                  .withOpacity(0.2),
               borderRadius: BorderRadius.circular(8),
               border: Border.all(
-                color: Theme.of(context).colorScheme.tertiary.withOpacity(0.2),
+                color:
+                    Theme.of(context).colorScheme.tertiary.withOpacity(0.2),
               ),
             ),
             child: Column(
@@ -502,27 +495,30 @@ class _TranslationTooltipWidgetState extends State<TranslationTooltipWidget>
               children: [
                 Row(
                   children: [
-                    Icon(
-                      Icons.lightbulb_outline,
-                      size: 16,
-                      color: Theme.of(context).colorScheme.tertiary,
-                    ),
+                    Icon(Icons.lightbulb_outline,
+                        size: 16,
+                        color: Theme.of(context).colorScheme.tertiary),
                     const SizedBox(width: 6),
                     Text(
                       'Example:',
-                      style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                        color: Theme.of(context).colorScheme.tertiary,
-                      ),
+                      style: Theme.of(context)
+                          .textTheme
+                          .labelMedium
+                          ?.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: Theme.of(context)
+                                .colorScheme
+                                .tertiary,
+                          ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  _translation!.examples!.first,
+                  _translation!.examples.first,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    fontStyle: FontStyle.italic,
-                  ),
+                        fontStyle: FontStyle.italic,
+                      ),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -541,13 +537,16 @@ class _TranslationTooltipWidgetState extends State<TranslationTooltipWidget>
         icon: const Icon(Icons.volume_up, size: 20),
         onPressed: _playPronunciation,
         style: IconButton.styleFrom(
-          backgroundColor: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.5),
-          foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
+          backgroundColor: Theme.of(context)
+              .colorScheme
+              .primaryContainer
+              .withOpacity(0.5),
+          foregroundColor:
+              Theme.of(context).colorScheme.onPrimaryContainer,
           padding: const EdgeInsets.all(8),
           minimumSize: const Size(36, 36),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
         tooltip: 'Play pronunciation',
       ),
@@ -555,8 +554,10 @@ class _TranslationTooltipWidgetState extends State<TranslationTooltipWidget>
   }
 
   bool _shouldShowActions() {
-    return (widget.enableFavorites || widget.enableExpandedView || widget.enableCopy) 
-           && _translation != null;
+    return (widget.enableFavorites ||
+            widget.enableExpandedView ||
+            widget.enableCopy) &&
+        _translation != null;
   }
 
   Widget _buildActions() {
@@ -566,7 +567,8 @@ class _TranslationTooltipWidgetState extends State<TranslationTooltipWidget>
       decoration: BoxDecoration(
         border: Border(
           top: BorderSide(
-            color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+            color:
+                Theme.of(context).colorScheme.outline.withOpacity(0.2),
           ),
         ),
       ),
@@ -582,9 +584,12 @@ class _TranslationTooltipWidgetState extends State<TranslationTooltipWidget>
           if (widget.enableFavorites)
             Consumer<FavoritesProvider>(
               builder: (context, favoritesProvider, child) {
-                final isFavorite = favoritesProvider.isFavorite(widget.text);
+                final isFavorite =
+                    favoritesProvider.isFavorite(widget.text);
                 return _buildActionButton(
-                  icon: isFavorite ? Icons.favorite : Icons.favorite_border,
+                  icon: isFavorite
+                      ? Icons.favorite
+                      : Icons.favorite_border,
                   label: isFavorite ? 'Saved' : 'Save',
                   onPressed: () => _toggleFavorite(favoritesProvider),
                   color: isFavorite ? Colors.red : null,
@@ -619,14 +624,22 @@ class _TranslationTooltipWidgetState extends State<TranslationTooltipWidget>
             Icon(
               icon,
               size: 18,
-              color: color ?? Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+              color: color ??
+                  Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withOpacity(0.7),
             ),
             const SizedBox(height: 4),
             Text(
               label,
               style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                color: color ?? Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
-              ),
+                    color: color ??
+                        Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withOpacity(0.7),
+                  ),
             ),
           ],
         ),
@@ -636,10 +649,11 @@ class _TranslationTooltipWidgetState extends State<TranslationTooltipWidget>
 
   void _copyTranslation() {
     if (_translation == null) return;
-    
-    Clipboard.setData(ClipboardData(text: _translation!.translatedText));
+    Clipboard.setData(
+      ClipboardData(text: _translation!.translatedText),
+    );
     HapticFeedback.selectionClick();
-    
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: const Row(
@@ -652,54 +666,58 @@ class _TranslationTooltipWidgetState extends State<TranslationTooltipWidget>
         ),
         duration: const Duration(seconds: 2),
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
     );
   }
 
   Future<void> _playPronunciation() async {
     if (_translation == null) return;
-    
+    final audioService = AudioService();
+
     try {
       HapticFeedback.selectionClick();
-      
-      // Try to play translated text pronunciation first
-      if (_translation!.audioUrl != null) {
-        await AudioService.playFromUrl(_translation!.audioUrl!);
+
+      // Preferir URL si llega del backend; si no, TTS
+      if (_translation!.audioUrl != null &&
+          _translation!.audioUrl!.isNotEmpty) {
+        await audioService.playAudioFromUrl(_translation!.audioUrl!);
       } else {
-        // Fallback to TTS for translated text
-        await AudioService.speak(
-          _translation!.translatedText,
-          language: widget.targetLanguage,
+        // TTS sobre el texto traducido (o original si no hay pronunciación)
+        final speakText = _translation!.pronunciation != null
+            ? widget.text
+            : _translation!.translatedText;
+        final lang = _translation!.pronunciation != null
+            ? widget.sourceLanguage
+            : widget.targetLanguage;
+
+        final ok = await audioService.speakText(
+          speakText,
+          language: audioService.getSupportedLanguage(lang),
         );
+
+        if (!ok && mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Audio not available'),
+              duration: Duration(seconds: 2),
+            ),
+          );
+        }
       }
     } catch (e) {
-      // If translation audio fails, try original text
+      // Intentar fallback a TTS del texto original
       try {
-        await AudioService.speak(
+        await audioService.speakText(
           widget.text,
-          language: widget.sourceLanguage,
+          language: audioService.getSupportedLanguage(widget.sourceLanguage),
         );
-      } catch (e2) {
+      } catch (_) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.volume_off, color: Colors.white, size: 20),
-                  const SizedBox(width: 8),
-                  const Text('Audio not available'),
-                ],
-              ),
+              content: Text('Audio error: $e'),
               duration: const Duration(seconds: 2),
-              behavior: SnackBarBehavior.floating,
-              backgroundColor: Theme.of(context).colorScheme.error,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
             ),
           );
         }
@@ -707,96 +725,80 @@ class _TranslationTooltipWidgetState extends State<TranslationTooltipWidget>
     }
   }
 
-  void _toggleFavorite(FavoritesProvider favoritesProvider) async {
+  Future<void> _toggleFavorite(
+    FavoritesProvider favoritesProvider,
+  ) async {
     if (_translation == null) return;
 
     try {
       HapticFeedback.mediumImpact();
-      
+
       final isFavorite = favoritesProvider.isFavorite(widget.text);
-      
       if (isFavorite) {
-        // Get the favorite word to get its ID
-        final favoriteWord = favoritesProvider.getFavoriteByWord(widget.text);
-        if (favoriteWord != null) {
-          await favoritesProvider.removeFromFavorites(favoriteWord.id);
+        final fav = favoritesProvider.getFavoriteByWord(widget.text);
+        if (fav != null) {
+          await favoritesProvider.removeFromFavorites(fav.id);
           if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: const Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.heart_broken, color: Colors.white, size: 20),
-                    SizedBox(width: 8),
-                    Text('Removed from favorites'),
-                  ],
-                ),
-                duration: const Duration(seconds: 2),
-                behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-            );
+            _toast('Removed from favorites', icon: Icons.heart_broken);
           }
         }
       } else {
         final now = DateTime.now();
-        final favoriteWord = FavoriteWord(
-          id: DateTime.now().millisecondsSinceEpoch.toString(),
+        final fav = FavoriteWord(
+          id: now.millisecondsSinceEpoch.toString(),
           word: widget.text,
           translation: _translation!.translatedText,
-          language: widget.targetLanguage,
+          language: widget.sourceLanguage, // de qué idioma viene la palabra
           pronunciation: _translation!.pronunciation,
           definition: _translation!.definition,
           examples: _translation!.examples,
+          audioUrl: _translation!.audioUrl,
+          category: widget.context,
+          difficultyLevel: null,
           createdAt: now,
           updatedAt: now,
+          isSynced: false,
+          serverId: null,
         );
 
-        await favoritesProvider.addToFavorites(favoriteWord);
+        await favoritesProvider.addToFavorites(fav);
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: const Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.favorite, color: Colors.red, size: 20),
-                  SizedBox(width: 8),
-                  Text('Added to favorites'),
-                ],
-              ),
-              duration: const Duration(seconds: 2),
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-          );
+          _toast('Added to favorites', icon: Icons.favorite, iconColor: Colors.red);
         }
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.error_outline, color: Colors.white, size: 20),
-                const SizedBox(width: 8),
-                Text('Failed to update favorites: ${e.toString()}'),
-              ],
-            ),
-            backgroundColor: Theme.of(context).colorScheme.error,
-            duration: const Duration(seconds: 3),
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
+        _toast(
+          'Failed to update favorites',
+          icon: Icons.error_outline,
+          bg: Theme.of(context).colorScheme.error,
         );
       }
     }
+  }
+
+  void _toast(
+    String msg, {
+    IconData icon = Icons.check_circle,
+    Color? iconColor,
+    Color? bg,
+  }) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        backgroundColor: bg,
+        content: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, color: iconColor ?? Colors.white, size: 20),
+            const SizedBox(width: 8),
+            Text(msg),
+          ],
+        ),
+        duration: const Duration(seconds: 2),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      ),
+    );
   }
 
   void _showExpandedView() {
@@ -805,20 +807,19 @@ class _TranslationTooltipWidgetState extends State<TranslationTooltipWidget>
     HapticFeedback.lightImpact();
     _hideTooltip();
 
+    // Mostrar panel completo en modal bottom sheet
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => DraggableScrollableSheet(
-        initialChildSize: 0.7,
+        initialChildSize: 0.75,
         minChildSize: 0.5,
         maxChildSize: 0.95,
         builder: (context, scrollController) => Container(
           decoration: BoxDecoration(
             color: Theme.of(context).colorScheme.surface,
-            borderRadius: const BorderRadius.vertical(
-              top: Radius.circular(20),
-            ),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(0.1),
@@ -829,33 +830,39 @@ class _TranslationTooltipWidgetState extends State<TranslationTooltipWidget>
           ),
           child: Column(
             children: [
-              // Handle bar
+              // Handle
               Container(
                 margin: const EdgeInsets.only(top: 12, bottom: 8),
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withOpacity(0.3),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
               // Header
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
                 child: Row(
                   children: [
                     Text(
                       'Translation Details',
-                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
+                      style: Theme.of(context)
+                          .textTheme
+                          .headlineSmall
+                          ?.copyWith(fontWeight: FontWeight.w600),
                     ),
                     const Spacer(),
                     IconButton(
                       icon: const Icon(Icons.close),
                       onPressed: () => Navigator.of(context).pop(),
                       style: IconButton.styleFrom(
-                        backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
+                        backgroundColor:
+                            Theme.of(context).colorScheme.surfaceVariant,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
@@ -894,28 +901,34 @@ class _TranslationTooltipWidgetState extends State<TranslationTooltipWidget>
   }
 }
 
-/// A convenient widget that wraps text with translation tooltip functionality
+/// Texto con tooltip de traducción integrado (wrapper conveniente)
 class TranslatableText extends StatelessWidget {
   final String text;
   final TextStyle? style;
   final String sourceLanguage;
   final String targetLanguage;
   final String? context;
+
   final bool showOnTap;
   final bool showOnLongPress;
   final bool showOnHover;
+
   final bool enableFavorites;
   final bool enablePronunciation;
   final bool enableExpandedView;
   final bool enableCopy;
   final bool enableSmartPositioning;
+
   final Duration animationDuration;
   final Duration autoHideDelay;
+
   final VoidCallback? onTranslationLoaded;
+
   final EdgeInsetsGeometry? tooltipPadding;
   final Color? tooltipBackgroundColor;
   final TextStyle? tooltipTextStyle;
   final double? tooltipBorderRadius;
+
   final int? maxLines;
   final TextOverflow? overflow;
   final TextAlign? textAlign;

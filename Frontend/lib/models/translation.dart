@@ -1,4 +1,5 @@
 class Translation {
+  // Campos comunes
   final String id;
   final String originalText;
   final String translatedText;
@@ -7,10 +8,12 @@ class Translation {
   final String? pronunciation;
   final List<String> examples;
   final String? audioUrl;
-  final String? definition;
-  final String? context;
   final DateTime createdAt;
   final DateTime? expiresAt;
+
+  // Campos del branch main (enriquecidos)
+  final String? definition;
+  final String? context;
 
   const Translation({
     required this.id,
@@ -27,56 +30,158 @@ class Translation {
     this.expiresAt,
   });
 
-  // Factory constructor from JSON (server response)
+  // ================= FACTORIES =================
+
+  /// Acepta HU-007-4 (snake_case) y main (camelCase).
   factory Translation.fromJson(Map<String, dynamic> json) {
+    // Detectores de estilo
+    final bool isSnake =
+        json.containsKey('original_text') || json.containsKey('source_language');
+    final bool isCamel =
+        json.containsKey('originalText') || json.containsKey('sourceLanguage');
+
+    String _str(dynamic v, [String d = '']) => (v ?? d).toString();
+
+    // Campos base (tolerantes a ambos estilos)
+    final id = _str(json['id'] ??
+        DateTime.now().millisecondsSinceEpoch.toString());
+    final originalText =
+        _str(isSnake ? json['original_text'] : json['originalText']);
+    final translatedText =
+        _str(isSnake ? json['translated_text'] : json['translatedText']);
+    final sourceLanguage =
+        _str(isSnake ? json['source_language'] : json['sourceLanguage']);
+    final targetLanguage =
+        _str(isSnake ? json['target_language'] : json['targetLanguage']);
+
+    // Pronunciación / audio
+    final pronunciation = (isSnake ? json['pronunciation'] : json['pronunciation']) as String?;
+    final audioUrl = (isSnake ? json['audio_url'] : json['audioUrl']) as String?;
+
+    // Examples puede venir como List o String
+    List<String> examples = const [];
+    final rawExamples = json['examples'];
+    if (rawExamples is List) {
+      examples = List<String>.from(rawExamples.map((e) => e.toString()));
+    } else if (rawExamples is String) {
+      // Acepta ambos separadores para robustez
+      examples = rawExamples
+          .split(RegExp(r'[|,]'))
+          .map((e) => e.trim())
+          .where((e) => e.isNotEmpty)
+          .toList();
+    }
+
+    // Campos enriquecidos (solo camelCase en main)
+    final definition = isCamel ? json['definition'] as String? : null;
+    final context = isCamel ? json['context'] as String? : null;
+
+    // Fechas
+    DateTime createdAt;
+    final createdSnake = json['created_at'];
+    final createdCamel = json['createdAt'];
+    if (createdSnake is String) {
+      createdAt = DateTime.parse(createdSnake);
+    } else if (createdCamel is String) {
+      createdAt = DateTime.parse(createdCamel);
+    } else {
+      createdAt = DateTime.now();
+    }
+
+    DateTime? expiresAt;
+    final expiresSnake = json['expires_at'];
+    final expiresCamel = json['expiresAt'];
+    if (expiresSnake is String) {
+      expiresAt = DateTime.parse(expiresSnake);
+    } else if (expiresCamel is String) {
+      expiresAt = DateTime.parse(expiresCamel);
+    }
+
     return Translation(
-      id: json['id'] ?? DateTime.now().millisecondsSinceEpoch.toString(),
-      originalText: json['originalText'] ?? json['text'] ?? '',
-      translatedText: json['translatedText'] ?? json['translation'] ?? '',
-      sourceLanguage: json['sourceLanguage'] ?? 'en',
-      targetLanguage: json['targetLanguage'] ?? 'es',
-      pronunciation: json['pronunciation'],
-      examples: json['examples'] != null 
-          ? List<String>.from(json['examples'])
-          : [],
-      audioUrl: json['audioUrl'],
-      definition: json['definition'],
-      context: json['context'],
-      createdAt: json['createdAt'] != null 
-          ? DateTime.parse(json['createdAt'])
-          : DateTime.now(),
-      expiresAt: json['expiresAt'] != null 
-          ? DateTime.parse(json['expiresAt'])
-          : null,
+      id: id,
+      originalText: originalText,
+      translatedText: translatedText,
+      sourceLanguage: sourceLanguage,
+      targetLanguage: targetLanguage,
+      pronunciation: pronunciation,
+      examples: examples,
+      audioUrl: audioUrl,
+      definition: definition,
+      context: context,
+      createdAt: createdAt,
+      expiresAt: expiresAt,
     );
   }
 
-  // Factory constructor from local database
+  /// Local DB (acepta ejemplos con '|' o ',')
   factory Translation.fromLocalDb(Map<String, dynamic> map) {
+    String _str(dynamic v, [String d = '']) => (v ?? d).toString();
+
+    final examplesStr = map['examples']?.toString();
+    final examples = examplesStr == null
+        ? const <String>[]
+        : examplesStr
+            .split(RegExp(r'[|,]'))
+            .map((e) => e.trim())
+            .where((e) => e.isNotEmpty)
+            .toList();
+
+    final createdAtRaw = map['created_at'];
+    final expiresAtRaw = map['expires_at'];
+
+    DateTime createdAt;
+    if (createdAtRaw is int) {
+      createdAt = DateTime.fromMillisecondsSinceEpoch(createdAtRaw);
+    } else if (createdAtRaw is String) {
+      createdAt = DateTime.tryParse(createdAtRaw) ?? DateTime.now();
+    } else {
+      createdAt = DateTime.now();
+    }
+
+    DateTime? expiresAt;
+    if (expiresAtRaw is int) {
+      expiresAt = DateTime.fromMillisecondsSinceEpoch(expiresAtRaw);
+    } else if (expiresAtRaw is String) {
+      expiresAt = DateTime.tryParse(expiresAtRaw);
+    }
+
     return Translation(
-      id: map['id'] ?? '',
-      originalText: map['original_text'] ?? '',
-      translatedText: map['translated_text'] ?? '',
-      sourceLanguage: map['source_language'] ?? '',
-      targetLanguage: map['target_language'] ?? '',
-      pronunciation: map['pronunciation'],
-      examples: map['examples'] != null 
-          ? map['examples'].toString().split(',').where((e) => e.isNotEmpty).toList()
-          : [],
-      audioUrl: map['audio_url'],
-      definition: null, // Not stored in cache
-      context: null, // Not stored in cache
-      createdAt: map['created_at'] != null 
-          ? DateTime.fromMillisecondsSinceEpoch(map['created_at'])
-          : DateTime.now(),
-      expiresAt: map['expires_at'] != null 
-          ? DateTime.fromMillisecondsSinceEpoch(map['expires_at'])
-          : null,
+      id: _str(map['id']),
+      originalText: _str(map['original_text']),
+      translatedText: _str(map['translated_text']),
+      sourceLanguage: _str(map['source_language']),
+      targetLanguage: _str(map['target_language']),
+      pronunciation: map['pronunciation'] as String?,
+      examples: examples,
+      audioUrl: map['audio_url'] as String?,
+      // definition/context no se guardan en cache v1
+      definition: null,
+      context: null,
+      createdAt: createdAt,
+      expiresAt: expiresAt,
     );
   }
 
-  // Convert to JSON for server requests
-  Map<String, dynamic> toJson() {
+  // ================= SERIALIZACIÓN =================
+
+  /// JSON estilo HU-007-4 (snake_case)
+  Map<String, dynamic> toJsonV1() {
+    return {
+      'id': id,
+      'original_text': originalText,
+      'translated_text': translatedText,
+      'source_language': sourceLanguage,
+      'target_language': targetLanguage,
+      'pronunciation': pronunciation,
+      'examples': examples, // si necesitas string: examples.join('|')
+      'audio_url': audioUrl,
+      'created_at': createdAt.toIso8601String(),
+      'expires_at': expiresAt?.toIso8601String(),
+    };
+  }
+
+  /// JSON estilo main (camelCase + campos enriquecidos)
+  Map<String, dynamic> toJsonV2() {
     return {
       'id': id,
       'originalText': originalText,
@@ -93,13 +198,31 @@ class Translation {
     };
   }
 
-  // Convert to local database format
-  Map<String, dynamic> toLocalDb() {
-    final textHash = '$originalText-$sourceLanguage-$targetLanguage'.hashCode.toString();
-    
+  /// Compatibilidad: por defecto exportamos V2
+  Map<String, dynamic> toJson() => toJsonV2();
+
+  /// Local DB v1 (usa ‘|’ para ejemplos)
+  Map<String, dynamic> toLocalDbV1() {
     return {
       'id': id,
-      'text_hash': textHash,
+      'text_hash': _generateTextHash(),
+      'original_text': originalText,
+      'translated_text': translatedText,
+      'source_language': sourceLanguage,
+      'target_language': targetLanguage,
+      'pronunciation': pronunciation,
+      'examples': examples.join('|'),
+      'audio_url': audioUrl,
+      'created_at': createdAt.millisecondsSinceEpoch,
+      'expires_at': expiresAt?.millisecondsSinceEpoch,
+    };
+  }
+
+  /// Local DB v2 (usa ‘,’ para ejemplos)
+  Map<String, dynamic> toLocalDbV2() {
+    return {
+      'id': id,
+      'text_hash': _generateTextHash(),
       'original_text': originalText,
       'translated_text': translatedText,
       'source_language': sourceLanguage,
@@ -112,7 +235,16 @@ class Translation {
     };
   }
 
-  // Copy with method for immutable updates
+  /// Compatibilidad: por defecto guardamos con v2
+  Map<String, dynamic> toLocalDb() => toLocalDbV2();
+
+  // ================= UTILS =================
+
+  String _generateTextHash() =>
+      '$originalText-$sourceLanguage-$targetLanguage'.hashCode.toString();
+
+  bool get isExpired => expiresAt != null && DateTime.now().isAfter(expiresAt!);
+
   Translation copyWith({
     String? id,
     String? originalText,
@@ -146,7 +278,7 @@ class Translation {
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
-    
+
     return other is Translation &&
         other.id == id &&
         other.originalText == originalText &&
@@ -156,16 +288,14 @@ class Translation {
   }
 
   @override
-  int get hashCode {
-    return id.hashCode ^
-        originalText.hashCode ^
-        translatedText.hashCode ^
-        sourceLanguage.hashCode ^
-        targetLanguage.hashCode;
-  }
+  int get hashCode =>
+      id.hashCode ^
+      originalText.hashCode ^
+      translatedText.hashCode ^
+      sourceLanguage.hashCode ^
+      targetLanguage.hashCode;
 
   @override
-  String toString() {
-    return 'Translation(id: $id, originalText: $originalText, translatedText: $translatedText, sourceLanguage: $sourceLanguage, targetLanguage: $targetLanguage)';
-  }
+  String toString() =>
+      'Translation(id: $id, originalText: $originalText, translatedText: $translatedText, sourceLanguage: $sourceLanguage, targetLanguage: $targetLanguage)';
 }
