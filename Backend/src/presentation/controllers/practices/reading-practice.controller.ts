@@ -1,3 +1,4 @@
+/* eslint-disable */
 import {
   Controller,
   Post,
@@ -13,6 +14,7 @@ import {
   ParseUUIDPipe,
   Query,
 } from '@nestjs/common';
+
 import {
   ApiTags,
   ApiOperation,

@@ -9,6 +9,12 @@ import 'providers/progress_provider.dart';
 import 'providers/lives_provider.dart';
 import 'providers/evaluation_provider.dart';
 import 'providers/episode_provider.dart';
+import 'providers/approval_provider.dart';
+import 'providers/favorites_provider.dart';
+import 'providers/vocabulary_chapters_provider.dart';
+import 'providers/vocabulary_practice_provider.dart';
+import 'providers/reading_chapters_provider.dart';
+import 'providers/reading_content_provider.dart';
 
 import 'screens/login_screen.dart';
 import 'screens/home_screen.dart';
@@ -47,8 +53,37 @@ class EnglishApp extends StatelessWidget {
           update: (context, auth, previous) =>
               previous ?? EvaluationProvider(auth),
         ),
-        // Si necesitas EpisodeProvider como ChangeNotifier:
-        // ChangeNotifierProvider(create: (_) => EpisodeProvider()),
+        ChangeNotifierProvider(create: (_) => EpisodeProvider()),
+        ChangeNotifierProvider(create: (_) => ApprovalProvider()),
+        ChangeNotifierProvider(create: (_) => FavoritesProvider()),
+        ChangeNotifierProxyProvider<AuthProvider, VocabularyChaptersProvider>(
+          create: (context) => VocabularyChaptersProvider(
+            Provider.of<AuthProvider>(context, listen: false),
+          ),
+          update: (context, auth, previous) =>
+              previous ?? VocabularyChaptersProvider(auth),
+        ),
+        ChangeNotifierProxyProvider<AuthProvider, VocabularyPracticeProvider>(
+          create: (context) => VocabularyPracticeProvider(
+            Provider.of<AuthProvider>(context, listen: false),
+          ),
+          update: (context, auth, previous) =>
+              previous ?? VocabularyPracticeProvider(auth),
+        ),
+        ChangeNotifierProxyProvider<AuthProvider, ReadingChaptersProvider>(
+          create: (context) => ReadingChaptersProvider(
+            Provider.of<AuthProvider>(context, listen: false),
+          ),
+          update: (context, auth, previous) =>
+              previous ?? ReadingChaptersProvider(auth),
+        ),
+        ChangeNotifierProxyProvider<AuthProvider, ReadingContentProvider>(
+          create: (context) => ReadingContentProvider(
+            Provider.of<AuthProvider>(context, listen: false),
+          ),
+          update: (context, auth, previous) =>
+              previous ?? ReadingContentProvider(auth),
+        ),
       ],
       child: Consumer2<ThemeProvider, LocaleProvider>(
         builder: (context, themeProvider, localeProvider, child) {

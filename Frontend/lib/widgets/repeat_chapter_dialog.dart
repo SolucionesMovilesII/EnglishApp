@@ -37,11 +37,9 @@ class RepeatChapterDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
-    
+
     return AlertDialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       title: Column(
         children: [
           Icon(
@@ -68,7 +66,9 @@ class RepeatChapterDialog extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+              color: Theme.of(
+                context,
+              ).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Row(
@@ -92,9 +92,9 @@ class RepeatChapterDialog extends StatelessWidget {
               ],
             ),
           ),
-          
+
           const SizedBox(height: 16),
-          
+
           // Warning message
           Text(
             localizations.repeatChapterWarning,
@@ -104,9 +104,9 @@ class RepeatChapterDialog extends StatelessWidget {
               fontSize: 14,
             ),
           ),
-          
+
           const SizedBox(height: 16),
-          
+
           // Current score display
           Container(
             padding: const EdgeInsets.all(12),
@@ -124,7 +124,7 @@ class RepeatChapterDialog extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  localizations.currentScore(currentScore),
+                  localizations.currentScore as String,
                   style: TextStyle(
                     color: Theme.of(context).colorScheme.onPrimaryContainer,
                     fontWeight: FontWeight.bold,
@@ -134,9 +134,9 @@ class RepeatChapterDialog extends StatelessWidget {
               ],
             ),
           ),
-          
+
           const SizedBox(height: 16),
-          
+
           // Benefits of repetition
           Container(
             padding: const EdgeInsets.all(12),

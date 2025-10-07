@@ -5,7 +5,6 @@ import '../models/approval_rule.dart';
 import '../models/approval_evaluation.dart';
 import '../models/approval_metrics.dart';
 import '../utils/approval_service.dart';
-import '../utils/api_service.dart';
 
 enum ApprovalState {
   initial,
@@ -24,7 +23,7 @@ class ApprovalProvider with ChangeNotifier {
   // Current data
   List<ApprovalRule> _approvalRules = [];
   List<ApprovalEvaluation> _userEvaluations = [];
-  List<ApprovalMetrics> _userMetrics = [];
+  final List<ApprovalMetrics> _userMetrics = [];
   ApprovalEvaluation? _currentEvaluation;
   UserMetricsSummary? _userMetricsSummary;
   
@@ -383,8 +382,4 @@ class ApprovalProvider with ChangeNotifier {
     notifyListeners();
   }
   
-  @override
-  void dispose() {
-    super.dispose();
-  }
 }

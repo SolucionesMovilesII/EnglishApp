@@ -1,6 +1,4 @@
-import 'dart:convert';
 import 'base_practice_service.dart';
-import '../utils/api_service.dart';
 import '../utils/environment_config.dart';
 
 // Data models for vocabulary practice

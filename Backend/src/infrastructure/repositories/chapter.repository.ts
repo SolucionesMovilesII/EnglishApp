@@ -211,7 +211,7 @@ export class ChapterRepository implements IChapterRepository {
 
   private async isChapterUnlocked(
     chapter: Chapter,
-    progressMap: Map<string, UserProgress>,
+    progressMap: Map<string | null, UserProgress>,
   ): Promise<boolean> {
     // First chapter is always unlocked
     if (chapter.order === 1) return true;

@@ -3,18 +3,18 @@ import { NotFoundException, BadRequestException } from '@nestjs/common';
 import { EvaluateApprovalUseCase } from './evaluate-approval.use-case';
 import { IApprovalRuleRepository } from '../../interfaces/repositories/approval-rule-repository.interface';
 import { IApprovalEvaluationRepository } from '../../interfaces/repositories/approval-evaluation-repository.interface';
-
 import { IUserRepository } from '../../interfaces/repositories/user-repository.interface';
+
+import { User } from '../../../domain/entities/user.entity';
+import { Person } from '../../../domain/entities/person.entity';
 import { ApprovalRule } from '../../../domain/entities/approval-rule.entity';
 import {
   ApprovalEvaluation,
   EvaluationStatus,
 } from '../../../domain/entities/approval-evaluation.entity';
 import { EvaluateApprovalDto } from '../../dtos/approval/evaluate-approval.dto';
-import { User } from '../../../domain/entities/user.entity';
-import { Person } from '../../../domain/entities/person.entity';
 
-// Helper functions for creating mock objects
+// ---------- Helpers ----------
 function createMockPerson(overrides: Partial<Person> = {}): Person {
   return {
     id: 'person-123',
@@ -67,8 +67,8 @@ function createMockApprovalRule(overrides: Partial<ApprovalRule> = {}): Approval
   return {
     id: 'rule-123',
     name: 'Test Rule',
-    description: null,
-    chapterId: null,
+    description: 'Test approval rule',
+    chapterId: '1',
     minScoreThreshold: 80,
     maxAttempts: 3,
     allowErrorCarryover: false,
@@ -82,20 +82,23 @@ function createMockApprovalRule(overrides: Partial<ApprovalRule> = {}): Approval
     getThresholdPercentage: jest.fn().mockReturnValue(80),
     canRetryAfterFailure: jest.fn().mockReturnValue(true),
     ...overrides,
-  };
+  } as ApprovalRule;
 }
 
 function createMockApprovalEvaluation(
   overrides: Partial<ApprovalEvaluation> = {},
 ): ApprovalEvaluation {
+  const baseScore = overrides.score ?? 85;
+  const threshold = overrides.threshold ?? 80;
+
   return {
     id: 'eval-123',
     userId: 'user-123',
     ruleId: 'rule-123',
-    chapterId: 'chapter-123',
-    score: 85,
-    threshold: 80,
-    status: EvaluationStatus.APPROVED,
+    chapterId: '1',
+    score: baseScore,
+    threshold,
+    status: baseScore >= threshold ? EvaluationStatus.APPROVED : EvaluationStatus.REJECTED,
     attemptNumber: 1,
     errorsFromPreviousAttempts: 0,
     feedback: null,
@@ -105,18 +108,19 @@ function createMockApprovalEvaluation(
     rule: createMockApprovalRule(),
     createdAt: new Date(),
     updatedAt: new Date(),
-    isApproved: jest.fn().mockReturnValue(true),
-    isRejected: jest.fn().mockReturnValue(false),
+    isApproved: jest.fn().mockReturnValue(baseScore >= threshold),
+    isRejected: jest.fn().mockReturnValue(baseScore < threshold),
     isPending: jest.fn().mockReturnValue(false),
-    getAdjustedScore: jest.fn().mockReturnValue(85),
+    getAdjustedScore: jest.fn().mockReturnValue(baseScore),
     approve: jest.fn(),
     reject: jest.fn(),
     hasErrorCarryover: jest.fn().mockReturnValue(false),
-    getScoreWithPenalty: jest.fn().mockReturnValue(85),
+    getScoreWithPenalty: jest.fn().mockReturnValue(baseScore),
     ...overrides,
-  };
+  } as ApprovalEvaluation;
 }
 
+// ---------- Suite ----------
 describe('EvaluateApprovalUseCase', () => {
   let useCase: EvaluateApprovalUseCase;
   let approvalRuleRepository: jest.Mocked<IApprovalRuleRepository>;
@@ -124,7 +128,7 @@ describe('EvaluateApprovalUseCase', () => {
   let userRepository: jest.Mocked<IUserRepository>;
 
   beforeEach(async () => {
-    const mockApprovalRuleRepository = {
+    const mockApprovalRuleRepository: jest.Mocked<IApprovalRuleRepository> = {
       create: jest.fn(),
       findById: jest.fn(),
       findByChapterId: jest.fn(),
@@ -135,9 +139,9 @@ describe('EvaluateApprovalUseCase', () => {
       delete: jest.fn(),
       deactivate: jest.fn(),
       activate: jest.fn(),
-    };
+    } as any;
 
-    const mockApprovalEvaluationRepository = {
+    const mockApprovalEvaluationRepository: jest.Mocked<IApprovalEvaluationRepository> = {
       create: jest.fn(),
       findById: jest.fn(),
       findByUserId: jest.fn(),
@@ -150,7 +154,7 @@ describe('EvaluateApprovalUseCase', () => {
       delete: jest.fn(),
       getEvaluationHistory: jest.fn(),
       getChapterEvaluationStats: jest.fn(),
-    };
+    } as any;
 
     const mockApprovalMetricsRepository = {
       create: jest.fn(),
@@ -163,7 +167,7 @@ describe('EvaluateApprovalUseCase', () => {
       createBulkMetrics: jest.fn(),
     };
 
-    const mockUserRepository = {
+    const mockUserRepository: jest.Mocked<IUserRepository> = {
       create: jest.fn(),
       findById: jest.fn(),
       findByIdWithPerson: jest.fn(),
@@ -184,27 +188,15 @@ describe('EvaluateApprovalUseCase', () => {
       delete: jest.fn(),
       exists: jest.fn(),
       existsByEmail: jest.fn(),
-    };
+    } as any;
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         EvaluateApprovalUseCase,
-        {
-          provide: 'IApprovalRuleRepository',
-          useValue: mockApprovalRuleRepository,
-        },
-        {
-          provide: 'IApprovalEvaluationRepository',
-          useValue: mockApprovalEvaluationRepository,
-        },
-        {
-          provide: 'IApprovalMetricsRepository',
-          useValue: mockApprovalMetricsRepository,
-        },
-        {
-          provide: 'IUserRepository',
-          useValue: mockUserRepository,
-        },
+        { provide: 'IApprovalRuleRepository', useValue: mockApprovalRuleRepository },
+        { provide: 'IApprovalEvaluationRepository', useValue: mockApprovalEvaluationRepository },
+        { provide: 'IApprovalMetricsRepository', useValue: mockApprovalMetricsRepository },
+        { provide: 'IUserRepository', useValue: mockUserRepository },
       ],
     }).compile();
 
@@ -219,8 +211,7 @@ describe('EvaluateApprovalUseCase', () => {
   });
 
   describe('execute', () => {
-    it('should successfully evaluate approval', async () => {
-      // Arrange
+    it('should successfully evaluate approval (approved)', async () => {
       const dto: EvaluateApprovalDto = {
         userId: 'user-123',
         chapterId: '1',
@@ -229,10 +220,8 @@ describe('EvaluateApprovalUseCase', () => {
       };
 
       const mockRule = createMockApprovalRule({
-        chapterId: 'chapter-1',
+        chapterId: '1',
         minScoreThreshold: 80,
-        maxAttempts: 3,
-        allowErrorCarryover: false,
       });
 
       userRepository.findById.mockResolvedValue(createMockUser());
@@ -240,18 +229,23 @@ describe('EvaluateApprovalUseCase', () => {
       approvalEvaluationRepository.findLatestByUserAndChapter.mockResolvedValue(null);
       approvalEvaluationRepository.countAttempts.mockResolvedValue(0);
       approvalEvaluationRepository.findPreviousAttempts.mockResolvedValue([]);
-      approvalEvaluationRepository.create.mockResolvedValue(createMockApprovalEvaluation());
+      approvalEvaluationRepository.create.mockResolvedValue(
+        createMockApprovalEvaluation({
+          score: 85,
+          threshold: 80,
+          status: EvaluationStatus.APPROVED,
+        }),
+      );
 
-      // Act
       const result = await useCase.execute(dto);
 
-      // Assert
       expect(result.status).toBe(EvaluationStatus.APPROVED);
       expect(result.score).toBe(85);
+      expect(approvalRuleRepository.findApplicableRules).toHaveBeenCalled();
+      expect(approvalEvaluationRepository.create).toHaveBeenCalled();
     });
 
-    it('should handle rejection with error carry over', async () => {
-      // Arrange
+    it('should handle rejection with error carryover', async () => {
       const dto: EvaluateApprovalDto = {
         userId: 'user-123',
         chapterId: '1',
@@ -261,13 +255,11 @@ describe('EvaluateApprovalUseCase', () => {
       const mockRule = createMockApprovalRule({
         chapterId: '1',
         minScoreThreshold: 80,
-        maxAttempts: 3,
         allowErrorCarryover: true,
       });
 
       const previousEvaluation = createMockApprovalEvaluation({
         id: 'prev-eval',
-        ruleId: 'rule-1',
         chapterId: '1',
         score: 70,
         threshold: 80,
@@ -281,112 +273,80 @@ describe('EvaluateApprovalUseCase', () => {
       approvalEvaluationRepository.findLatestByUserAndChapter.mockResolvedValue(previousEvaluation);
       approvalEvaluationRepository.countAttempts.mockResolvedValue(1);
       approvalEvaluationRepository.findPreviousAttempts.mockResolvedValue([previousEvaluation]);
-      approvalEvaluationRepository.create.mockResolvedValue(createMockApprovalEvaluation());
+      approvalEvaluationRepository.create.mockResolvedValue(
+        createMockApprovalEvaluation({
+          score: 75,
+          threshold: 80,
+          status: EvaluationStatus.REJECTED,
+        }),
+      );
 
-      // Act
       const result = await useCase.execute(dto);
 
-      // Assert
       expect(result.status).toBe(EvaluationStatus.REJECTED);
       expect(result.score).toBe(75);
     });
 
-    it('should handle chapters 4 and 5 with 100% requirement', async () => {
-      // Arrange
+    it('should enforce 100% requirement for chapters 4 and 5', async () => {
       const dto: EvaluateApprovalDto = {
         userId: 'user-123',
         chapterId: '4',
         score: 95,
       };
 
-      const mockRule = {
+      const mockRule = createMockApprovalRule({
         id: 'rule-4',
-        name: 'Test Rule Chapter 4',
-        description: 'Test approval rule for chapter 4',
         chapterId: '4',
         minScoreThreshold: 100,
-        maxAttempts: 3,
-        allowErrorCarryover: false,
-        isActive: true,
-        metadata: null,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        isApplicableToChapter: jest.fn(),
-        isScoreApproved: jest.fn(),
-        hasSpecialRequirements: jest.fn(),
-        getThresholdPercentage: jest.fn(),
-        canRetryAfterFailure: jest.fn(),
-      } as ApprovalRule;
+      });
 
       userRepository.findById.mockResolvedValue(createMockUser());
       approvalRuleRepository.findApplicableRules.mockResolvedValue([mockRule]);
       approvalEvaluationRepository.findLatestByUserAndChapter.mockResolvedValue(null);
       approvalEvaluationRepository.countAttempts.mockResolvedValue(0);
       approvalEvaluationRepository.findPreviousAttempts.mockResolvedValue([]);
-      approvalEvaluationRepository.create.mockResolvedValue(createMockApprovalEvaluation());
+      approvalEvaluationRepository.create.mockResolvedValue(
+        createMockApprovalEvaluation({
+          chapterId: '4',
+          score: 95,
+          threshold: 100,
+          status: EvaluationStatus.REJECTED,
+        }),
+      );
 
-      // Act
       const result = await useCase.execute(dto);
-
-      // Assert
       expect(result.status).toBe(EvaluationStatus.REJECTED);
     });
 
-    it('should throw BadRequestException for invalid input', async () => {
-      // Arrange
-      const dto: EvaluateApprovalDto = {
-        userId: 'user-123',
-        chapterId: '1',
-        score: -5,
-      };
-
-      // Act & Assert
+    it('should throw BadRequestException for invalid score', async () => {
+      const dto: EvaluateApprovalDto = { userId: 'user-123', chapterId: '1', score: -5 };
       await expect(useCase.execute(dto)).rejects.toThrow(BadRequestException);
     });
 
     it('should throw NotFoundException when user not found', async () => {
-      // Arrange
-      const dto: EvaluateApprovalDto = {
-        userId: 'invalid-user',
-        chapterId: '1',
-        score: 80,
-      };
+      const dto: EvaluateApprovalDto = { userId: 'invalid-user', chapterId: '1', score: 80 };
 
-      const mockRule = createMockApprovalRule({
-        chapterId: '1',
-        minScoreThreshold: 80,
-        maxAttempts: 3,
-        allowErrorCarryover: false,
-      });
+      const mockRule = createMockApprovalRule({ chapterId: '1', minScoreThreshold: 80 });
 
-      userRepository.findById.mockResolvedValue(null); // User not found
+      userRepository.findById.mockResolvedValue(null);
       approvalRuleRepository.findApplicableRules.mockResolvedValue([mockRule]);
       approvalEvaluationRepository.countAttempts.mockResolvedValue(0);
       approvalEvaluationRepository.findPreviousAttempts.mockResolvedValue([]);
       approvalEvaluationRepository.findLatestByUserAndChapter.mockResolvedValue(null);
-      approvalEvaluationRepository.create.mockResolvedValue(createMockApprovalEvaluation());
 
-      // Act & Assert
       await expect(useCase.execute(dto)).rejects.toThrow(NotFoundException);
     });
 
-    it('should throw NotFoundException when chapter rule not found', async () => {
-      // Arrange
-      const dto: EvaluateApprovalDto = {
-        userId: 'user-123',
-        chapterId: '999',
-        score: 80,
-      };
+    it('should throw NotFoundException when no applicable rule is found for chapter', async () => {
+      const dto: EvaluateApprovalDto = { userId: 'user-123', chapterId: '999', score: 80 };
 
       userRepository.findById.mockResolvedValue(createMockUser());
       approvalRuleRepository.findApplicableRules.mockResolvedValue([]);
 
-      // Act & Assert
       await expect(useCase.execute(dto)).rejects.toThrow(NotFoundException);
     });
 
-    it('should handle extraData correctly', async () => {
-      // Arrange
+    it('should approve with extraData present', async () => {
       const dto: EvaluateApprovalDto = {
         userId: 'user-123',
         chapterId: '1',
@@ -402,7 +362,6 @@ describe('EvaluateApprovalUseCase', () => {
       const mockRule = createMockApprovalRule({
         chapterId: '1',
         minScoreThreshold: 80,
-        maxAttempts: 3,
         allowErrorCarryover: true,
       });
 
@@ -411,28 +370,25 @@ describe('EvaluateApprovalUseCase', () => {
       approvalEvaluationRepository.findLatestByUserAndChapter.mockResolvedValue(null);
       approvalEvaluationRepository.countAttempts.mockResolvedValue(0);
       approvalEvaluationRepository.findPreviousAttempts.mockResolvedValue([]);
-      approvalEvaluationRepository.create.mockResolvedValue(createMockApprovalEvaluation());
+      approvalEvaluationRepository.create.mockResolvedValue(
+        createMockApprovalEvaluation({
+          score: 85,
+          threshold: 80,
+          status: EvaluationStatus.APPROVED,
+        }),
+      );
 
-      // Act
       const result = await useCase.execute(dto);
-
-      // Assert
       expect(result.status).toBe(EvaluationStatus.APPROVED);
       expect(result.score).toBe(85);
     });
 
-    it('should work without extraData', async () => {
-      // Arrange
-      const dto: EvaluateApprovalDto = {
-        userId: 'user-123',
-        chapterId: '1',
-        score: 85,
-      };
+    it('should approve without extraData', async () => {
+      const dto: EvaluateApprovalDto = { userId: 'user-123', chapterId: '1', score: 85 };
 
       const mockRule = createMockApprovalRule({
         chapterId: '1',
         minScoreThreshold: 80,
-        maxAttempts: 3,
         allowErrorCarryover: true,
       });
 
@@ -441,67 +397,43 @@ describe('EvaluateApprovalUseCase', () => {
       approvalEvaluationRepository.findLatestByUserAndChapter.mockResolvedValue(null);
       approvalEvaluationRepository.countAttempts.mockResolvedValue(0);
       approvalEvaluationRepository.findPreviousAttempts.mockResolvedValue([]);
-      approvalEvaluationRepository.create.mockResolvedValue(createMockApprovalEvaluation());
+      approvalEvaluationRepository.create.mockResolvedValue(
+        createMockApprovalEvaluation({
+          score: 85,
+          threshold: 80,
+          status: EvaluationStatus.APPROVED,
+        }),
+      );
 
-      // Act
       const result = await useCase.execute(dto);
-
-      // Assert
       expect(result.status).toBe(EvaluationStatus.APPROVED);
       expect(result.score).toBe(85);
     });
   });
 
   describe('error handling and edge cases', () => {
-    it('should handle service errors gracefully', async () => {
-      // Arrange
-      const dto: EvaluateApprovalDto = {
-        userId: 'user-123',
-        chapterId: '1',
-        score: 80,
-      };
+    it('should bubble up repository errors', async () => {
+      const dto: EvaluateApprovalDto = { userId: 'user-123', chapterId: '1', score: 80 };
 
       userRepository.findById.mockResolvedValue(createMockUser());
       const error = new Error('Database connection failed');
       approvalRuleRepository.findApplicableRules.mockRejectedValue(error);
 
-      // Act & Assert
       await expect(useCase.execute(dto)).rejects.toThrow('Database connection failed');
     });
 
-    it('should validate score boundaries', async () => {
-      // Arrange
-      const dto: EvaluateApprovalDto = {
-        userId: 'user-123',
-        chapterId: '1',
-        score: 101,
-      };
-
-      // Act & Assert
+    it('should validate score upper bound (<=100)', async () => {
+      const dto: EvaluateApprovalDto = { userId: 'user-123', chapterId: '1', score: 101 };
       await expect(useCase.execute(dto)).rejects.toThrow(BadRequestException);
     });
 
-    it('should handle empty or null userId', async () => {
-      // Arrange
-      const dto: EvaluateApprovalDto = {
-        userId: '',
-        chapterId: '1',
-        score: 80,
-      };
-
-      // Act & Assert
+    it('should reject empty userId', async () => {
+      const dto: EvaluateApprovalDto = { userId: '', chapterId: '1', score: 80 };
       await expect(useCase.execute(dto)).rejects.toThrow(BadRequestException);
     });
 
-    it('should handle empty or null chapterId', async () => {
-      // Arrange
-      const dto: EvaluateApprovalDto = {
-        userId: 'user-123',
-        chapterId: null!,
-        score: 80,
-      };
-
-      // Act & Assert
+    it('should reject empty/null chapterId', async () => {
+      const dto = { userId: 'user-123', chapterId: null as unknown as string, score: 80 };
       await expect(useCase.execute(dto)).rejects.toThrow(BadRequestException);
     });
   });

@@ -59,17 +59,45 @@ class _ChapterEpisodesScreenState extends State<ChapterEpisodesScreen>
     super.dispose();
   }
 
+  /// Calcula las posiciones de los episodios en un patrón de cuadrantes (5 filas x 2 columnas)
+  /// Los episodios se posicionan alternando entre columnas (zigzag)
   List<Offset> _getEpisodePositions(Size screenSize) {
     final width = screenSize.width;
     final height = screenSize.height;
-    
-    return [
-      Offset(width * 0.2, height * 0.15),  // Chapter 1: 20% from left, 15% from top
-      Offset(width * 0.7, height * 0.25),  // Chapter 2: 70% from left, 25% from top
-      Offset(width * 0.25, height * 0.45), // Chapter 3: 25% from left, 45% from top
-      Offset(width * 0.65, height * 0.55), // Chapter 4: 65% from left, 55% from top
-      Offset(width * 0.45, height * 0.75), // Chapter 5: 45% from left, 75% from top
-    ];
+
+    final positions = <Offset>[];
+    const int rows = 5;
+    const int cols = 2;
+
+    // Padding desde los bordes
+    const double horizontalPadding = 0.15; // 15% padding
+    const double verticalPadding = 0.1;   // 10% padding
+
+    // Espacio disponible para el grid
+    final double availableWidth = width * (1 - 2 * horizontalPadding);
+    final double availableHeight = height * (1 - 2 * verticalPadding);
+
+    // Tamaño de cada cuadrante
+    final double quadrantWidth = availableWidth / cols;
+    final double quadrantHeight = availableHeight / rows;
+
+    for (int i = 0; i < 10 && i < rows * cols; i++) {
+      // Alternar entre columnas: 0, 1, 0, 1, 0...
+      final int col = i % cols;
+      final int row = i ~/ cols;
+
+      // Posición X: centro del cuadrante correspondiente
+      final double x = width * horizontalPadding +
+                       (col + 0.5) * quadrantWidth;
+
+      // Posición Y: centro del cuadrante correspondiente
+      final double y = height * verticalPadding +
+                       (row + 0.5) * quadrantHeight;
+
+      positions.add(Offset(x, y));
+    }
+
+    return positions;
   }
 
   @override

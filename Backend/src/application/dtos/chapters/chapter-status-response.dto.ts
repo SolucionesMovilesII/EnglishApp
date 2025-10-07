@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { ChapterLevel } from '../../../domain/entities/chapter.entity';
+import { ChapterLevel } from '../../../domain/enums/chapter-level.enum';
 
 export class ChapterStatusDto {
   @ApiProperty({ description: 'Chapter ID', example: 'uuid-chapter-id' })

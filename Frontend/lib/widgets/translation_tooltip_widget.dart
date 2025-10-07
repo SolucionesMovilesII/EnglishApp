@@ -320,7 +320,7 @@ class _TranslationTooltipWidgetState extends State<TranslationTooltipWidget>
           constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
           style: IconButton.styleFrom(
             backgroundColor:
-                Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.5),
+                Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.5),
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
           ),
@@ -420,7 +420,7 @@ class _TranslationTooltipWidgetState extends State<TranslationTooltipWidget>
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             color:
-                Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+                Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.3),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Text(
@@ -862,7 +862,7 @@ class _TranslationTooltipWidgetState extends State<TranslationTooltipWidget>
                       onPressed: () => Navigator.of(context).pop(),
                       style: IconButton.styleFrom(
                         backgroundColor:
-                            Theme.of(context).colorScheme.surfaceVariant,
+                            Theme.of(context).colorScheme.surfaceContainerHighest,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),

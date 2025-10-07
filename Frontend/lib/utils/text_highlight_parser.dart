@@ -10,9 +10,13 @@ class TextHighlightParser {
     List<HighlightedWord> highlights, {
     TextStyle? defaultStyle,
     Function(HighlightedWord)? onWordTap,
+    Color? highlightColor,
   }) {
+    // Remove asterisks from text
+    final cleanText = text.replaceAll('*', '');
+
     if (highlights.isEmpty) {
-      return [TextSpan(text: text, style: defaultStyle)];
+      return [TextSpan(text: cleanText, style: defaultStyle)];
     }
 
     // Ordenar los resaltados por posición de inicio
@@ -22,26 +26,27 @@ class TextHighlightParser {
     final List<TextSpan> spans = [];
     int currentIndex = 0;
 
+    // Use provided highlight color or fall back to deep purple
+    final textColor = highlightColor ?? Colors.deepPurple;
+
     for (final highlight in sortedHighlights) {
       // Agregar texto antes del resaltado
       if (currentIndex < highlight.startIndex) {
         spans.add(TextSpan(
-          text: text.substring(currentIndex, highlight.startIndex),
+          text: cleanText.substring(currentIndex, highlight.startIndex),
           style: defaultStyle,
         ));
       }
 
-      // Agregar el texto resaltado
+      // Agregar el texto resaltado con color personalizado
       spans.add(TextSpan(
-        text: text.substring(highlight.startIndex, highlight.endIndex),
+        text: cleanText.substring(highlight.startIndex, highlight.endIndex),
         style: defaultStyle?.copyWith(
-          backgroundColor: highlight.highlightColor,
-          color: highlight.textColor,
-          fontWeight: FontWeight.w500,
+          color: textColor,
+          fontWeight: FontWeight.w600,
         ) ?? TextStyle(
-          backgroundColor: highlight.highlightColor,
-          color: highlight.textColor,
-          fontWeight: FontWeight.w500,
+          color: textColor,
+          fontWeight: FontWeight.w600,
         ),
         recognizer: highlight.isClickable && onWordTap != null
             ? (TapGestureRecognizer()..onTap = () => onWordTap(highlight))
@@ -52,9 +57,9 @@ class TextHighlightParser {
     }
 
     // Agregar texto restante después del último resaltado
-    if (currentIndex < text.length) {
+    if (currentIndex < cleanText.length) {
       spans.add(TextSpan(
-        text: text.substring(currentIndex),
+        text: cleanText.substring(currentIndex),
         style: defaultStyle,
       ));
     }

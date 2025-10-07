@@ -140,7 +140,17 @@ export class CorsMiddleware implements NestMiddleware {
       return true;
     }
 
+    // TEMPORARY: Allow all origins for testing (REMOVE IN PRODUCTION)
+    if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'dev') {
+      this.logger.debug(`CORS: Allowing origin ${origin} (development mode)`);
+      return true;
+    }
+
     // Check against allowed origins
-    return corsConfig.origins.includes(origin) || corsConfig.origins.includes('*');
+    if (corsConfig.origins.includes(origin) || corsConfig.origins.includes('*')) {
+      return true;
+    }
+
+    return false;
   }
 }

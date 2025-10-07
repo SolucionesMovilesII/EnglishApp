@@ -16,7 +16,7 @@ class HighlightedTextWidget extends StatefulWidget {
   final bool showTooltips;
 
   const HighlightedTextWidget({
-    Key? key,
+    super.key,
     required this.text,
     this.highlights,
     this.textStyle,
@@ -27,7 +27,7 @@ class HighlightedTextWidget extends StatefulWidget {
     this.enableGrammarHighlights = false,
     this.onWordTap,
     this.showTooltips = true,
-  }) : super(key: key);
+  });
 
   @override
   State<HighlightedTextWidget> createState() => _HighlightedTextWidgetState();
@@ -178,6 +178,7 @@ class _HighlightedTextWidgetState extends State<HighlightedTextWidget> {
       _allHighlights,
       defaultStyle: widget.textStyle,
       onWordTap: _handleWordTap,
+      highlightColor: Theme.of(context).colorScheme.primary,
     );
 
     return RichText(
@@ -194,9 +195,9 @@ class HighlightStatsWidget extends StatelessWidget {
   final List<HighlightedWord> highlights;
 
   const HighlightStatsWidget({
-    Key? key,
+    super.key,
     required this.highlights,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -266,11 +267,11 @@ class HighlightConfigWidget extends StatefulWidget {
   final Function(bool vocabulary, bool grammar) onConfigChanged;
 
   const HighlightConfigWidget({
-    Key? key,
+    super.key,
     required this.enableVocabulary,
     required this.enableGrammar,
     required this.onConfigChanged,
-  }) : super(key: key);
+  });
 
   @override
   State<HighlightConfigWidget> createState() => _HighlightConfigWidgetState();
@@ -307,7 +308,7 @@ class _HighlightConfigWidgetState extends State<HighlightConfigWidget> {
               title: const Text('Vocabulario'),
               subtitle: const Text('Resaltar palabras de vocabulario'),
               value: _enableVocabulary,
-              activeColor: HighlightType.vocabulary.color,
+              activeThumbColor: HighlightType.vocabulary.color,
               onChanged: (value) {
                 setState(() {
                   _enableVocabulary = value;
@@ -319,7 +320,7 @@ class _HighlightConfigWidgetState extends State<HighlightConfigWidget> {
               title: const Text('Gramática'),
               subtitle: const Text('Resaltar patrones gramaticales'),
               value: _enableGrammar,
-              activeColor: HighlightType.grammar.color,
+              activeThumbColor: HighlightType.grammar.color,
               onChanged: (value) {
                 setState(() {
                   _enableGrammar = value;

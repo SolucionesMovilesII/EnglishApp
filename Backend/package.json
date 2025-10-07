@@ -26,7 +26,9 @@
     "migration:show": "typeorm-ts-node-commonjs migration:show -d ormconfig.ts",
     "schema:sync": "typeorm-ts-node-commonjs schema:sync -d src/infrastructure/database/data-source.ts",
     "schema:drop": "typeorm-ts-node-commonjs schema:drop -d src/infrastructure/database/data-source.ts",
-    "seed": "ts-node src/infrastructure/database/seeders/index.ts"
+    "seed": "ts-node -r tsconfig-paths/register src/infrastructure/database/seeders/run-seeder.ts",
+    "seed:lives": "ts-node -r tsconfig-paths/register src/infrastructure/database/seeders/run-lives-seeder.ts",
+    "seed:reading": "ts-node -r tsconfig-paths/register src/infrastructure/database/seeders/run-reading-seeder.ts"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",

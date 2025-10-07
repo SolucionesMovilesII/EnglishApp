@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 import '../providers/vocabulary_chapters_provider.dart';
 import '../providers/lives_provider.dart';
+import '../providers/auth_provider.dart';
 import '../models/vocabulary_chapter.dart';
 import '../l10n/app_localizations.dart';
 import '../widgets/vocabulary_chapter_card.dart';
-import '../widgets/custom_app_bar.dart';
+import '../widgets/app_banner.dart';
+import 'vocabulary_practice_screen.dart';
 
 class VocabularyChaptersScreen extends StatefulWidget {
   const VocabularyChaptersScreen({super.key});
@@ -50,12 +54,21 @@ class _VocabularyChaptersScreenState extends State<VocabularyChaptersScreen>
 
   Future<void> _loadInitialData() async {
     if (!mounted) return;
-    
+
     setState(() => _isLoading = true);
-    
-    final chaptersProvider = context.read<VocabularyChaptersProvider>();
-    await chaptersProvider.loadChapters();
-    
+
+    // Load lives status first
+    if (mounted) {
+      final livesProvider = context.read<LivesProvider>();
+      await livesProvider.fetchLivesStatus();
+    }
+
+    // Then load chapters
+    if (mounted) {
+      final chaptersProvider = context.read<VocabularyChaptersProvider>();
+      await chaptersProvider.loadChapters();
+    }
+
     if (mounted) {
       setState(() => _isLoading = false);
       _progressAnimationController.forward();
@@ -74,36 +87,55 @@ class _VocabularyChaptersScreenState extends State<VocabularyChaptersScreen>
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
-    
+
     return Scaffold(
-      backgroundColor: theme.colorScheme.surface,
-      appBar: CustomAppBar(
-        title: l10n.vocabularyChaptersTitle,
-        showBackButton: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: _handleRefresh,
-            tooltip: l10n.refresh,
+      backgroundColor: theme.colorScheme.surfaceContainer,
+      appBar: AppBar(
+        toolbarHeight: 0,
+        backgroundColor: theme.colorScheme.primary,
+        elevation: 0,
+        systemOverlayStyle: SystemUiOverlayStyle(
+          statusBarColor: theme.colorScheme.primary,
+          statusBarIconBrightness: theme.brightness == Brightness.dark
+              ? Brightness.light
+              : Brightness.dark,
+          statusBarBrightness: theme.brightness,
+        ),
+      ),
+      body: Column(
+        children: [
+          // App Banner (reusable header from main menu)
+          Consumer2<AuthProvider, LivesProvider>(
+            builder: (context, authProvider, livesProvider, child) {
+              return AppBanner(
+                title: l10n.vocabularyChaptersTitle,
+                subtitle: authProvider.user?.name ?? l10n.user,
+                livesText: l10n.livesRemaining(livesProvider.currentLives),
+              );
+            },
+          ),
+
+          // Content
+          Expanded(
+            child: Consumer<VocabularyChaptersProvider>(
+              builder: (context, chaptersProvider, child) {
+                if (_isLoading || chaptersProvider.isLoading) {
+                  return _buildLoadingState(l10n);
+                }
+
+                if (chaptersProvider.state == VocabularyChaptersState.error) {
+                  return _buildErrorState(l10n, chaptersProvider, theme);
+                }
+
+                if (!chaptersProvider.hasData || chaptersProvider.chapters.isEmpty) {
+                  return _buildEmptyState(l10n, theme);
+                }
+
+                return _buildChaptersList(chaptersProvider, l10n, theme);
+              },
+            ),
           ),
         ],
-      ),
-      body: Consumer<VocabularyChaptersProvider>(
-        builder: (context, chaptersProvider, child) {
-          if (_isLoading || chaptersProvider.isLoading) {
-            return _buildLoadingState(l10n);
-          }
-
-          if (chaptersProvider.state == VocabularyChaptersState.error) {
-            return _buildErrorState(l10n, chaptersProvider, theme);
-          }
-
-          if (!chaptersProvider.hasData || chaptersProvider.chapters.isEmpty) {
-            return _buildEmptyState(l10n, theme);
-          }
-
-          return _buildChaptersList(chaptersProvider, l10n, theme);
-        },
       ),
     );
   }
@@ -481,7 +513,7 @@ class _VocabularyChaptersScreenState extends State<VocabularyChaptersScreen>
             if (chapter.completionDate != null) ...[
               const SizedBox(height: 8),
               Text(
-                l10n.completedOn(chapter.completionDate!),
+                l10n.completedOn(DateFormat.yMMMd().format(chapter.completionDate!)),
                 style: Theme.of(context).textTheme.bodySmall,
               ),
             ],
@@ -520,7 +552,7 @@ class _VocabularyChaptersScreenState extends State<VocabularyChaptersScreen>
             if (livesProvider.nextReset != null) ...[
               const SizedBox(height: 8),
               Text(
-                l10n.nextResetAt(livesProvider.nextReset!),
+                l10n.nextResetAt(DateFormat.yMMMd().add_jm().format(DateTime.parse(livesProvider.nextReset!))),
                 style: Theme.of(context).textTheme.bodySmall,
               ),
             ],
@@ -537,12 +569,9 @@ class _VocabularyChaptersScreenState extends State<VocabularyChaptersScreen>
   }
 
   void _navigateToChapter(VocabularyChapter chapter) {
-    // TODO: Navigate to chapter content screen
-    // This will be implemented when we have the chapter content screen
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Opening ${chapter.title}...'),
-        duration: const Duration(seconds: 2),
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => VocabularyPracticeScreen(chapter: chapter),
       ),
     );
   }

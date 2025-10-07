@@ -26,6 +26,7 @@ import { ThrottlerGuard } from '@nestjs/throttler';
 import { EnhancedJwtGuard } from '../../../shared/guards/enhanced-jwt.guard';
 import { TranslationService } from '../../../application/services/translation.service';
 import { TranslateRequestDto, TranslationResponseDto } from '../../../application/dtos/translation';
+import { DeviceInfo } from '../../../shared/middleware/device-detection.middleware';
 
 interface AuthenticatedRequest extends Request {
   user: {
@@ -33,6 +34,7 @@ interface AuthenticatedRequest extends Request {
     email: string;
     role: string;
   };
+  deviceInfo?: DeviceInfo;
 }
 
 @ApiTags('Translation Service')
@@ -113,7 +115,7 @@ export class TranslationController {
     );
 
     try {
-      const result = await this.translationService.translateText(translateRequest);
+      const result = await this.translationService.translateText(translateRequest, req.deviceInfo);
 
       this.logger.log(
         `Translation completed successfully for user ${req.user.userId}, translation ID: ${result.id}`,

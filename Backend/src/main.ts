@@ -7,6 +7,7 @@ import { AppModule } from './app.module';
 import { GlobalExceptionFilter } from './shared/filters/global-exception.filter';
 import { SecurityMiddleware } from './shared/middleware/security.middleware';
 import { CorsMiddleware } from './shared/middleware/cors.middleware';
+import { DeviceDetectionMiddleware } from './shared/middleware/device-detection.middleware';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -27,6 +28,9 @@ async function bootstrap() {
 
   // CORS middleware (should be before other middleware)
   app.use(new CorsMiddleware(configService).use.bind(new CorsMiddleware(configService)));
+
+  // Device detection middleware
+  app.use(new DeviceDetectionMiddleware().use.bind(new DeviceDetectionMiddleware()));
 
   // Global pipes
   app.useGlobalPipes(

@@ -20,12 +20,13 @@ export class DailyLivesRepository implements IDailyLivesRepository {
 
   async findByUserIdAndDate(userId: string, date: Date): Promise<DailyLives | null> {
     const dateString = date.toISOString().split('T')[0];
-    return await this.repository.findOne({
-      where: {
-        userId,
-        lastResetDate: new Date(dateString),
-      },
-    });
+
+    // Use raw query to properly compare DATE field
+    return await this.repository
+      .createQueryBuilder('dailyLives')
+      .where('dailyLives.userId = :userId', { userId })
+      .andWhere('DATE(dailyLives.lastResetDate) = :date', { date: dateString })
+      .getOne();
   }
 
   async createOrUpdateForUser(userId: string): Promise<DailyLives> {
@@ -35,18 +36,19 @@ export class DailyLivesRepository implements IDailyLivesRepository {
     let dailyLives = await this.findByUserIdAndDate(userId, today);
 
     if (!dailyLives) {
-      // Create new daily lives record
+      // Create new daily lives record for today with 5 lives
+      // (This happens when user accesses the app for the first time today)
       dailyLives = this.repository.create({
         userId,
         currentLives: 5,
         lastResetDate: new Date(todayString),
       });
-    } else if (dailyLives.needsReset) {
-      // Reset lives for today
-      dailyLives.resetLives();
+      return await this.repository.save(dailyLives);
     }
 
-    return await this.repository.save(dailyLives);
+    // If record exists for today, return it as-is (don't reset)
+    // Lives should only be reset by the cron job
+    return dailyLives;
   }
 
   async consumeLife(userId: string): Promise<DailyLives | null> {
@@ -67,12 +69,8 @@ export class DailyLivesRepository implements IDailyLivesRepository {
         return null;
       }
 
-      // Check if reset is needed
-      if (dailyLives.needsReset) {
-        dailyLives.resetLives();
-      }
-
-      // Try to consume life
+      // Don't auto-reset here - only the cron job should reset lives
+      // Just try to consume a life from current state
       const canConsume = dailyLives.consumeLife();
       if (!canConsume) {
         await queryRunner.rollbackTransaction();

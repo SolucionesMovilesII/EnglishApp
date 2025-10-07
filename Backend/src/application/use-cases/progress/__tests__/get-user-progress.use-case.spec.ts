@@ -4,7 +4,6 @@ import { GetUserProgressUseCase } from '../get-user-progress.use-case';
 import { IUserProgressRepository } from '../../../interfaces/repositories/user-progress-repository.interface';
 import { IUserRepository } from '../../../interfaces/repositories/user-repository.interface';
 import { User } from '../../../../domain/entities/user.entity';
-import { Chapter } from '../../../../domain/entities/chapter.entity';
 import { UserProgress } from '../../../../domain/entities/user-progress.entity';
 
 describe('GetUserProgressUseCase', () => {
@@ -67,24 +66,6 @@ describe('GetUserProgressUseCase', () => {
       isAdmin: true,
     } as User;
 
-    const mockChapter: Chapter = {
-      id: 'chapter-1',
-      title: 'Test Chapter 1',
-      level: 1,
-      order: 1,
-      isUnlocked: true,
-      description: 'Test chapter description',
-      imageUrl: null,
-      metadata: null,
-      vocabularyItems: [],
-      userProgresses: [],
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      canBeUnlocked: jest.fn().mockReturnValue(true),
-      getDisplayLevel: jest.fn().mockReturnValue('Basic'),
-      isFirstChapter: jest.fn().mockReturnValue(true),
-    };
-
     const mockProgressRecords = [
       {
         id: 'progress-1',
@@ -92,24 +73,11 @@ describe('GetUserProgressUseCase', () => {
         chapterId: 'chapter-1',
         score: 85.5,
         lastActivity: new Date('2025-09-08T17:00:00Z'),
-        chapterCompleted: false,
-        chapterCompletionDate: null,
-        vocabularyItemsLearned: 8,
-        totalVocabularyItems: 20,
         extraData: { vocab: { chapter: 1, lastWord: 'apple' } },
         createdAt: new Date('2025-09-08T15:00:00Z'),
         updatedAt: new Date('2025-09-08T17:00:00Z'),
-        // Relations
-        user: mockTargetUser,
-        chapter: mockChapter,
-        // Business methods
-        getProgressPercentage: jest.fn().mockReturnValue(40),
-        markChapterCompleted: jest.fn(),
-        incrementVocabularyLearned: jest.fn(),
-        isChapterInProgress: jest.fn().mockReturnValue(true),
-        canCompleteChapter: jest.fn().mockReturnValue(false),
       },
-    ] as UserProgress[];
+    ] as unknown as UserProgress[];
 
     const mockStats = {
       totalRecords: 1,

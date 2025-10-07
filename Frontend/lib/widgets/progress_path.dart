@@ -24,7 +24,7 @@ class _ProgressPathState extends State<ProgressPath>
   @override
   void initState() {
     super.initState();
-    
+
     _sparkleController = AnimationController(
       duration: const Duration(seconds: 4),
       vsync: this,
@@ -43,23 +43,51 @@ class _ProgressPathState extends State<ProgressPath>
     super.dispose();
   }
 
+  /// Calcula las posiciones de los episodios en un patrón de cuadrantes (5 filas x 2 columnas)
+  /// Los episodios se posicionan alternando entre columnas (zigzag)
   List<Offset> _getEpisodePositions() {
     final width = widget.screenSize.width;
     final height = widget.screenSize.height;
-    
-    return [
-      Offset(width * 0.2, height * 0.15),  // Episode 1: 20% from left, 15% from top
-      Offset(width * 0.7, height * 0.25),  // Episode 2: 70% from left, 25% from top
-      Offset(width * 0.25, height * 0.45), // Episode 3: 25% from left, 45% from top
-      Offset(width * 0.65, height * 0.55), // Episode 4: 65% from left, 55% from top
-      Offset(width * 0.45, height * 0.75), // Episode 5: 45% from left, 75% from top
-    ];
+
+    final positions = <Offset>[];
+    const int rows = 5;
+    const int cols = 2;
+
+    // Padding desde los bordes
+    const double horizontalPadding = 0.15; // 15% padding
+    const double verticalPadding = 0.1;   // 10% padding
+
+    // Espacio disponible para el grid
+    final double availableWidth = width * (1 - 2 * horizontalPadding);
+    final double availableHeight = height * (1 - 2 * verticalPadding);
+
+    // Tamaño de cada cuadrante
+    final double quadrantWidth = availableWidth / cols;
+    final double quadrantHeight = availableHeight / rows;
+
+    for (int i = 0; i < widget.episodes.length && i < rows * cols; i++) {
+      // Alternar entre columnas: 0, 1, 0, 1, 0...
+      final int col = i % cols;
+      final int row = i ~/ cols;
+
+      // Posición X: centro del cuadrante correspondiente
+      final double x = width * horizontalPadding +
+                       (col + 0.5) * quadrantWidth;
+
+      // Posición Y: centro del cuadrante correspondiente
+      final double y = height * verticalPadding +
+                       (row + 0.5) * quadrantHeight;
+
+      positions.add(Offset(x, y));
+    }
+
+    return positions;
   }
 
   @override
   Widget build(BuildContext context) {
     final positions = _getEpisodePositions();
-    
+
     return CustomPaint(
       size: widget.screenSize,
       painter: _PathPainter(
@@ -86,88 +114,129 @@ class _PathPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final pathPaint = Paint()
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 3.0
-      ..strokeCap = StrokeCap.round;
+      ..strokeWidth = 4.0
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round;
 
     final sparklePaint = Paint()
       ..style = PaintingStyle.fill
       ..color = Colors.amber;
 
-    // Draw winding path between episodes
+    // Dibujar conexiones entre episodios
     for (int i = 0; i < positions.length - 1; i++) {
       final start = positions[i];
       final end = positions[i + 1];
       final episode = episodes[i];
-      
-      // Path color based on next episode status
+
+      // Color del path según estado del siguiente episodio
       if (episodes[i + 1].status == EpisodeStatus.locked) {
         pathPaint.color = Colors.grey.shade300;
+      } else if (episodes[i + 1].status == EpisodeStatus.completed) {
+        pathPaint.color = Colors.green.shade400;
       } else {
-        pathPaint.color = Colors.grey.shade500;
+        pathPaint.color = Colors.blue.shade400;
       }
 
-      // Crear path curvo (serpenteante)
-      final path = Path();
-      path.moveTo(start.dx, start.dy);
-      
-      // Control points para curva suave
-      final midX = (start.dx + end.dx) / 2;
-      final midY = (start.dy + end.dy) / 2;
-      final controlX = midX + (i % 2 == 0 ? 30 : -30); // Alternar curvatura
-      final controlY = midY;
-      
-      path.quadraticBezierTo(controlX, controlY, end.dx, end.dy);
-      
-      // Draw dashed path
-      _drawDashedPath(canvas, path, pathPaint);
-      
-      // Add sparkle particles on completed paths
-      if (episode.status == EpisodeStatus.completed && 
+      // Crear path con conexión estilo cuadrante (90 grados con curvas)
+      final path = _createQuadrantPath(start, end, i);
+
+      // Dibujar path
+      canvas.drawPath(path, pathPaint);
+
+      // Agregar partículas brillantes en paths completados
+      if (episode.status == EpisodeStatus.completed &&
           episodes[i + 1].status != EpisodeStatus.locked) {
         _drawSparkles(canvas, path, sparklePaint);
       }
     }
   }
 
-  void _drawDashedPath(Canvas canvas, Path path, Paint paint) {
-    const dashWidth = 8.0;
-    const dashSpace = 4.0;
-    
-    final pathMetrics = path.computeMetrics();
-    for (final metric in pathMetrics) {
-      double distance = 0.0;
-      bool draw = true;
-      
-      while (distance < metric.length) {
-        final length = draw ? dashWidth : dashSpace;
-        final end = (distance + length).clamp(0.0, metric.length);
-        
-        if (draw) {
-          final extractPath = metric.extractPath(distance, end);
-          canvas.drawPath(extractPath, paint);
-        }
-        
-        distance += length;
-        draw = !draw;
+  /// Crea un path con estilo de cuadrante (conexiones en ángulo de 90 grados con esquinas redondeadas)
+  Path _createQuadrantPath(Offset start, Offset end, int index) {
+    final path = Path();
+    path.moveTo(start.dx, start.dy);
+
+    // Determinar si vamos de izquierda a derecha o derecha a izquierda
+    final bool movingRight = end.dx > start.dx;
+    final bool movingDown = end.dy > start.dy;
+
+    // Radio de las esquinas redondeadas
+    const double cornerRadius = 20.0;
+
+    // Punto intermedio horizontal (a mitad de camino horizontalmente)
+    final double midX = start.dx + (end.dx - start.dx) / 2;
+
+    if (movingRight) {
+      // Moverse a la derecha primero, luego bajar
+      final double horizontalEndX = end.dx - cornerRadius;
+      final double verticalStartY = start.dy + cornerRadius;
+
+      // Línea horizontal hacia la derecha
+      path.lineTo(horizontalEndX, start.dy);
+
+      // Esquina redondeada (cuarto de círculo)
+      if (movingDown) {
+        path.arcToPoint(
+          Offset(end.dx, verticalStartY),
+          radius: const Radius.circular(cornerRadius),
+          clockwise: true,
+        );
+      } else {
+        path.arcToPoint(
+          Offset(end.dx, start.dy - cornerRadius),
+          radius: const Radius.circular(cornerRadius),
+          clockwise: false,
+        );
       }
+
+      // Línea vertical hacia abajo/arriba
+      path.lineTo(end.dx, end.dy);
+    } else {
+      // Moverse hacia abajo primero, luego a la izquierda
+      final double verticalEndY = end.dy - (movingDown ? cornerRadius : -cornerRadius);
+      final double horizontalStartX = start.dx - cornerRadius;
+
+      // Línea vertical hacia abajo/arriba
+      path.lineTo(start.dx, verticalEndY);
+
+      // Esquina redondeada
+      if (movingDown) {
+        path.arcToPoint(
+          Offset(horizontalStartX, end.dy),
+          radius: const Radius.circular(cornerRadius),
+          clockwise: true,
+        );
+      } else {
+        path.arcToPoint(
+          Offset(horizontalStartX, end.dy),
+          radius: const Radius.circular(cornerRadius),
+          clockwise: false,
+        );
+      }
+
+      // Línea horizontal hacia la izquierda
+      path.lineTo(end.dx, end.dy);
     }
+
+    return path;
   }
 
   void _drawSparkles(Canvas canvas, Path path, Paint paint) {
     final pathMetrics = path.computeMetrics();
     for (final metric in pathMetrics) {
-      // Draw 3-4 particles along the path
+      // Dibujar 3-4 partículas a lo largo del path
       for (int i = 0; i < 3; i++) {
         final progress = (sparkleAnimation.value + i * 0.3) % 1.0;
         final distance = metric.length * progress;
         final tangent = metric.getTangentForOffset(distance);
-        
+
         if (tangent != null) {
           final sparkleSize = 4.0 + 2.0 * math.sin(sparkleAnimation.value * math.pi * 2);
+          final opacity = 0.5 + 0.3 * math.sin(sparkleAnimation.value * math.pi * 2);
           canvas.drawCircle(
             tangent.position,
             sparkleSize,
-            paint..color = Colors.amber.withValues(alpha: 0.8),
+            paint..color = Colors.amber.withValues(alpha: opacity),
           );
         }
       }

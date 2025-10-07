@@ -363,7 +363,21 @@ export class ApprovalController {
         `AUDIT: Chapter stats retrieved for chapter ${chapterId} by user ${req.user.userId}`,
       );
 
-      return result;
+      // Map ChapterEvaluationStats to ChapterEvaluationStatsDto
+      const approvalRate =
+        result.totalEvaluations > 0 ? (result.approvedCount / result.totalEvaluations) * 100 : 0;
+
+      return {
+        chapterId,
+        totalEvaluations: result.totalEvaluations,
+        approvedCount: result.approvedCount,
+        failedCount: result.failedCount,
+        pendingCount: 0, // No pending evaluations in current implementation
+        averageScore: result.averageScore,
+        averageAdjustedScore: result.averageScore, // Same as average score for now
+        approvalRate,
+        averageAttempts: result.averageAttempts,
+      };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
       this.logger.error(`Error getting chapter stats: ${errorMessage}`);

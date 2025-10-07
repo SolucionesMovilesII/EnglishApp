@@ -1,6 +1,6 @@
 {
   "@@locale": "en",
-  "appTitle": "Language Learning App",
+  "appTitle": "TECHSPEAK",
   "login": "Login",
   "email": "Email",
   "password": "Password",
@@ -15,6 +15,7 @@
   "continueText": "Continue",
   "vocabulary": "Vocabulary",
   "reading": "Reading",
+  "readingPracticeSubtitle": "Practice the words",
   "interview": "Interview",
   "home": "Home",
   "documents": "Documents",
@@ -49,13 +50,14 @@
   "initializingExperience": "Initializing your learning experience...",
   "or": "OR",
   "user": "User",
+  "loading": "Loading...",
 
   "livesRemaining": "{lives} lives remaining",
   "@livesRemaining": {
     "placeholders": {
       "lives": {
         "type": "int",
-        "example": 3
+        "example": "3"
       }
     }
   },
@@ -173,6 +175,7 @@
   "livesResetTomorrow": "Lives reset tomorrow",
   "nextResetTomorrow": "Next reset tomorrow",
   "refresh": "Refresh",
+  "episodeRoadmap": "Episode Roadmap",
 
   "repeatChapterTitle": "Repeat Chapter",
   "repeatChapterWarning": "You've already completed this chapter. Repeating it won't affect your current score, but it's a great way to reinforce your learning.",
@@ -182,7 +185,7 @@
     "placeholders": {
       "score": {
         "type": "int",
-        "example": 85
+        "example": "85"
       }
     }
   },
@@ -237,7 +240,7 @@
     "placeholders": {
       "previousChapter": {
         "type": "int",
-        "example": 3
+        "example": "3"
       }
     }
   },
@@ -279,5 +282,59 @@
   "chapterResults": "Chapter Results",
   "allChapters": "All Chapters",
   "noEvaluationsFound": "No evaluations found",
-  "completeChaptersToSeeResults": "Complete chapters to see results"
+  "completeChaptersToSeeResults": "Complete chapters to see results",
+
+  "restart": "Restart",
+  "restartPracticeConfirm": "Are you sure you want to restart? Your current progress will be lost.",
+  "error": "Error",
+  "unknownError": "An unknown error occurred",
+  "retry": "Retry",
+  "noVocabularyItems": "No vocabulary items available",
+  "showAnswer": "Show Answer",
+  "dontKnow": "Don't Know",
+  "iKnow": "I Know",
+  "practiceCompleted": "Practice Completed!",
+  "score": "Score",
+  "correct": "Correct",
+  "incorrect": "Incorrect",
+  "practiceAgain": "Practice Again",
+  "backToChapters": "Back to Chapters",
+
+  "readingChapters": "Reading Chapters",
+  "page": "Page",
+  "chaptersCompleted": "Chapters Completed",
+  "completed": "Completed",
+  "chapterLocked": "This chapter is locked. Complete the previous chapter first.",
+  "noLives": "No Lives",
+  "noLivesMessage": "You have no lives remaining. Please wait for the next reset.",
+  "nextReset": "Next Reset",
+  "ok": "OK",
+  "noChaptersAvailable": "No chapters available",
+  "previous": "Previous",
+  "next": "Next",
+  "startQuiz": "Start Quiz",
+  "question": "Question",
+  "submit": "Submit",
+  "congratulations": "Congratulations!",
+  "chapterCompleted": "You have completed this chapter!",
+  "tryAgain": "Try Again",
+  "scoreNotEnough": "You need at least 7 correct answers to pass (70%).",
+  "exitQuiz": "Exit Quiz",
+  "exitQuizConfirmation": "Are you sure you want to exit? Your progress will be lost.",
+  "exit": "Exit",
+
+  "outOfLives": "Out of Lives!",
+  "outOfLivesMessage": "You've used all your lives for today. Take a break and come back tomorrow for a fresh start!",
+  "livesReset": "Lives Reset",
+  "nextResetIn": "Next reset of lives in {hours} hours",
+  "@nextResetIn": {
+    "placeholders": {
+      "hours": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  "reviewTime": "Use this time to review what you've learned!",
+  "iUnderstand": "I Understand"
 }

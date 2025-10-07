@@ -20,6 +20,9 @@ export class PracticeSessionRepository implements IPracticeSessionRepository {
   }
 
   async findById(id: string): Promise<PracticeSession | null> {
+    if (!id || id.trim() === '') {
+      throw new Error('Practice session ID is required');
+    }
     return await this.repository.findOne({
       where: { id },
       relations: ['chapter'],
@@ -27,6 +30,12 @@ export class PracticeSessionRepository implements IPracticeSessionRepository {
   }
 
   async findByUserId(userId: string, limit = 10, offset = 0): Promise<PracticeSession[]> {
+    if (!userId || userId.trim() === '') {
+      throw new Error('User ID is required');
+    }
+    if (limit < 0 || offset < 0) {
+      throw new Error('Limit and offset must be non-negative');
+    }
     return await this.repository.find({
       where: { userId },
       relations: ['chapter'],
@@ -42,6 +51,15 @@ export class PracticeSessionRepository implements IPracticeSessionRepository {
     limit = 10,
     offset = 0,
   ): Promise<PracticeSession[]> {
+    if (!userId || userId.trim() === '') {
+      throw new Error('User ID is required');
+    }
+    if (!practiceType) {
+      throw new Error('Practice type is required');
+    }
+    if (limit < 0 || offset < 0) {
+      throw new Error('Limit and offset must be non-negative');
+    }
     return await this.repository.find({
       where: { userId, practiceType },
       relations: ['chapter'],
@@ -56,6 +74,13 @@ export class PracticeSessionRepository implements IPracticeSessionRepository {
     chapterId: string,
     practiceType?: PracticeType,
   ): Promise<PracticeSession[]> {
+    if (!userId || userId.trim() === '') {
+      throw new Error('User ID is required');
+    }
+    if (!chapterId || chapterId.trim() === '') {
+      throw new Error('Chapter ID is required');
+    }
+
     const where: Partial<{ userId: string; chapterId: string; practiceType: PracticeType }> = {
       userId,
       chapterId,
@@ -72,13 +97,16 @@ export class PracticeSessionRepository implements IPracticeSessionRepository {
   }
 
   async update(id: string, updates: Partial<PracticeSession>): Promise<PracticeSession> {
+    if (!id || id.trim() === '') {
+      throw new Error('Practice session ID is required');
+    }
     // Exclude relation properties and handle extraData type conversion
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { chapter, ...updateData } = updates;
 
-    // Create the final update object with proper typing
-    const finalUpdateData: any = { ...updateData };
-
-    await this.repository.update(id, finalUpdateData);
+    // Create the final update object with proper typing for TypeORM
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await this.repository.update(id, updateData as any);
     const updated = await this.findById(id);
     if (!updated) {
       throw new Error('Practice session not found after update');
@@ -87,10 +115,16 @@ export class PracticeSessionRepository implements IPracticeSessionRepository {
   }
 
   async delete(id: string): Promise<void> {
+    if (!id || id.trim() === '') {
+      throw new Error('Practice session ID is required');
+    }
     await this.repository.delete(id);
   }
 
   async findActiveSessionsByUser(userId: string): Promise<PracticeSession[]> {
+    if (!userId || userId.trim() === '') {
+      throw new Error('User ID is required');
+    }
     return await this.repository.find({
       where: {
         userId,
@@ -107,6 +141,14 @@ export class PracticeSessionRepository implements IPracticeSessionRepository {
       throw new Error('Practice session not found');
     }
 
+    // Validate that the session can be completed
+    if (session.status === PracticeStatus.COMPLETED) {
+      throw new Error('Practice session is already completed');
+    }
+    if (session.status === PracticeStatus.ABANDONED) {
+      throw new Error('Cannot complete an abandoned practice session');
+    }
+
     session.markAsCompleted(score);
     return await this.repository.save(session);
   }
@@ -115,6 +157,14 @@ export class PracticeSessionRepository implements IPracticeSessionRepository {
     const session = await this.findById(id);
     if (!session) {
       throw new Error('Practice session not found');
+    }
+
+    // Validate that the session can be abandoned
+    if (session.status === PracticeStatus.COMPLETED) {
+      throw new Error('Cannot abandon a completed practice session');
+    }
+    if (session.status === PracticeStatus.ABANDONED) {
+      throw new Error('Practice session is already abandoned');
     }
 
     session.markAsAbandoned();
