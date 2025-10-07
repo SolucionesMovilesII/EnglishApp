@@ -32,11 +32,11 @@ export class PracticeSession {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column({ name: 'user_id', type: 'varchar', length: 255 })
+  @Column({ name: 'user_id', type: 'uuid' })
   @Index()
   userId!: string;
 
-  @Column({ name: 'chapter_id', type: 'varchar', length: 255, nullable: true })
+  @Column({ name: 'chapter_id', type: 'uuid', nullable: true })
   chapterId?: string;
 
   @ManyToOne(() => Chapter, { nullable: true })

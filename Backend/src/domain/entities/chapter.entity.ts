@@ -9,12 +9,7 @@ import {
 } from 'typeorm';
 import { VocabularyItem } from './vocabulary-item.entity';
 import { UserProgress } from './user-progress.entity';
-
-export enum ChapterLevel {
-  BASIC = 1,
-  INTERMEDIATE = 2,
-  ADVANCED = 3,
-}
+import { ChapterLevel } from '../enums/chapter-level.enum';
 
 @Entity('chapters')
 @Index(['order'], { unique: true })

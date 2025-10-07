@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/daily_lives_model.dart';
 import '../utils/api_service.dart';
+import '../utils/environment_config.dart';
 import 'auth_provider.dart';
 
 enum LivesState {
@@ -46,6 +47,20 @@ class LivesProvider with ChangeNotifier {
   int get currentLives => _dailyLives?.currentLives ?? 0;
   bool get isBlocked => _livesState == LivesState.blocked || currentLives <= 0;
   String? get nextReset => _dailyLives?.nextReset;
+
+  int get hoursUntilReset {
+    if (_dailyLives?.nextReset == null) return 24;
+
+    try {
+      final resetTime = DateTime.parse(_dailyLives!.nextReset!);
+      final now = DateTime.now();
+      final difference = resetTime.difference(now);
+
+      return difference.inHours.clamp(0, 24);
+    } catch (e) {
+      return 24;
+    }
+  }
 
   LivesProvider(this._authProvider) {
     _initialize();
@@ -100,7 +115,7 @@ class LivesProvider with ChangeNotifier {
 
     try {
       final response = await _apiService.get(
-        '/lives/status',
+        '${EnvironmentConfig.fullApiUrl}/lives/status',
         token: await _getAuthToken(),
       );
 
@@ -152,7 +167,7 @@ class LivesProvider with ChangeNotifier {
       }
 
       final response = await _apiService.post(
-        '/lives/consume',
+        '${EnvironmentConfig.fullApiUrl}/lives/consume',
         token: await _getAuthToken(),
       );
 

@@ -10,6 +10,8 @@ import {
   Param,
   Body,
   ParseUUIDPipe,
+  Query,
+  ParseIntPipe,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -24,8 +26,10 @@ import { ThrottlerGuard } from '@nestjs/throttler';
 import { EnhancedJwtGuard } from '../../../shared/guards/enhanced-jwt.guard';
 import { GetChaptersStatusUseCase } from '../../../application/use-cases/chapters/get-chapters-status.use-case';
 import { CompleteChapterUseCase } from '../../../application/use-cases/chapters/complete-chapter.use-case';
+import { GetVocabularyItemsUseCase } from '../../../application/use-cases/chapters/get-vocabulary-items.use-case';
 import { ChaptersStatusResponseDto } from '../../../application/dtos/chapters/chapter-status-response.dto';
 import { CompleteChapterDto } from '../../../application/dtos/chapters/complete-chapter.dto';
+import { VocabularyItemsResponseDto } from '../../../application/dtos/chapters/vocabulary-items-response.dto';
 
 interface AuthenticatedRequest extends Request {
   user: {
@@ -39,13 +43,14 @@ interface AuthenticatedRequest extends Request {
 @Controller('vocab/chapters')
 @UseGuards(ThrottlerGuard, EnhancedJwtGuard)
 @ApiBearerAuth()
-@ApiExtraModels(ChaptersStatusResponseDto, CompleteChapterDto)
+@ApiExtraModels(ChaptersStatusResponseDto, CompleteChapterDto, VocabularyItemsResponseDto)
 export class ChaptersController {
   private readonly logger = new Logger(ChaptersController.name);
 
   constructor(
     private readonly getChaptersStatusUseCase: GetChaptersStatusUseCase,
     private readonly completeChapterUseCase: CompleteChapterUseCase,
+    private readonly getVocabularyItemsUseCase: GetVocabularyItemsUseCase,
   ) {}
 
   @Get()
@@ -91,6 +96,68 @@ export class ChaptersController {
     } catch (error) {
       this.logger.error(
         `Error getting chapters status:`,
+        error instanceof Error ? error.message : String(error),
+      );
+      throw error;
+    }
+  }
+
+  @Get(':id/vocabulary')
+  @HttpCode(HttpStatus.OK)
+  @ApiParam({
+    name: 'id',
+    description: 'Chapter ID',
+    type: 'string',
+    format: 'uuid',
+  })
+  @ApiOperation({
+    summary: 'Get vocabulary items for a chapter',
+    description:
+      'Retrieve paginated vocabulary items for a specific chapter',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Vocabulary items retrieved successfully',
+    schema: {
+      $ref: getSchemaPath(VocabularyItemsResponseDto),
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Chapter not found',
+    schema: {
+      type: 'object',
+      properties: {
+        success: { type: 'boolean', example: false },
+        message: { type: 'string', example: 'Chapter not found' },
+        code: { type: 'string', example: 'CHAPTER_NOT_FOUND' },
+      },
+    },
+  })
+  async getVocabularyItems(
+    @Param('id', ParseUUIDPipe) chapterId: string,
+    @Query('page', new ParseIntPipe({ optional: true })) page: number = 1,
+    @Query('limit', new ParseIntPipe({ optional: true })) limit: number = 10,
+  ): Promise<VocabularyItemsResponseDto> {
+    try {
+      this.logger.log(
+        `Getting vocabulary items for chapter: ${chapterId} (page: ${page}, limit: ${limit})`,
+      );
+
+      const result = await this.getVocabularyItemsUseCase.execute(
+        chapterId,
+        page,
+        limit,
+      );
+
+      return {
+        success: true,
+        data: result,
+        message: 'Vocabulary items retrieved successfully',
+      };
+    } catch (error) {
+      this.logger.error(
+        `Error getting vocabulary items for chapter ${chapterId}:`,
         error instanceof Error ? error.message : String(error),
       );
       throw error;

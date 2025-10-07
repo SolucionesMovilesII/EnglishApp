@@ -292,46 +292,76 @@ class _ReadingScreenContentState extends State<_ReadingScreenContent> {
                     children: [
                       // Paragraph Card
                       Card(
-                        elevation: 4,
+                        elevation: 2,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
                         child: Container(
                           width: double.infinity,
                           padding: const EdgeInsets.all(24),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(16),
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                Theme.of(context).colorScheme.surface,
+                                Theme.of(context).colorScheme.surfaceContainerHighest,
+                              ],
+                            ),
+                          ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text(
-                                    'Paragraph ${readingProvider.currentParagraph.paragraphNumber}',
-                                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                      color: Theme.of(context).colorScheme.primary,
-                                      fontWeight: FontWeight.bold,
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                    decoration: BoxDecoration(
+                                      color: Theme.of(context).colorScheme.primaryContainer,
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    child: Text(
+                                      'Paragraph ${readingProvider.currentParagraph.paragraphNumber}',
+                                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                                        color: Theme.of(context).colorScheme.onPrimaryContainer,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
                                   ),
-                                  IconButton(
-                                    onPressed: () => _speakText(readingProvider.currentParagraph.content),
-                                    icon: Icon(
-                                      _isPlaying ? Icons.stop : Icons.volume_up,
-                                      color: _isPlaying 
-                                          ? Theme.of(context).colorScheme.error
-                                          : Theme.of(context).colorScheme.primary,
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      color: _isPlaying
+                                          ? Theme.of(context).colorScheme.errorContainer
+                                          : Theme.of(context).colorScheme.secondaryContainer,
+                                      shape: BoxShape.circle,
                                     ),
-                                    tooltip: _isPlaying ? 'Detener lectura' : 'Leer en voz alta',
+                                    child: IconButton(
+                                      onPressed: () => _speakText(readingProvider.currentParagraph.content),
+                                      icon: Icon(
+                                        _isPlaying ? Icons.stop : Icons.volume_up,
+                                        color: _isPlaying
+                                            ? Theme.of(context).colorScheme.onErrorContainer
+                                            : Theme.of(context).colorScheme.onSecondaryContainer,
+                                      ),
+                                      tooltip: _isPlaying ? 'Detener lectura' : 'Leer en voz alta',
+                                    ),
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: 16),
+                              const SizedBox(height: 20),
                               HighlightedTextWidget(
                                 text: readingProvider.currentParagraph.content,
                                 textStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                  height: 1.6,
-                                  fontSize: 16,
+                                  height: 1.8,
+                                  fontSize: 17,
+                                  letterSpacing: 0.3,
                                 ),
                                 enableVocabularyHighlights: _enableVocabularyHighlights,
                                 enableGrammarHighlights: _enableGrammarHighlights,
                                 onWordTap: _onWordTap,
-                                showTooltips: false, // Usamos nuestro diálogo personalizado
+                                showTooltips: false,
                               ),
                             ],
                           ),
@@ -510,42 +540,86 @@ class _ReadingScreenContentState extends State<_ReadingScreenContent> {
               // Navigation Controls
               Container(
                 padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surface,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, -2),
+                    ),
+                  ],
+                ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    ElevatedButton.icon(
-                      onPressed: readingProvider.currentParagraphIndex > 0
-                          ? readingProvider.previousParagraph
-                          : null,
-                      icon: const Icon(Icons.arrow_back),
-                      label: const Text('Previous'),
-                    ),
-                    
-                    if (!readingProvider.isReadingComplete)
-                      ElevatedButton.icon(
-                        onPressed: !readingProvider.isLastParagraph
-                            ? readingProvider.nextParagraph
-                            : () {
-                                readingProvider.nextParagraph(); // This will mark reading as complete
-                              },
-                        icon: Icon(readingProvider.isLastParagraph ? Icons.check : Icons.arrow_forward),
-                        label: Text(readingProvider.isLastParagraph ? 'Finish' : 'Next'),
-                        style: readingProvider.isLastParagraph
-                            ? ElevatedButton.styleFrom(
-                                backgroundColor: Theme.of(context).colorScheme.primary,
-                                foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                              )
-                            : null,
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                        child: ElevatedButton.icon(
+                          onPressed: readingProvider.currentParagraphIndex > 0
+                              ? readingProvider.previousParagraph
+                              : null,
+                          icon: const Icon(Icons.arrow_back, size: 18),
+                          label: const Text('Previous'),
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                        ),
                       ),
-                    
+                    ),
+
+                    if (!readingProvider.isReadingComplete)
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 4),
+                          child: ElevatedButton.icon(
+                            onPressed: !readingProvider.isLastParagraph
+                                ? readingProvider.nextParagraph
+                                : () {
+                                    readingProvider.nextParagraph();
+                                  },
+                            icon: Icon(
+                              readingProvider.isLastParagraph ? Icons.check_circle : Icons.arrow_forward,
+                              size: 18,
+                            ),
+                            label: Text(readingProvider.isLastParagraph ? 'Finish' : 'Next'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: readingProvider.isLastParagraph
+                                  ? Theme.of(context).colorScheme.primary
+                                  : null,
+                              foregroundColor: readingProvider.isLastParagraph
+                                  ? Theme.of(context).colorScheme.onPrimary
+                                  : null,
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+
                     if (readingProvider.isReadingComplete && !readingProvider.isQuizComplete)
-                      ElevatedButton.icon(
-                        onPressed: () => _showQuizDialog(context, readingProvider),
-                        icon: const Icon(Icons.quiz),
-                        label: const Text('Quiz'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Theme.of(context).colorScheme.primary,
-                          foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 4),
+                          child: ElevatedButton.icon(
+                            onPressed: () => _showQuizDialog(context, readingProvider),
+                            icon: const Icon(Icons.quiz, size: 18),
+                            label: const Text('Start Quiz'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Theme.of(context).colorScheme.primary,
+                              foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                          ),
                         ),
                       ),
                   ],

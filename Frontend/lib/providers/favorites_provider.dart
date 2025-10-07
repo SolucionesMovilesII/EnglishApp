@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
@@ -97,7 +96,8 @@ class FavoritesProvider with ChangeNotifier {
       _clearError();
 
       // Check if word already exists
-      if (isFavorite(favoriteWord.word)) {
+      final wordToCheck = favoriteWord.word ?? favoriteWord.originalWord ?? '';
+      if (wordToCheck.isNotEmpty && isFavorite(wordToCheck)) {
         _setError('Word is already in favorites');
         return false;
       }
@@ -161,14 +161,15 @@ class FavoritesProvider with ChangeNotifier {
 
   // Check if a word is in favorites
   bool isFavorite(String word) {
-    return _favorites.any((f) => f.word.toLowerCase() == word.toLowerCase());
+    return _favorites.any((f) => 
+      (f.word?.toLowerCase() ?? f.originalWord?.toLowerCase() ?? '') == word.toLowerCase());
   }
 
   // Get favorite by word
   FavoriteWord? getFavoriteByWord(String word) {
     try {
       return _favorites.firstWhere(
-        (f) => f.word.toLowerCase() == word.toLowerCase(),
+        (f) => (f.word?.toLowerCase() ?? f.originalWord?.toLowerCase() ?? '') == word.toLowerCase(),
       );
     } catch (_) {
       return null;
@@ -182,7 +183,11 @@ class FavoritesProvider with ChangeNotifier {
 
   // Get favorites by language
   List<String> getLanguages() {
-    final languages = _favorites.map((f) => f.language).toSet().toList();
+    final languages = _favorites
+        .map((f) => f.language ?? f.sourceLanguage ?? 'Unknown')
+        .where((lang) => lang.isNotEmpty)
+        .toSet()
+        .toList();
     languages.sort();
     return languages;
   }
@@ -193,7 +198,7 @@ class FavoritesProvider with ChangeNotifier {
     return _favorites
         .where(
           (f) =>
-              f.word.toLowerCase().contains(lowercaseQuery) ||
+              (f.word?.toLowerCase() ?? f.originalWord?.toLowerCase() ?? '').contains(lowercaseQuery) ||
               f.translation.toLowerCase().contains(lowercaseQuery) ||
               (f.definition?.toLowerCase().contains(lowercaseQuery) ?? false),
         )
@@ -245,7 +250,12 @@ class FavoritesProvider with ChangeNotifier {
       if (existingIndex >= 0) {
         // Update existing favorite if server version is newer
         final localFavorite = _favorites[existingIndex];
-        if (serverFavorite.updatedAt.isAfter(localFavorite.updatedAt)) {
+        final serverUpdatedAt = serverFavorite.updatedAt;
+        final localUpdatedAt = localFavorite.updatedAt;
+        
+        // Update if server has updatedAt and (local doesn't have updatedAt or server is newer)
+        if (serverUpdatedAt != null && 
+            (localUpdatedAt == null || serverUpdatedAt.isAfter(localUpdatedAt))) {
           _favorites[existingIndex] = serverFavorite.copyWith(isSynced: true);
           await db.update(
             'favorite_words',

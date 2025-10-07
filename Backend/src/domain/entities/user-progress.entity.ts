@@ -10,11 +10,12 @@ import {
 } from 'typeorm';
 import { User } from './user.entity';
 import { Chapter } from './chapter.entity';
+import { ReadingChapter } from './reading-chapter.entity';
 
 @Entity('user_progress')
 @Index(['userId'], { unique: false })
 @Index(['chapterId'], { unique: false })
-@Index(['userId', 'chapterId'], { unique: true })
+@Index(['readingChapterId'], { unique: false })
 @Index(['chapterCompleted'])
 export class UserProgress {
   @PrimaryGeneratedColumn('uuid')
@@ -23,8 +24,11 @@ export class UserProgress {
   @Column({ type: 'uuid' })
   userId!: string;
 
-  @Column({ type: 'uuid' })
-  chapterId!: string;
+  @Column({ type: 'uuid', nullable: true })
+  chapterId!: string | null;
+
+  @Column({ type: 'uuid', nullable: true })
+  readingChapterId!: string | null;
 
   @Column({ type: 'numeric', precision: 10, scale: 2, nullable: true })
   score!: number | null;
@@ -51,9 +55,13 @@ export class UserProgress {
   @JoinColumn({ name: 'userId' })
   user!: User;
 
-  @ManyToOne(() => Chapter, { eager: false })
+  @ManyToOne(() => Chapter, { eager: false, nullable: true })
   @JoinColumn({ name: 'chapterId' })
-  chapter!: Chapter;
+  chapter!: Chapter | null;
+
+  @ManyToOne(() => ReadingChapter, { eager: false, nullable: true })
+  @JoinColumn({ name: 'readingChapterId' })
+  readingChapter!: ReadingChapter | null;
 
   @CreateDateColumn({ type: 'timestamptz' })
   readonly createdAt!: Date;

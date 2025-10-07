@@ -252,7 +252,7 @@ class _TranslationPanelWidgetState extends State<TranslationPanelWidget>
     return Card(
       elevation: 2,
       child: Padding(
-        const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -333,7 +333,7 @@ class _TranslationPanelWidgetState extends State<TranslationPanelWidget>
     return Card(
       elevation: 2,
       child: Padding(
-        const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -518,7 +518,7 @@ class _TranslationPanelWidgetState extends State<TranslationPanelWidget>
     return Card(
       elevation: 2,
       child: Padding(
-        const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -538,7 +538,7 @@ class _TranslationPanelWidgetState extends State<TranslationPanelWidget>
 
   Widget _buildDetailRow(String label, String value) {
     return Padding(
-      const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.only(bottom: 8),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

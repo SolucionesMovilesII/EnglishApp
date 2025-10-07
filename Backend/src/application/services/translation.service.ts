@@ -8,6 +8,10 @@ import {
 } from '../../domain/entities/translation.entity';
 import { VocabularyItem } from '../../domain/entities/vocabulary-item.entity';
 import { TranslateRequestDto, TranslationResponseDto } from '../dtos/translation';
+import {
+  DeviceInfo,
+  DeviceOptimizationHelper,
+} from '../../shared/middleware/device-detection.middleware';
 import axios from 'axios';
 
 export interface ExternalTranslationResponse {
@@ -48,7 +52,10 @@ export class TranslationService {
     private readonly vocabularyRepository: Repository<VocabularyItem>,
   ) {}
 
-  async translateText(request: TranslateRequestDto): Promise<TranslationResponseDto> {
+  async translateText(
+    request: TranslateRequestDto,
+    deviceInfo?: DeviceInfo,
+  ): Promise<TranslationResponseDto> {
     try {
       this.logger.log(
         `Translating text from ${request.sourceLanguage} to ${request.targetLanguage}`,
@@ -77,7 +84,15 @@ export class TranslationService {
         this.logger.log('Using cached translation');
         cachedTranslation.incrementUsage();
         await this.translationRepository.save(cachedTranslation);
-        return cachedTranslation.toResponseFormat();
+
+        const response = cachedTranslation.toResponseFormat();
+
+        // Apply device-specific optimizations
+        if (deviceInfo) {
+          return this.optimizeResponseForDevice(response, deviceInfo);
+        }
+
+        return response;
       }
 
       // Get translation from external API
@@ -103,7 +118,14 @@ export class TranslationService {
       const savedTranslation = await this.translationRepository.save(translation);
       this.logger.log(`Translation saved with ID: ${savedTranslation.id}`);
 
-      return savedTranslation.toResponseFormat();
+      const response = savedTranslation.toResponseFormat();
+
+      // Apply device-specific optimizations
+      if (deviceInfo) {
+        return this.optimizeResponseForDevice(response, deviceInfo);
+      }
+
+      return response;
     } catch (error) {
       this.logger.error('Error translating text:', error);
       throw new HttpException(
@@ -415,5 +437,37 @@ export class TranslationService {
       this.logger.error('Error searching in vocabulary:', error);
       return null;
     }
+  }
+
+  private optimizeResponseForDevice(
+    response: TranslationResponseDto,
+    deviceInfo: DeviceInfo,
+  ): TranslationResponseDto {
+    const optimizedResponse = { ...response };
+
+    // Apply device-specific optimizations
+    if (DeviceOptimizationHelper.shouldCompressResponse(deviceInfo)) {
+      // Reduce examples for mobile devices
+      if (optimizedResponse.examples && optimizedResponse.examples.length > 0) {
+        const maxExamples = DeviceOptimizationHelper.getMaxExamplesCount(deviceInfo);
+        optimizedResponse.examples = optimizedResponse.examples.slice(0, maxExamples);
+      }
+    }
+
+    // Remove audio URL for slow connections
+    if (!DeviceOptimizationHelper.shouldIncludeAudio(deviceInfo)) {
+      optimizedResponse.audioUrl = null;
+    }
+
+    // Truncate definition for mobile devices
+    if (deviceInfo.isMobile && optimizedResponse.definition) {
+      const maxLength = DeviceOptimizationHelper.getOptimalResponseSize(deviceInfo);
+      if (optimizedResponse.definition.length > maxLength) {
+        optimizedResponse.definition =
+          optimizedResponse.definition.substring(0, maxLength - 3) + '...';
+      }
+    }
+
+    return optimizedResponse;
   }
 }

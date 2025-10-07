@@ -1,6 +1,6 @@
 {
   "@@locale": "es",
-  "appTitle": "App de Aprendizaje de Inglés",
+  "appTitle": "TECHSPEAK",
   "login": "Iniciar Sesión",
   "email": "Correo electrónico",
   "password": "Contraseña",
@@ -15,6 +15,7 @@
   "continueText": "Continuar",
   "vocabulary": "Vocabulario",
   "reading": "Lectura",
+  "readingPracticeSubtitle": "Practica las palabras",
   "interview": "Entrevista",
   "home": "Inicio",
   "documents": "Documentos",
@@ -46,11 +47,12 @@
   "initializingExperience": "Inicializando tu experiencia de aprendizaje...",
   "or": "O",
   "user": "Usuario",
+  "loading": "Cargando...",
 
-  "livesRemaining": "{lives}/5",
+  "livesRemaining": "{lives} vidas restantes",
   "@livesRemaining": {
     "placeholders": {
-      "lives": { "type": "int", "example": 3 }
+      "lives": { "type": "int", "example": "3" }
     }
   },
 
@@ -151,6 +153,7 @@
   "livesResetTomorrow": "Las vidas se reinician mañana",
   "nextResetTomorrow": "Próximo reinicio mañana",
   "refresh": "Actualizar",
+  "episodeRoadmap": "Mapa de Episodios",
 
   "repeatChapterTitle": "Repetir Capítulo",
   "repeatChapterWarning": "Ya has completado este capítulo. Repetirlo no afectará tu puntuación actual, ¡pero es una excelente manera de reforzar tu aprendizaje!",
@@ -158,7 +161,7 @@
   "currentScore": "Puntuación actual: {score} puntos",
   "@currentScore": {
     "placeholders": {
-      "score": { "type": "int", "example": 42 }
+      "score": { "type": "int", "example": "42" }
     }
   },
 
@@ -205,7 +208,7 @@
   "chapterLockedDescription": "Completa el capítulo {previousChapter} para desbloquear este capítulo",
   "@chapterLockedDescription": {
     "placeholders": {
-      "previousChapter": { "type": "int", "example": 3 }
+      "previousChapter": { "type": "int", "example": "3" }
     }
   },
 
@@ -243,5 +246,59 @@
   "chapterResults": "Resultados por Capítulo",
   "allChapters": "Todos los Capítulos",
   "noEvaluationsFound": "No se encontraron evaluaciones",
-  "completeChaptersToSeeResults": "Completa capítulos para ver resultados"
+  "completeChaptersToSeeResults": "Completa capítulos para ver resultados",
+
+  "restart": "Reiniciar",
+  "restartPracticeConfirm": "¿Estás seguro de que quieres reiniciar? Tu progreso actual se perderá.",
+  "error": "Error",
+  "unknownError": "Ocurrió un error desconocido",
+  "retry": "Reintentar",
+  "noVocabularyItems": "No hay elementos de vocabulario disponibles",
+  "showAnswer": "Mostrar Respuesta",
+  "dontKnow": "No Sé",
+  "iKnow": "Sí Sé",
+  "practiceCompleted": "¡Práctica Completada!",
+  "score": "Puntuación",
+  "correct": "Correcto",
+  "incorrect": "Incorrecto",
+  "practiceAgain": "Practicar de Nuevo",
+  "backToChapters": "Volver a Capítulos",
+
+  "readingChapters": "Capítulos de Lectura",
+  "page": "Página",
+  "chaptersCompleted": "Capítulos Completados",
+  "completed": "Completado",
+  "chapterLocked": "Este capítulo está bloqueado. Completa el capítulo anterior primero.",
+  "noLives": "Sin Vidas",
+  "noLivesMessage": "No te quedan vidas. Por favor espera al siguiente reinicio.",
+  "nextReset": "Próximo Reinicio",
+  "ok": "OK",
+  "noChaptersAvailable": "No hay capítulos disponibles",
+  "previous": "Anterior",
+  "next": "Siguiente",
+  "startQuiz": "Iniciar Quiz",
+  "question": "Pregunta",
+  "submit": "Enviar",
+  "congratulations": "¡Felicitaciones!",
+  "chapterCompleted": "¡Has completado este capítulo!",
+  "tryAgain": "Intentar de Nuevo",
+  "scoreNotEnough": "Necesitas al menos 7 respuestas correctas para aprobar (70%).",
+  "exitQuiz": "Salir del Quiz",
+  "exitQuizConfirmation": "¿Estás seguro de que quieres salir? Tu progreso se perderá.",
+  "exit": "Salir",
+
+  "outOfLives": "¡Sin Vidas!",
+  "outOfLivesMessage": "Has usado todas tus vidas por hoy. ¡Tómate un descanso y vuelve mañana para empezar de nuevo!",
+  "livesReset": "Reinicio de Vidas",
+  "nextResetIn": "Próximo reinicio de vidas en {hours} horas",
+  "@nextResetIn": {
+    "placeholders": {
+      "hours": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  "reviewTime": "¡Usa este tiempo para repasar lo que has aprendido!",
+  "iUnderstand": "Entendido"
 }

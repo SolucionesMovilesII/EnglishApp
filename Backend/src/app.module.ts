@@ -16,11 +16,15 @@ import { ApprovalRule } from './domain/entities/approval-rule.entity';
 import { ApprovalEvaluation } from './domain/entities/approval-evaluation.entity';
 import { ApprovalMetrics } from './domain/entities/approval-metrics.entity';
 import { Translation } from './domain/entities/translation.entity';
+import { ReadingChapter } from './domain/entities/reading-chapter.entity';
+import { ReadingContent } from './domain/entities/reading-content.entity';
+import { QuizQuestion } from './domain/entities/quiz-question.entity';
 import { AuthModule } from './presentation/modules/auth.module';
 import { ApprovalModule } from './presentation/modules/approval.module';
 import { ProgressModule } from './presentation/modules/progress.module';
 import { LivesModule } from './presentation/modules/lives.module';
 import { ChaptersModule } from './presentation/modules/chapters.module';
+import { ReadingModule } from './presentation/modules/reading.module';
 import { AdminModule } from './presentation/modules/admin.module';
 import { TranslationModule } from './application/modules/translation.module';
 import { CronModule } from './application/modules/cron.module';
@@ -65,6 +69,9 @@ import { ThrottlerModule } from '@nestjs/throttler';
           DailyLives,
           Chapter,
           VocabularyItem,
+          ReadingChapter,
+          ReadingContent,
+          QuizQuestion,
           ApprovalRule,
           ApprovalEvaluation,
           ApprovalMetrics,
@@ -84,6 +91,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
     ProgressModule,
     LivesModule,
     ChaptersModule,
+    ReadingModule,
     AdminModule,
     ApprovalModule,
     TranslationModule,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
+import '../providers/lives_provider.dart';
 import '../widgets/custom_card.dart';
 import '../widgets/custom_icons.dart';
 import '../widgets/bottom_navigation.dart';
@@ -11,6 +12,11 @@ import 'settings_screen.dart';
 import 'quiz_screen.dart';
 import 'chapter_episodes_screen.dart';
 import 'chapter_results_screen.dart';
+import 'favorites_screen.dart';
+import 'vocabulary_chapters_screen.dart';
+import 'reading_screen.dart';
+import 'reading_chapters_screen.dart';
+import 'interview_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -34,6 +40,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       duration: const Duration(milliseconds: 300),
       vsync: this,
     );
+
+    // Fetch lives status on init
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        final livesProvider = Provider.of<LivesProvider>(context, listen: false);
+        livesProvider.fetchLivesStatus();
+      }
+    });
   }
 
   @override
@@ -115,9 +129,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       case 0:
         return _buildHomeContent();
       case 1:
-        return _buildPlaceholderContent(AppLocalizations.of(context)!.folders);
+        return const VocabularyChaptersScreen();
       case 2:
-        return _buildPlaceholderContent(AppLocalizations.of(context)!.book);
+        return const ReadingChaptersScreen();
       case 3:
         return const QuizScreen();
       default:
@@ -125,81 +139,32 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     }
   }
 
-  Widget _buildPlaceholderContent(String title) {
-    return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.construction,
-              size: 64,
-              color: Theme.of(context).colorScheme.primary,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              AppLocalizations.of(context)!.sectionTitle(title),
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              AppLocalizations.of(context)!.comingSoon,
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+
 
   Widget _buildHomeContent() {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
       appBar: AppBar(
-        toolbarHeight: 56,
+        toolbarHeight: 0,
         backgroundColor: Theme.of(context).colorScheme.primary,
         elevation: 0,
-        title: Text(
-          AppLocalizations.of(context)!.home,
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-            color: Theme.of(context).colorScheme.onPrimary,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        actions: [
-          IconButton(
-            icon: Icon(
-              Icons.analytics_outlined,
-              color: Theme.of(context).colorScheme.onPrimary,
-            ),
-            onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => const ChapterResultsScreen(),
-              ),
-            ),
-            tooltip: AppLocalizations.of(context)!.chapterResults,
-          ),
-        ],
         systemOverlayStyle: SystemUiOverlayStyle(
           statusBarColor: Theme.of(context).colorScheme.primary,
-          statusBarIconBrightness: Theme.of(context).brightness == Brightness.dark 
-              ? Brightness.light 
+          statusBarIconBrightness: Theme.of(context).brightness == Brightness.dark
+              ? Brightness.light
               : Brightness.dark,
           statusBarBrightness: Theme.of(context).brightness,
         ),
       ),
       body: Column(
         children: [
-          // Header
-          Consumer<AuthProvider>(
-            builder: (context, authProvider, child) {
+          // Header - AppBanner
+          Consumer2<AuthProvider, LivesProvider>(
+            builder: (context, authProvider, livesProvider, child) {
               return AppBanner(
                 title: '${AppLocalizations.of(context)!.hi}, ${authProvider.user?.name ?? AppLocalizations.of(context)!.user}',
                 subtitle: AppLocalizations.of(context)!.welcomeBack,
-                livesText: AppLocalizations.of(context)!.livesRemaining(5),
+                livesText: AppLocalizations.of(context)!.livesRemaining(livesProvider.currentLives),
               );
             },
           ),
@@ -247,7 +212,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                             subtitle: AppLocalizations.of(context)!.continueText,
                             description: AppLocalizations.of(context)!.reading,
                             icon: CustomIcons.readingIcon(),
-                            onTap: () => _navigateToSection('reading'),
+                            onTap: () => Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => const ReadingChaptersScreen(),
+                              ),
+                            ),
                           ),
                           
                           const SizedBox(height: 8),
@@ -258,7 +227,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                             subtitle: AppLocalizations.of(context)!.continueText,
                             description: AppLocalizations.of(context)!.interview,
                             icon: CustomIcons.interviewIcon(),
-                            onTap: () => _navigateToSection('interview'),
+                            onTap: () => Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => const InterviewScreen(),
+                              ),
+                            ),
                           ),
                           
                           const SizedBox(height: 8),
@@ -266,8 +239,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                           // Chapter Results Card
                           CustomCard(
                             title: AppLocalizations.of(context)!.chapterResults,
-                            subtitle: AppLocalizations.of(context)!.viewProgress,
-                            description: AppLocalizations.of(context)!.evaluationHistory,
+                            subtitle: AppLocalizations.of(context)!.progress,
+                            description: AppLocalizations.of(context)!.evaluationDetails,
                             icon: Icon(
                               Icons.analytics,
                               size: 32,
@@ -292,13 +265,5 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     );
   }
 
-  void _navigateToSection(String section) {
-    // Placeholder navigation
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(AppLocalizations.of(context)!.navigatingToSection(section)),
-        duration: const Duration(seconds: 1),
-      ),
-    );
-  }
+
 }

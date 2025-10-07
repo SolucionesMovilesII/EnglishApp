@@ -11,6 +11,7 @@ import {
 } from '../../../domain/entities/approval-evaluation.entity';
 import { User } from '../../../domain/entities/user.entity';
 import { ApprovalRule } from '../../../domain/entities/approval-rule.entity';
+import { ChapterEvaluationStatsDto } from '../../dtos/approval/evaluation-history.dto';
 
 // Helper functions for creating mock objects
 function createMockUser(overrides: Partial<User> = {}): User {
@@ -229,7 +230,7 @@ describe('GetChapterEvaluationStatsUseCase', () => {
   describe('execute', () => {
     it('should get chapter evaluation statistics', async () => {
       // Arrange
-      const mockStats = {
+      const mockRepositoryStats = {
         totalEvaluations: 100,
         approvedCount: 85,
         rejectedCount: 15,
@@ -237,13 +238,25 @@ describe('GetChapterEvaluationStatsUseCase', () => {
         averageAttempts: 1.2,
       };
 
-      approvalEvaluationRepository.getChapterEvaluationStats.mockResolvedValue(mockStats);
+      const expectedResult: ChapterEvaluationStatsDto = {
+        chapterId: '1',
+        totalEvaluations: 100,
+        approvedCount: 85,
+        failedCount: 15,
+        pendingCount: 0,
+        averageScore: 82.5,
+        averageAdjustedScore: 82.5,
+        approvalRate: 85,
+        averageAttempts: 1.2,
+      };
+
+      approvalEvaluationRepository.getChapterEvaluationStats.mockResolvedValue(mockRepositoryStats);
 
       // Act
       const result = await useCase.execute('1');
 
       // Assert
-      expect(result).toEqual(mockStats);
+      expect(result).toEqual(expectedResult);
       expect(approvalEvaluationRepository.getChapterEvaluationStats).toHaveBeenCalledWith('1');
     });
   });

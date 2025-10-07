@@ -333,31 +333,3 @@ class FavoriteWord {
     return 'FavoriteWord(id: $id, word: $baseWord, translation: $translation, language: $baseLang)';
   }
 }
-
-// ================== Response wrapper (HU-007-4) ==================
-
-class FavoritesResponse {
-  final List<FavoriteWord> favorites;
-  final int total;
-
-  FavoritesResponse({
-    required this.favorites,
-    required this.total,
-  });
-
-  factory FavoritesResponse.fromJson(Map<String, dynamic> json) {
-    return FavoritesResponse(
-      favorites: (json['favorites'] as List<dynamic>)
-          .map((item) => FavoriteWord.fromJson(item as Map<String, dynamic>))
-          .toList(),
-      total: json['total'] as int,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'favorites': favorites.map((f) => f.toJson()).toList(),
-      'total': total,
-    };
-  }
-}

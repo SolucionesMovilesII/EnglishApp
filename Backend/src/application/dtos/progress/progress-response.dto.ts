@@ -16,8 +16,9 @@ export class ProgressResponseDto {
   @ApiProperty({
     description: 'Chapter ID',
     example: '770e8400-e29b-41d4-a716-446655440002',
+    nullable: true,
   })
-  readonly chapterId!: string;
+  readonly chapterId!: string | null;
 
   @ApiProperty({
     description: 'Score obtained by the user',

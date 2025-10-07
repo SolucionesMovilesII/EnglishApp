@@ -182,8 +182,8 @@ abstract class BasePracticeService {
         }
         
         return dataList
-            .where((item) => item is Map<String, dynamic>)
-            .map((item) => fromJson(item as Map<String, dynamic>))
+            .whereType<Map<String, dynamic>>()
+            .map((item) => fromJson(item))
             .toList();
       } catch (e) {
         if (EnvironmentConfig.enableLogging) {

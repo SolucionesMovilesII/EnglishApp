@@ -40,19 +40,19 @@ class Translation {
     final bool isCamel =
         json.containsKey('originalText') || json.containsKey('sourceLanguage');
 
-    String _str(dynamic v, [String d = '']) => (v ?? d).toString();
+    String str(dynamic v, [String d = '']) => (v ?? d).toString();
 
     // Campos base (tolerantes a ambos estilos)
-    final id = _str(json['id'] ??
+    final id = str(json['id'] ??
         DateTime.now().millisecondsSinceEpoch.toString());
     final originalText =
-        _str(isSnake ? json['original_text'] : json['originalText']);
+        str(isSnake ? json['original_text'] : json['originalText']);
     final translatedText =
-        _str(isSnake ? json['translated_text'] : json['translatedText']);
+        str(isSnake ? json['translated_text'] : json['translatedText']);
     final sourceLanguage =
-        _str(isSnake ? json['source_language'] : json['sourceLanguage']);
+        str(isSnake ? json['source_language'] : json['sourceLanguage']);
     final targetLanguage =
-        _str(isSnake ? json['target_language'] : json['targetLanguage']);
+        str(isSnake ? json['target_language'] : json['targetLanguage']);
 
     // Pronunciación / audio
     final pronunciation = (isSnake ? json['pronunciation'] : json['pronunciation']) as String?;
@@ -115,7 +115,7 @@ class Translation {
 
   /// Local DB (acepta ejemplos con '|' o ',')
   factory Translation.fromLocalDb(Map<String, dynamic> map) {
-    String _str(dynamic v, [String d = '']) => (v ?? d).toString();
+    String str(dynamic v, [String d = '']) => (v ?? d).toString();
 
     final examplesStr = map['examples']?.toString();
     final examples = examplesStr == null
@@ -146,11 +146,11 @@ class Translation {
     }
 
     return Translation(
-      id: _str(map['id']),
-      originalText: _str(map['original_text']),
-      translatedText: _str(map['translated_text']),
-      sourceLanguage: _str(map['source_language']),
-      targetLanguage: _str(map['target_language']),
+      id: str(map['id']),
+      originalText: str(map['original_text']),
+      translatedText: str(map['translated_text']),
+      sourceLanguage: str(map['source_language']),
+      targetLanguage: str(map['target_language']),
       pronunciation: map['pronunciation'] as String?,
       examples: examples,
       audioUrl: map['audio_url'] as String?,

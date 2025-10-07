@@ -173,6 +173,12 @@ export class OriginValidationGuard implements CanActivate {
    * Check if an origin is allowed
    */
   private isOriginAllowed(origin: string, allowedOrigins: string[]): boolean {
+    // TEMPORARY: Allow all origins for testing in development mode (REMOVE IN PRODUCTION)
+    if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'dev') {
+      this.logger.debug(`OriginValidation: Allowing origin ${origin} (development mode)`);
+      return true;
+    }
+
     // Allow same-origin requests (when origin is null or undefined)
     if (!origin || origin === 'null') {
       return true;

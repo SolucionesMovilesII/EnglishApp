@@ -6,6 +6,9 @@ import { UserProgress } from './src/domain/entities/user-progress.entity';
 import { DailyLives } from './src/domain/entities/daily-lives.entity';
 import { Chapter } from './src/domain/entities/chapter.entity';
 import { VocabularyItem } from './src/domain/entities/vocabulary-item.entity';
+import { ReadingChapter } from './src/domain/entities/reading-chapter.entity';
+import { ReadingContent } from './src/domain/entities/reading-content.entity';
+import { QuizQuestion } from './src/domain/entities/quiz-question.entity';
 import { ApprovalRule } from './src/domain/entities/approval-rule.entity';
 import { ApprovalEvaluation } from './src/domain/entities/approval-evaluation.entity';
 import { ApprovalMetrics } from './src/domain/entities/approval-metrics.entity';
@@ -32,6 +35,9 @@ const AppDataSource = new DataSource({
     DailyLives,
     Chapter,
     VocabularyItem,
+    ReadingChapter,
+    ReadingContent,
+    QuizQuestion,
     ApprovalRule,
     ApprovalEvaluation,
     ApprovalMetrics,

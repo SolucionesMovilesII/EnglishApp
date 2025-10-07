@@ -93,14 +93,15 @@ class ApiService {
   Future<ApiResponse> get(
     String endpoint, {
     String? token,
+    bool withCredentials = true,
   }) async {
     try {
       final url = Uri.parse(endpoint);
       _logRequest('GET', endpoint, null);
-      
+
       final response = await http.get(
         url,
-        headers: _getHeaders(token: token),
+        headers: _getHeaders(token: token, withCredentials: withCredentials),
       ).timeout(EnvironmentConfig.apiTimeout);
       
       _logResponse(response);
@@ -130,14 +131,15 @@ class ApiService {
     String endpoint, {
     Map<String, dynamic>? body,
     String? token,
+    bool withCredentials = true,
   }) async {
     try {
       final url = Uri.parse(endpoint);
       _logRequest('PUT', endpoint, body);
-      
+
       final response = await http.put(
         url,
-        headers: _getHeaders(token: token),
+        headers: _getHeaders(token: token, withCredentials: withCredentials),
         body: body != null ? jsonEncode(body) : null,
       ).timeout(EnvironmentConfig.apiTimeout);
       
@@ -167,14 +169,15 @@ class ApiService {
   Future<ApiResponse> delete(
     String endpoint, {
     String? token,
+    bool withCredentials = true,
   }) async {
     try {
       final url = Uri.parse(endpoint);
       _logRequest('DELETE', endpoint, null);
-      
+
       final response = await http.delete(
         url,
-        headers: _getHeaders(token: token),
+        headers: _getHeaders(token: token, withCredentials: withCredentials),
       ).timeout(EnvironmentConfig.apiTimeout);
       
       _logResponse(response);

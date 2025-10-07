@@ -42,7 +42,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(
-        title: Text(l10n.favorites),
+        title: const Text('Favorites'),
         backgroundColor: theme.colorScheme.primary,
         foregroundColor: theme.colorScheme.onPrimary,
         elevation: 0,
@@ -103,7 +103,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                   Icon(
                     Icons.favorite_border,
                     size: 64,
-                    color: theme.colorScheme.onSurface.withOpacity(0.5),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                   ),
                   const SizedBox(height: 16),
                   Text(
@@ -111,11 +111,11 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                         ? 'No favorites found matching your filters'
                         : 'No favorite words yet',
                     style: theme.textTheme.bodyLarge?.copyWith(
-                      color: theme.colorScheme.onSurface.withOpacity(0.7),
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                     ),
                     textAlign: TextAlign.center,
                   ),
-                  if (_searchQuery.isNotEmpty || _selectedCategory != 'all' || _selectedLanguage != 'all') ..[
+                  if (_searchQuery.isNotEmpty || _selectedCategory != 'all' || _selectedLanguage != 'all') ...[
                     const SizedBox(height: 16),
                     ElevatedButton(
                       onPressed: _clearFilters,
@@ -170,7 +170,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          favorite.word,
+                          favorite.word ?? '',
                           style: theme.textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.bold,
                             color: theme.colorScheme.primary,
@@ -180,7 +180,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                         Text(
                           favorite.translation,
                           style: theme.textTheme.bodyMedium?.copyWith(
-                            color: theme.colorScheme.onSurface.withOpacity(0.8),
+                            color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
                           ),
                         ),
                       ],
@@ -212,17 +212,17 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                   ),
                 ],
               ),
-              if (favorite.pronunciation != null) ..[
+              if (favorite.pronunciation != null) ...[
                 const SizedBox(height: 8),
                 Text(
                   '/${favorite.pronunciation}/',
                   style: theme.textTheme.bodySmall?.copyWith(
                     fontStyle: FontStyle.italic,
-                    color: theme.colorScheme.onSurface.withOpacity(0.6),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                   ),
                 ),
               ],
-              if (favorite.category != null) ..[
+              if (favorite.category != null) ...[
                 const SizedBox(height: 8),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -251,8 +251,9 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
       // Search filter
       if (_searchQuery.isNotEmpty) {
         final query = _searchQuery.toLowerCase();
-        if (!favorite.word.toLowerCase().contains(query) &&
+        if (!(favorite.word?.toLowerCase().contains(query) ?? false) &&
             !favorite.translation.toLowerCase().contains(query)) {
+          if (favorite.category != null && favorite.category!.toLowerCase().contains(query)) return true;
           return false;
         }
       }
@@ -358,7 +359,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                 const DropdownMenuItem(value: 'all', child: Text('All Languages')),
                 ...languages.map((language) => DropdownMenuItem(
                   value: language,
-                  child: Text(language.toUpperCase()),
+                  child: Text(language?.toUpperCase() ?? ''),
                 )),
               ],
               onChanged: (value) {
@@ -398,11 +399,11 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
         await _audioService.playAudioFromUrl(favorite.audioUrl!);
       } else {
         final success = await _audioService.speakText(
-          favorite.word,
-          language: _audioService.getSupportedLanguage(favorite.language),
+          favorite.word ?? '',
+          language: _audioService.getSupportedLanguage(favorite.language ?? 'en'),
         );
         
-        if (!success) {
+        if (!success && mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Audio playback failed'),
@@ -412,12 +413,14 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
         }
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Audio error: $e'),
-          duration: const Duration(seconds: 2),
-        ),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Audio error: $e'),
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
     }
   }
 
@@ -436,6 +439,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
             onPressed: () async {
               Navigator.of(context).pop();
               
+              final scaffoldMessenger = ScaffoldMessenger.of(context);
               final authProvider = Provider.of<AuthProvider>(context, listen: false);
               final success = await favoritesProvider.removeFromFavorites(
                 favorite.id,
@@ -443,7 +447,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
               );
               
               if (!success && mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
+                scaffoldMessenger.showSnackBar(
                   const SnackBar(
                     content: Text('Failed to remove favorite'),
                     duration: Duration(seconds: 2),
@@ -461,9 +465,9 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
   void _showTranslationPanel(FavoriteWord favorite) {
     final translation = Translation(
       id: favorite.id,
-      originalText: favorite.word,
+      originalText: favorite.word ?? '',
       translatedText: favorite.translation,
-      sourceLanguage: favorite.language,
+      sourceLanguage: favorite.language ?? 'en',
       targetLanguage: 'es', // Default target language
       pronunciation: favorite.pronunciation,
       examples: favorite.examples,
@@ -476,8 +480,8 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
       context: context,
       builder: (context) => TranslationPanelWidget(
         translation: translation,
-        originalText: favorite.word,
-        sourceLanguage: favorite.language,
+        originalText: favorite.word ?? '',
+        sourceLanguage: favorite.language ?? 'en',
         targetLanguage: 'es',
       ),
     );

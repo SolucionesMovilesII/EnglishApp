@@ -5,7 +5,7 @@ import { BadRequestException } from '@nestjs/common';
 import { ApprovalRule } from '../../../domain/entities/approval-rule.entity';
 import { ConfigureApprovalRuleDto } from '../../dtos/approval/configure-approval-rule.dto';
 
-// Helper function for creating mock objects
+// Helper para crear reglas mock
 function createMockApprovalRule(overrides: Partial<ApprovalRule> = {}): ApprovalRule {
   return {
     id: 'rule-123',
@@ -19,8 +19,12 @@ function createMockApprovalRule(overrides: Partial<ApprovalRule> = {}): Approval
     metadata: null,
     createdAt: new Date(),
     updatedAt: new Date(),
+    // Métodos de dominio mockeados
     isApplicableToChapter: () => true,
-    canRetryAfterFailure: () => true,
+    isScoreApproved: (score: number) => score >= 80,
+    hasSpecialRequirements: () => false,
+    getThresholdPercentage: () => 80,
+    canRetryAfterFailure: (currentAttempts: number) => currentAttempts < 3,
     ...overrides,
   } as ApprovalRule;
 }
@@ -37,7 +41,7 @@ describe('ConfigureApprovalRuleUseCase', () => {
   });
 
   beforeEach(async () => {
-    const mockApprovalRuleRepository = {
+    const mockApprovalRuleRepository: jest.Mocked<IApprovalRuleRepository> = {
       create: jest.fn(),
       findById: jest.fn(),
       findByChapterId: jest.fn(),
@@ -48,7 +52,7 @@ describe('ConfigureApprovalRuleUseCase', () => {
       delete: jest.fn(),
       deactivate: jest.fn(),
       activate: jest.fn(),
-    };
+    } as any;
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -70,7 +74,6 @@ describe('ConfigureApprovalRuleUseCase', () => {
 
   describe('execute', () => {
     it('should successfully configure a new approval rule', async () => {
-      // Arrange
       const dto: ConfigureApprovalRuleDto = {
         chapterId: '1',
         minScoreThreshold: 80,
@@ -83,10 +86,8 @@ describe('ConfigureApprovalRuleUseCase', () => {
       approvalRuleRepository.findByChapterId.mockResolvedValue([]);
       approvalRuleRepository.create.mockResolvedValue(mockApprovalRule);
 
-      // Act
       const result = await useCase.execute(dto);
 
-      // Assert
       expect(result.id).toBe(mockApprovalRule.id);
       expect(result.chapterId).toBe(mockApprovalRule.chapterId);
       expect(result.minScoreThreshold).toBe(mockApprovalRule.minScoreThreshold);
@@ -94,7 +95,6 @@ describe('ConfigureApprovalRuleUseCase', () => {
     });
 
     it('should configure rule for chapter 4 with 100% threshold', async () => {
-      // Arrange
       const dto: ConfigureApprovalRuleDto = {
         chapterId: '4',
         minScoreThreshold: 100,
@@ -112,16 +112,13 @@ describe('ConfigureApprovalRuleUseCase', () => {
       approvalRuleRepository.findByChapterId.mockResolvedValue([]);
       approvalRuleRepository.create.mockResolvedValue(chapter4Rule);
 
-      // Act
       const result = await useCase.execute(dto);
 
-      // Assert
       expect(result.minScoreThreshold).toBe(100);
       expect(result.chapterId).toBe('4');
     });
 
     it('should configure rule for chapter 5 with 100% threshold', async () => {
-      // Arrange
       const dto: ConfigureApprovalRuleDto = {
         chapterId: '5',
         minScoreThreshold: 100,
@@ -139,16 +136,13 @@ describe('ConfigureApprovalRuleUseCase', () => {
       approvalRuleRepository.findByChapterId.mockResolvedValue([]);
       approvalRuleRepository.create.mockResolvedValue(chapter5Rule);
 
-      // Act
       const result = await useCase.execute(dto);
 
-      // Assert
       expect(result.minScoreThreshold).toBe(100);
       expect(result.chapterId).toBe('5');
     });
 
     it('should update existing approval rule', async () => {
-      // Arrange
       const dto: ConfigureApprovalRuleDto = {
         chapterId: '1',
         minScoreThreshold: 85,
@@ -158,9 +152,7 @@ describe('ConfigureApprovalRuleUseCase', () => {
         description: 'Updated threshold',
       };
 
-      const existingRule = createMockApprovalRule({
-        chapterId: '1',
-      });
+      const existingRule = createMockApprovalRule({ chapterId: '1' });
       const updatedRule = createMockApprovalRule({
         minScoreThreshold: 85,
         updatedAt: new Date(),
@@ -169,15 +161,12 @@ describe('ConfigureApprovalRuleUseCase', () => {
       approvalRuleRepository.findByChapterId.mockResolvedValue([existingRule]);
       approvalRuleRepository.update.mockResolvedValue(updatedRule);
 
-      // Act
       const result = await useCase.execute(dto);
 
-      // Assert
       expect(result.minScoreThreshold).toBe(85);
     });
 
     it('should work without description', async () => {
-      // Arrange
       const dto: ConfigureApprovalRuleDto = {
         chapterId: '2',
         minScoreThreshold: 75,
@@ -189,15 +178,12 @@ describe('ConfigureApprovalRuleUseCase', () => {
       approvalRuleRepository.findByChapterId.mockResolvedValue([]);
       approvalRuleRepository.create.mockResolvedValue(mockApprovalRule);
 
-      // Act
       await useCase.execute(dto);
 
-      // Assert
       expect(approvalRuleRepository.create).toHaveBeenCalled();
     });
 
     it('should throw BadRequestException for invalid threshold', async () => {
-      // Arrange
       const dto: ConfigureApprovalRuleDto = {
         chapterId: '1',
         minScoreThreshold: 105,
@@ -207,13 +193,12 @@ describe('ConfigureApprovalRuleUseCase', () => {
         description: 'Invalid threshold test',
       };
 
-      // Act & Assert
       await expect(useCase.execute(dto)).rejects.toThrow(BadRequestException);
     });
 
     it('should create global rule when chapterId is not provided', async () => {
-      // Arrange
       const dto: ConfigureApprovalRuleDto = {
+        // chapterId omitido → global
         minScoreThreshold: 80,
         maxAttempts: 3,
         allowErrorCarryover: true,
@@ -226,15 +211,12 @@ describe('ConfigureApprovalRuleUseCase', () => {
         description: 'Global rule test',
       });
 
-      // Mock repository to return empty array for global rules (no existing global rules)
       approvalRuleRepository.findGlobalRules.mockResolvedValue([]);
       approvalRuleRepository.create.mockResolvedValue(globalRule);
 
-      // Act
       const result = await useCase.execute(dto);
 
-      // Assert
-      expect(result.chapterId).toBeUndefined();
+      expect(result.chapterId).toBeUndefined(); // expuesto como undefined para global
       expect(result.description).toBe('Global rule test');
       expect(approvalRuleRepository.create).toHaveBeenCalledWith({
         chapterId: null,
@@ -248,7 +230,6 @@ describe('ConfigureApprovalRuleUseCase', () => {
     });
 
     it('should handle service errors gracefully', async () => {
-      // Arrange
       const dto: ConfigureApprovalRuleDto = {
         chapterId: '1',
         minScoreThreshold: 80,
@@ -261,7 +242,6 @@ describe('ConfigureApprovalRuleUseCase', () => {
       const error = new Error('Database connection failed');
       approvalRuleRepository.findByChapterId.mockRejectedValue(error);
 
-      // Act & Assert
       await expect(useCase.execute(dto)).rejects.toThrow('Database connection failed');
     });
   });
@@ -276,7 +256,6 @@ describe('ConfigureApprovalRuleUseCase', () => {
         isActive: true,
       };
 
-      // Act & Assert
       await expect(useCase.execute(dto)).rejects.toThrow(BadRequestException);
     });
 
@@ -289,12 +268,10 @@ describe('ConfigureApprovalRuleUseCase', () => {
         isActive: true,
       };
 
-      // Act & Assert
       await expect(useCase.execute(dto)).rejects.toThrow(BadRequestException);
     });
 
     it('should handle minimum valid threshold', async () => {
-      // Arrange
       const dto: ConfigureApprovalRuleDto = {
         chapterId: '1',
         minScoreThreshold: 0,
@@ -302,22 +279,17 @@ describe('ConfigureApprovalRuleUseCase', () => {
         allowErrorCarryover: true,
         isActive: true,
       };
-      const ruleWithMinThreshold = createMockApprovalRule({
-        minScoreThreshold: 0,
-      });
+      const ruleWithMinThreshold = createMockApprovalRule({ minScoreThreshold: 0 });
 
       approvalRuleRepository.findByChapterId.mockResolvedValue([]);
       approvalRuleRepository.create.mockResolvedValue(ruleWithMinThreshold);
 
-      // Act
       const result = await useCase.execute(dto);
 
-      // Assert
       expect(result.minScoreThreshold).toBe(0);
     });
 
     it('should handle maximum valid threshold', async () => {
-      // Arrange
       const dto: ConfigureApprovalRuleDto = {
         chapterId: '1',
         minScoreThreshold: 100,
@@ -325,22 +297,17 @@ describe('ConfigureApprovalRuleUseCase', () => {
         allowErrorCarryover: true,
         isActive: true,
       };
-      const ruleWithMaxThreshold = createMockApprovalRule({
-        minScoreThreshold: 100,
-      });
+      const ruleWithMaxThreshold = createMockApprovalRule({ minScoreThreshold: 100 });
 
       approvalRuleRepository.findByChapterId.mockResolvedValue([]);
       approvalRuleRepository.create.mockResolvedValue(ruleWithMaxThreshold);
 
-      // Act
       const result = await useCase.execute(dto);
 
-      // Assert
       expect(result.minScoreThreshold).toBe(100);
     });
 
     it('should handle long description', async () => {
-      // Arrange
       const dto: ConfigureApprovalRuleDto = {
         chapterId: '1',
         minScoreThreshold: 80,
@@ -353,15 +320,12 @@ describe('ConfigureApprovalRuleUseCase', () => {
       approvalRuleRepository.findByChapterId.mockResolvedValue([]);
       approvalRuleRepository.create.mockResolvedValue(mockApprovalRule);
 
-      // Act
       await useCase.execute(dto);
 
-      // Assert
       expect(approvalRuleRepository.create).toHaveBeenCalled();
     });
 
     it('should handle special characters in chapterId', async () => {
-      // Arrange
       const dto: ConfigureApprovalRuleDto = {
         chapterId: '1',
         minScoreThreshold: 80,
@@ -369,28 +333,22 @@ describe('ConfigureApprovalRuleUseCase', () => {
         allowErrorCarryover: true,
         isActive: true,
       };
-      const specialRule = createMockApprovalRule({
-        chapterId: '1',
-      });
+      const specialRule = createMockApprovalRule({ chapterId: '1' });
 
       approvalRuleRepository.findByChapterId.mockResolvedValue([]);
       approvalRuleRepository.create.mockResolvedValue(specialRule);
 
-      // Act
       const result = await useCase.execute(dto);
 
-      // Assert
       expect(result.chapterId).toBe('1');
     });
   });
 
   describe('business logic scenarios', () => {
-    it('should enforce 100% threshold for critical chapters', async () => {
-      // Test that the business logic enforces 100% for chapters 4 and 5
+    it('should enforce 100% threshold for critical chapters (4,5)', async () => {
       const criticalChapters = ['4', '5'];
 
       for (const chapterId of criticalChapters) {
-        // Arrange
         const dto: ConfigureApprovalRuleDto = {
           chapterId,
           minScoreThreshold: 100,
@@ -406,22 +364,18 @@ describe('ConfigureApprovalRuleUseCase', () => {
         approvalRuleRepository.findByChapterId.mockResolvedValue([]);
         approvalRuleRepository.create.mockResolvedValue(criticalRule);
 
-        // Act
         const result = await useCase.execute(dto);
 
-        // Assert
         expect(result.minScoreThreshold).toBe(100);
         expect(result.chapterId).toBe(chapterId);
       }
     });
 
     it('should allow flexible thresholds for regular chapters', async () => {
-      // Test that regular chapters can have different thresholds
       const regularChapters = ['1', '2', '3'];
       const thresholds = [70, 80, 90];
 
       for (let i = 0; i < regularChapters.length; i++) {
-        // Arrange
         const chapterId = regularChapters[i];
         const threshold = thresholds[i];
         const dto: ConfigureApprovalRuleDto = {
@@ -439,10 +393,8 @@ describe('ConfigureApprovalRuleUseCase', () => {
         approvalRuleRepository.findByChapterId.mockResolvedValue([]);
         approvalRuleRepository.create.mockResolvedValue(flexibleRule);
 
-        // Act
         const result = await useCase.execute(dto);
 
-        // Assert
         expect(result.minScoreThreshold).toBe(threshold);
         expect(result.chapterId).toBe(chapterId);
       }

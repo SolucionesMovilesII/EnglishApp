@@ -111,7 +111,7 @@ class LivesGuard extends StatelessWidget {
                         ElevatedButton(
                           onPressed: () {
                             context.showNoLivesDialog(
-                              nextReset: livesProvider.nextReset,
+                              hoursUntilReset: livesProvider.hoursUntilReset,
                             );
                           },
                           child: const Text('Learn More'),
@@ -160,7 +160,7 @@ class LifeConsumingWidget extends StatelessWidget {
     // Check if user has lives before allowing interaction
     if (livesProvider.isBlocked) {
       context.showNoLivesDialog(
-        nextReset: livesProvider.nextReset,
+        hoursUntilReset: livesProvider.hoursUntilReset,
       );
       return;
     }
@@ -176,7 +176,7 @@ class LifeConsumingWidget extends StatelessWidget {
           // Show the no lives dialog if this was the last life
           if (context.mounted) {
             context.showNoLivesDialog(
-              nextReset: livesProvider.nextReset,
+              hoursUntilReset: livesProvider.hoursUntilReset,
             );
           }
         } else {
@@ -221,7 +221,7 @@ mixin LivesAwareMixin<T extends StatefulWidget> on State<T> {
     
     if (!success && _livesProvider!.isBlocked && showDialog && mounted) {
       context.showNoLivesDialog(
-        nextReset: _livesProvider!.nextReset,
+        hoursUntilReset: _livesProvider!.hoursUntilReset,
       );
     } else if (success && errorMessage != null && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(

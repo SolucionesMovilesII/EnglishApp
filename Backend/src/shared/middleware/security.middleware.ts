@@ -268,7 +268,18 @@ export class SecurityMiddleware implements NestMiddleware {
       return true;
     }
 
-    return originValidation.allowedOrigins.includes(origin);
+    // TEMPORARY: Allow all origins for testing (REMOVE IN PRODUCTION)
+    if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'dev') {
+      this.logger.debug(`Security: Allowing origin ${origin} (development mode)`);
+      return true;
+    }
+
+    // Check if origin is in the allowed list
+    if (originValidation.allowedOrigins.includes(origin)) {
+      return true;
+    }
+
+    return false;
   }
 
   /**

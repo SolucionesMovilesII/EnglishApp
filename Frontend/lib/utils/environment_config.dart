@@ -12,7 +12,7 @@ class EnvironmentConfig {
   // =========================
   // URLs base por defecto (ambas ramas)
   // =========================
-  static const String _tunnelApiUrl   = 'https://short-geckos-repair.loca.lt'; // <<<< HU-007-4
+  static const String _tunnelApiUrl   = 'https://115b1724cb70.ngrok-free.app/'; // <<<< HU-007-4
   static const String _localApiUrl    = 'http://localhost:3000';               // <<<< main
 
   // Elige por defecto según el flag _useTunnel (se puede sobreescribir con API_BASE_URL)

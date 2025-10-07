@@ -1,25 +1,26 @@
 import 'package:flutter/material.dart';
+import '../l10n/app_localizations.dart';
 
 class NoLivesDialog extends StatelessWidget {
-  final String? nextReset;
+  final int hoursUntilReset;
   final VoidCallback? onDismiss;
 
   const NoLivesDialog({
     super.key,
-    this.nextReset,
+    this.hoursUntilReset = 24,
     this.onDismiss,
   });
 
   static Future<void> show(
     BuildContext context, {
-    String? nextReset,
+    int hoursUntilReset = 24,
     VoidCallback? onDismiss,
   }) {
     return showDialog<void>(
       context: context,
       barrierDismissible: false,
       builder: (context) => NoLivesDialog(
-        nextReset: nextReset,
+        hoursUntilReset: hoursUntilReset,
         onDismiss: onDismiss,
       ),
     );
@@ -27,6 +28,8 @@ class NoLivesDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return AlertDialog(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
@@ -40,7 +43,7 @@ class NoLivesDialog extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           Text(
-            'Out of Lives!',
+            l10n.outOfLives,
             style: TextStyle(
               color: Theme.of(context).colorScheme.error,
               fontWeight: FontWeight.bold,
@@ -53,7 +56,7 @@ class NoLivesDialog extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            "You've used all your lives for today. Take a break and come back tomorrow for a fresh start!",
+            l10n.outOfLivesMessage,
             textAlign: TextAlign.center,
             style: TextStyle(
               color: Theme.of(context).colorScheme.onSurface,
@@ -95,7 +98,7 @@ class NoLivesDialog extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Lives Reset',
+                  l10n.livesReset,
                   style: TextStyle(
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
                     fontWeight: FontWeight.w500,
@@ -103,7 +106,7 @@ class NoLivesDialog extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  'Tomorrow at 1:00 AM',
+                  l10n.nextResetIn(hoursUntilReset),
                   style: TextStyle(
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
                     fontSize: 14,
@@ -133,7 +136,7 @@ class NoLivesDialog extends StatelessWidget {
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    'Use this time to review what you\'ve learned!',
+                    l10n.reviewTime,
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.onPrimaryContainer,
                       fontSize: 12,
@@ -151,7 +154,7 @@ class NoLivesDialog extends StatelessWidget {
             Navigator.of(context).pop();
             onDismiss?.call();
           },
-          child: const Text('I Understand'),
+          child: Text(l10n.iUnderstand),
         ),
       ],
     );
@@ -161,12 +164,12 @@ class NoLivesDialog extends StatelessWidget {
 /// Extension method to easily show the no lives dialog from any provider or widget
 extension NoLivesDialogExtension on BuildContext {
   Future<void> showNoLivesDialog({
-    String? nextReset,
+    int hoursUntilReset = 24,
     VoidCallback? onDismiss,
   }) {
     return NoLivesDialog.show(
       this,
-      nextReset: nextReset,
+      hoursUntilReset: hoursUntilReset,
       onDismiss: onDismiss,
     );
   }
