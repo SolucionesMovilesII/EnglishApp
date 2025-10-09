@@ -11,13 +11,7 @@ import {
   HttpCode,
   ParseUUIDPipe,
 } from '@nestjs/common';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiResponse,
-  ApiBearerAuth,
-  ApiParam,
-} from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam } from '@nestjs/swagger';
 import { ThrottlerGuard } from '@nestjs/throttler';
 import { EnhancedJwtGuard } from '../../../shared/guards/enhanced-jwt.guard';
 import { AuthenticatedRequest } from '../../../shared/types/request.types';

@@ -30,7 +30,7 @@ export class GetReadingChaptersStatusUseCase {
       isUnlocked: item.isUnlocked,
       isCompleted: item.userProgress?.chapterCompleted || false,
       progressPercentage: item.progressPercentage,
-      estimatedReadingTime: item.chapter.metadata?.estimatedMinutes as number || null,
+      estimatedReadingTime: (item.chapter.metadata?.estimatedMinutes as number) || null,
       lastActivity: item.userProgress?.lastActivity || null,
       completionDate: item.userProgress?.chapterCompletionDate || null,
     }));
