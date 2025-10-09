@@ -61,6 +61,9 @@ export class ReadingChaptersStatusResponseDto {
     completedChapters: number;
   };
 
-  @ApiProperty({ description: 'Response message', example: 'Reading chapters retrieved successfully' })
+  @ApiProperty({
+    description: 'Response message',
+    example: 'Reading chapters retrieved successfully',
+  })
   message!: string;
 }

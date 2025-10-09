@@ -41,6 +41,9 @@ export class CompleteReadingChapterResponseDto {
     score: number;
   };
 
-  @ApiProperty({ description: 'Response message', example: 'Reading chapter completed successfully' })
+  @ApiProperty({
+    description: 'Response message',
+    example: 'Reading chapter completed successfully',
+  })
   message!: string;
 }
