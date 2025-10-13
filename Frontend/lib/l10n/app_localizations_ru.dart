@@ -154,7 +154,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String livesRemaining(int lives) {
-    return '5/5';
+    return '$lives/5';
   }
 
   @override

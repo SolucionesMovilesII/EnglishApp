@@ -6,17 +6,14 @@ class EnvironmentConfig {
   // --dart-define=USE_TUNNEL=false
   static const bool _useTunnel = bool.fromEnvironment(
     'USE_TUNNEL',
-    defaultValue: true,
+    defaultValue: false, // Cambiado a false para usar localhost
   );
 
   // =========================
   // URLs base por defecto (ambas ramas)
   // =========================
   static const String _tunnelApiUrl   = 'https://115b1724cb70.ngrok-free.app/'; // <<<< HU-007-4
-  static const String _localApiUrl    = 'http://localhost:3000';               // <<<< main
-
-  // Elige por defecto según el flag _useTunnel (se puede sobreescribir con API_BASE_URL)
-  static const String _defaultApiUrl  = _useTunnel ? _tunnelApiUrl : _localApiUrl;
+  static const String _localApiUrl    = 'http://10.0.2.2:3000';               // Dirección especial para emulador Android
 
   // Versión de API (se puede sobreescribir con API_VERSION)
   static const String _defaultApiVersion = 'api/v1';
@@ -24,13 +21,8 @@ class EnvironmentConfig {
   // =========================
   // Lectura de variables de entorno (con fallback)
   // =========================
-  static String get apiBaseUrl {
-    const url = String.fromEnvironment(
-      'API_BASE_URL',
-      defaultValue: _defaultApiUrl,
-    );
-    return url.endsWith('/') ? url.substring(0, url.length - 1) : url;
-  }
+  // Forzar el uso de 10.0.2.2 para el emulador Android
+  static String get apiBaseUrl => 'http://10.0.2.2:3000';
 
   static String get apiVersion {
     return const String.fromEnvironment(
@@ -42,7 +34,7 @@ class EnvironmentConfig {
   // =========================
   // URL completa
   // =========================
-  static String get fullApiUrl => '$apiBaseUrl/$apiVersion';
+  static String get fullApiUrl => 'http://10.0.2.2:3000/$apiVersion';
 
   // =========================
   // Endpoints comunes
@@ -94,11 +86,11 @@ class EnvironmentConfig {
       // ignore: avoid_print
       print('USE_TUNNEL: $_useTunnel');
       // ignore: avoid_print
-      print('API Base URL: $apiBaseUrl');
+      print('API Base URL: http://10.0.2.2:3000');
       // ignore: avoid_print
       print('API Version: $apiVersion');
       // ignore: avoid_print
-      print('Full API URL: $fullApiUrl');
+      print('Full API URL: http://10.0.2.2:3000/$apiVersion');
       // ignore: avoid_print
       print('Development Mode: $isDevelopment');
       // ignore: avoid_print
