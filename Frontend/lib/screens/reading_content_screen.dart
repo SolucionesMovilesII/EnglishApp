@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/semantics.dart';
 import 'package:provider/provider.dart';
 import 'package:vibration/vibration.dart';
+import 'package:audioplayers/audioplayers.dart';
 import '../providers/reading_content_provider.dart';
 import '../providers/reading_chapters_provider.dart';
 import '../providers/lives_provider.dart';
@@ -12,10 +14,7 @@ import '../l10n/app_localizations.dart';
 class ReadingContentScreen extends StatefulWidget {
   final ReadingChapter chapter;
 
-  const ReadingContentScreen({
-    super.key,
-    required this.chapter,
-  });
+  const ReadingContentScreen({super.key, required this.chapter});
 
   @override
   State<ReadingContentScreen> createState() => _ReadingContentScreenState();
@@ -39,7 +38,10 @@ class _ReadingContentScreenState extends State<ReadingContentScreen> {
   }
 
   Future<void> _loadContent() async {
-    final provider = Provider.of<ReadingContentProvider>(context, listen: false);
+    final provider = Provider.of<ReadingContentProvider>(
+      context,
+      listen: false,
+    );
     await provider.fetchContent(widget.chapter.id);
   }
 
@@ -69,16 +71,11 @@ class _ReadingContentScreenState extends State<ReadingContentScreen> {
         return true;
       },
       child: Scaffold(
-        appBar: AppBar(
-          title: Text(widget.chapter.title),
-          elevation: 0,
-        ),
+        appBar: AppBar(title: Text(widget.chapter.title), elevation: 0),
         body: Consumer<ReadingContentProvider>(
           builder: (context, provider, child) {
             if (provider.isLoading) {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
+              return const Center(child: CircularProgressIndicator());
             }
 
             if (provider.hasError) {
@@ -108,9 +105,7 @@ class _ReadingContentScreenState extends State<ReadingContentScreen> {
             }
 
             if (provider.content == null) {
-              return const Center(
-                child: Text('No content available'),
-              );
+              return const Center(child: Text('No content available'));
             }
 
             // Show loading indicator while quiz is being loaded
@@ -121,10 +116,7 @@ class _ReadingContentScreenState extends State<ReadingContentScreen> {
                   children: [
                     const CircularProgressIndicator(),
                     const SizedBox(height: 16),
-                    Text(
-                      l10n.loading,
-                      style: const TextStyle(fontSize: 16),
-                    ),
+                    Text(l10n.loading, style: const TextStyle(fontSize: 16)),
                   ],
                 ),
               );
@@ -167,7 +159,10 @@ class _ReadingContentScreenState extends State<ReadingContentScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
                     decoration: BoxDecoration(
                       color: theme.colorScheme.primary,
                       borderRadius: BorderRadius.circular(20),
@@ -190,7 +185,10 @@ class _ReadingContentScreenState extends State<ReadingContentScreen> {
                   ),
                   // Level badge
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
                     decoration: BoxDecoration(
                       color: _getLevelColor(provider.content!.level),
                       borderRadius: BorderRadius.circular(12),
@@ -212,7 +210,9 @@ class _ReadingContentScreenState extends State<ReadingContentScreen> {
                 child: LinearProgressIndicator(
                   value: (provider.currentPage + 1) / provider.totalPages,
                   backgroundColor: Colors.grey.shade300,
-                  valueColor: AlwaysStoppedAnimation<Color>(theme.colorScheme.primary),
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    theme.colorScheme.primary,
+                  ),
                   minHeight: 8,
                 ),
               ),
@@ -238,7 +238,9 @@ class _ReadingContentScreenState extends State<ReadingContentScreen> {
                       end: Alignment.bottomRight,
                       colors: [
                         theme.colorScheme.surface,
-                        theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
+                        theme.colorScheme.surfaceContainerHighest.withOpacity(
+                          0.3,
+                        ),
                       ],
                     ),
                     borderRadius: BorderRadius.circular(20),
@@ -323,7 +325,7 @@ class _ReadingContentScreenState extends State<ReadingContentScreen> {
             color: Colors.white,
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.1),
+                color: Colors.black.withAlpha(26),
                 blurRadius: 8,
                 offset: const Offset(0, -2),
               ),
@@ -351,9 +353,7 @@ class _ReadingContentScreenState extends State<ReadingContentScreen> {
                   icon: Icon(
                     provider.isLastPage ? Icons.quiz : Icons.arrow_forward,
                   ),
-                  label: Text(
-                    provider.isLastPage ? l10n.startQuiz : l10n.next,
-                  ),
+                  label: Text(provider.isLastPage ? l10n.startQuiz : l10n.next),
                 ),
               ),
             ],
@@ -369,10 +369,13 @@ class _ReadingContentScreenState extends State<ReadingContentScreen> {
     final question = provider.currentQuestion;
     final livesProvider = Provider.of<LivesProvider>(context, listen: false);
 
+    // Show quiz result view if quiz is completed
+    if (provider.isQuizCompleted && mounted) {
+      return _buildQuizResultView(provider);
+    }
+
     if (question == null) {
-      return const Center(
-        child: Text('No questions available'),
-      );
+      return const Center(child: Text('No questions available'));
     }
 
     return Column(
@@ -404,7 +407,10 @@ class _ReadingContentScreenState extends State<ReadingContentScreen> {
                 children: [
                   // Question counter
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.white.withOpacity(0.2),
                       borderRadius: BorderRadius.circular(20),
@@ -422,7 +428,9 @@ class _ReadingContentScreenState extends State<ReadingContentScreen> {
                   Consumer<LivesProvider>(
                     builder: (context, livesProvider, child) {
                       return Row(
-                        children: List.generate(livesProvider.currentLives, (index) {
+                        children: List.generate(livesProvider.currentLives, (
+                          index,
+                        ) {
                           return Padding(
                             padding: const EdgeInsets.only(left: 4),
                             child: Icon(
@@ -442,7 +450,9 @@ class _ReadingContentScreenState extends State<ReadingContentScreen> {
               ClipRRect(
                 borderRadius: BorderRadius.circular(10),
                 child: LinearProgressIndicator(
-                  value: (provider.currentQuestionIndex + 1) / provider.totalQuestions,
+                  value:
+                      (provider.currentQuestionIndex + 1) /
+                      provider.totalQuestions,
                   backgroundColor: Colors.white.withOpacity(0.3),
                   valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
                   minHeight: 8,
@@ -469,7 +479,9 @@ class _ReadingContentScreenState extends State<ReadingContentScreen> {
                       end: Alignment.bottomRight,
                       colors: [
                         theme.colorScheme.surface,
-                        theme.colorScheme.surfaceContainerHighest.withOpacity(0.5),
+                        theme.colorScheme.surfaceContainerHighest.withOpacity(
+                          0.5,
+                        ),
                       ],
                     ),
                     borderRadius: BorderRadius.circular(20),
@@ -519,93 +531,193 @@ class _ReadingContentScreenState extends State<ReadingContentScreen> {
                 ),
                 const SizedBox(height: 24),
 
-                // Options - Beautiful cards
+                // Options - Beautiful cards with enhanced feedback
                 ...question.options.asMap().entries.map((entry) {
                   final index = entry.key;
                   final option = entry.value;
-                  final isSelected = provider.userAnswers[provider.currentQuestionIndex] == index;
+                  final isSelected =
+                      provider.userAnswers[provider.currentQuestionIndex] ==
+                          index ||
+                      provider.selectedAnswerIndex == index;
+                  final isCorrect =
+                      question != null && index == question.correctAnswer;
+                  final showCorrectAnswer = provider.showCorrectAnswer;
+
+                  // Determine card color based on state
+                  Color borderColor;
+                  Color? backgroundColor;
+                  LinearGradient? gradient;
+                  List<BoxShadow> boxShadows;
+
+                  if (showCorrectAnswer && isCorrect) {
+                    // Highlight correct answer
+                    borderColor = Colors.green;
+                    gradient = LinearGradient(
+                      colors: [
+                        Colors.green.withOpacity(0.3),
+                        Colors.green.withOpacity(0.1),
+                      ],
+                    );
+                    boxShadows = [
+                      BoxShadow(
+                        color: Colors.green.withOpacity(0.3),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
+                      ),
+                    ];
+                  } else if (isSelected &&
+                      provider.hasAttemptedOnce &&
+                      !isCorrect) {
+                    // Wrong answer
+                    borderColor = Colors.red;
+                    gradient = LinearGradient(
+                      colors: [
+                        Colors.red.withOpacity(0.2),
+                        Colors.red.withOpacity(0.1),
+                      ],
+                    );
+                    boxShadows = [
+                      BoxShadow(
+                        color: Colors.red.withOpacity(0.3),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
+                      ),
+                    ];
+                  } else if (isSelected) {
+                    // Selected but not yet evaluated
+                    borderColor = theme.colorScheme.primary;
+                    gradient = LinearGradient(
+                      colors: [
+                        theme.colorScheme.primary.withOpacity(0.2),
+                        theme.colorScheme.primary.withOpacity(0.1),
+                      ],
+                    );
+                    boxShadows = [
+                      BoxShadow(
+                        color: theme.colorScheme.primary.withOpacity(0.3),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
+                      ),
+                    ];
+                  } else {
+                    // Default state
+                    borderColor = Colors.grey.shade300;
+                    backgroundColor = Colors.white;
+                    gradient = null;
+                    boxShadows = [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ];
+                  }
 
                   return Container(
                     margin: const EdgeInsets.only(bottom: 16),
-                    child: InkWell(
-                      onTap: () => _onAnswerSelected(index, provider, livesProvider),
-                      borderRadius: BorderRadius.circular(16),
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 200),
-                        padding: const EdgeInsets.all(20),
-                        decoration: BoxDecoration(
-                          gradient: isSelected
-                              ? LinearGradient(
-                                  colors: [
-                                    theme.colorScheme.primary.withOpacity(0.2),
-                                    theme.colorScheme.primary.withOpacity(0.1),
-                                  ],
-                                )
-                              : null,
-                          color: isSelected ? null : Colors.white,
-                          border: Border.all(
-                            color: isSelected
-                                ? theme.colorScheme.primary
-                                : Colors.grey.shade300,
-                            width: isSelected ? 3 : 2,
+                    child: Semantics(
+                      label:
+                          'Opción ${String.fromCharCode(65 + index)}: ${option}',
+                      hint: isCorrect ? 'Respuesta correcta' : '',
+                      button: true,
+                      enabled: true,
+                      selected: isSelected,
+                      child: InkWell(
+                        onTap: () =>
+                            _onAnswerSelected(index, provider, livesProvider),
+                        borderRadius: BorderRadius.circular(16),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 200),
+                          padding: const EdgeInsets.all(20),
+                          decoration: BoxDecoration(
+                            gradient: gradient,
+                            color: backgroundColor,
+                            border: Border.all(
+                              color: borderColor,
+                              width: isSelected ? 3 : 2,
+                            ),
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: boxShadows,
                           ),
-                          borderRadius: BorderRadius.circular(16),
-                          boxShadow: isSelected
-                              ? [
-                                  BoxShadow(
-                                    color: theme.colorScheme.primary.withOpacity(0.3),
-                                    blurRadius: 12,
-                                    offset: const Offset(0, 4),
+                          child: Row(
+                            children: [
+                              // Option letter with icon for correct/incorrect
+                              Stack(
+                                alignment: Alignment.center,
+                                children: [
+                                  Container(
+                                    width: 40,
+                                    height: 40,
+                                    decoration: BoxDecoration(
+                                      color: isSelected
+                                          ? (showCorrectAnswer && isCorrect) ||
+                                                    (isSelected && isCorrect)
+                                                ? Colors.green
+                                                : (provider.hasAttemptedOnce &&
+                                                      !isCorrect)
+                                                ? Colors.red
+                                                : theme.colorScheme.primary
+                                          : Colors.grey.shade200,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        String.fromCharCode(
+                                          65 + index,
+                                        ), // A, B, C, D
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                          color: isSelected
+                                              ? Colors.white
+                                              : Colors.grey.shade700,
+                                        ),
+                                      ),
+                                    ),
                                   ),
-                                ]
-                              : [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.05),
-                                    blurRadius: 8,
-                                    offset: const Offset(0, 2),
-                                  ),
+                                  if (showCorrectAnswer && isCorrect)
+                                    Positioned(
+                                      right: -5,
+                                      bottom: -5,
+                                      child: Container(
+                                        padding: const EdgeInsets.all(2),
+                                        decoration: const BoxDecoration(
+                                          color: Colors.white,
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: const Icon(
+                                          Icons.check_circle,
+                                          color: Colors.green,
+                                          size: 18,
+                                        ),
+                                      ),
+                                    ),
                                 ],
-                        ),
-                        child: Row(
-                          children: [
-                            // Option letter
-                            Container(
-                              width: 40,
-                              height: 40,
-                              decoration: BoxDecoration(
-                                color: isSelected
-                                    ? theme.colorScheme.primary
-                                    : Colors.grey.shade200,
-                                shape: BoxShape.circle,
                               ),
-                              child: Center(
+                              const SizedBox(width: 16),
+                              Expanded(
                                 child: Text(
-                                  String.fromCharCode(65 + index), // A, B, C, D
+                                  option,
                                   style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
+                                    fontSize: 17,
+                                    fontWeight: isSelected
+                                        ? FontWeight.w600
+                                        : FontWeight.normal,
                                     color: isSelected
-                                        ? Colors.white
-                                        : Colors.grey.shade700,
+                                        ? (showCorrectAnswer && isCorrect) ||
+                                                  (isSelected && isCorrect)
+                                              ? Colors.green
+                                              : (provider.hasAttemptedOnce &&
+                                                    !isCorrect)
+                                              ? Colors.red
+                                              : theme.colorScheme.primary
+                                        : Colors.black87,
+                                    height: 1.4,
                                   ),
                                 ),
                               ),
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: Text(
-                                option,
-                                style: TextStyle(
-                                  fontSize: 17,
-                                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                                  color: isSelected
-                                      ? theme.colorScheme.primary
-                                      : Colors.black87,
-                                  height: 1.4,
-                                ),
-                              ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -656,7 +768,8 @@ class _ReadingContentScreenState extends State<ReadingContentScreen> {
                                 const SizedBox(width: 12),
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         'Hint',
@@ -685,6 +798,73 @@ class _ReadingContentScreenState extends State<ReadingContentScreen> {
                       );
                     },
                   ),
+
+                // Navigation buttons
+                Container(
+                  margin: const EdgeInsets.only(top: 24, bottom: 16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      // Previous button
+                      if (provider.currentQuestionIndex > 0)
+                        Semantics(
+                          label: l10n.previous,
+                          hint: 'Volver a la pregunta anterior',
+                          button: true,
+                          child: ElevatedButton.icon(
+                            onPressed: () {
+                              provider.previousQuestion();
+                              HapticFeedback.lightImpact();
+                              SemanticsService.announce(
+                                'Pregunta anterior',
+                                TextDirection.ltr,
+                              );
+                            },
+                            icon: const Icon(Icons.arrow_back),
+                            label: Text(l10n.previous),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor:
+                                  theme.colorScheme.surfaceContainerHighest,
+                              foregroundColor: theme.colorScheme.primary,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 12,
+                              ),
+                            ),
+                          ),
+                        )
+                      else
+                        const SizedBox(width: 100), // Placeholder for alignment
+                      // Skip button (only if not last question)
+                      if (!provider.isLastQuestion)
+                        Semantics(
+                          label: l10n.next,
+                          hint: 'Saltar a la siguiente pregunta',
+                          button: true,
+                          child: ElevatedButton.icon(
+                            onPressed: () {
+                              provider.nextQuestion();
+                              HapticFeedback.lightImpact();
+                              SemanticsService.announce(
+                                'Siguiente pregunta',
+                                TextDirection.ltr,
+                              );
+                            },
+                            icon: const Icon(Icons.skip_next),
+                            label: Text(l10n.next),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: theme.colorScheme.primary,
+                              foregroundColor: theme.colorScheme.onPrimary,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 12,
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
               ],
             ),
           ),
@@ -708,17 +888,24 @@ class _ReadingContentScreenState extends State<ReadingContentScreen> {
 
   Future<void> _onNextOrStartQuiz(ReadingContentProvider provider) async {
     if (provider.isLastPage) {
+      final l10n = AppLocalizations.of(context)!;
       await provider.startQuiz();
 
       // Check if there was an error loading quiz
       if (provider.errorMessage != null) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(provider.errorMessage!),
-              backgroundColor: Colors.red,
+          final snackBar = SnackBar(
+            content: Text(provider.errorMessage!),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+            action: SnackBarAction(
+              label: l10n.retry,
+              textColor: Colors.white,
+              onPressed: () => _onNextOrStartQuiz(provider),
             ),
           );
+          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+          SemanticsService.announce(provider.errorMessage!, TextDirection.ltr);
         }
       }
     } else {
@@ -727,36 +914,73 @@ class _ReadingContentScreenState extends State<ReadingContentScreen> {
     }
   }
 
-  /// New method: Handle answer selection with vibration and life loss logic
+  /// Handle answer selection with enhanced feedback and life loss logic
   Future<void> _onAnswerSelected(
     int answerIndex,
     ReadingContentProvider provider,
     LivesProvider livesProvider,
   ) async {
+    // Show visual feedback immediately before server response
+    provider.setSelectedAnswer(answerIndex);
+
+    // Haptic feedback for selection
+    HapticFeedback.mediumImpact();
+
     final result = await provider.submitAnswer(answerIndex);
 
     if (result == 'correct') {
-      // Correct answer - auto advance to next question
-      await Future.delayed(const Duration(milliseconds: 600));
+      // Correct answer - show success animation
+      _showFeedbackAnimation(true);
+
+      // Play success sound
+      await AudioPlayer().play(AssetSource('sounds/correct_answer.mp3'));
+
+      // Announce for screen readers
+      SemanticsService.announce('¡Respuesta correcta!', TextDirection.ltr);
+
+      await Future.delayed(const Duration(milliseconds: 1000));
 
       if (provider.isLastQuestion) {
         // Last question - submit quiz
         await _submitQuiz(provider);
       } else {
-        // Move to next question
+        // Move to next question with transition
         provider.nextQuestion();
       }
     } else if (result == 'wrong_first_attempt') {
-      // First wrong attempt - vibrate and show hint
+      // First wrong attempt - vibrate and show hint with animation
+      _showFeedbackAnimation(false);
+
       if (await Vibration.hasVibrator() ?? false) {
         Vibration.vibrate(duration: 500);
       }
-      // Hint is automatically shown by provider
+
+      // Play error sound
+      await AudioPlayer().play(AssetSource('sounds/wrong_answer.mp3'));
+
+      // Announce for screen readers
+      SemanticsService.announce(
+        'Respuesta incorrecta. Intenta de nuevo.',
+        TextDirection.ltr,
+      );
+
+      // Hint is automatically shown by provider with animation
     } else if (result == 'wrong_second_attempt') {
-      // Second wrong attempt - vibrate stronger, lose life, show animation
+      // Second wrong attempt - stronger feedback
+      _showFeedbackAnimation(false);
+
       if (await Vibration.hasVibrator() ?? false) {
         Vibration.vibrate(pattern: [0, 200, 100, 200]);
       }
+
+      // Play error sound
+      await AudioPlayer().play(AssetSource('sounds/wrong_answer.mp3'));
+
+      // Announce for screen readers
+      SemanticsService.announce(
+        'Respuesta incorrecta. Se mostrará la respuesta correcta.',
+        TextDirection.ltr,
+      );
 
       // Show life lost animation
       await _showLifeLostAnimation();
@@ -771,8 +995,13 @@ class _ReadingContentScreenState extends State<ReadingContentScreen> {
         return;
       }
 
+      // Show correct answer before moving on
+      if (mounted) {
+        provider.displayCorrectAnswer();
+        await Future.delayed(const Duration(milliseconds: 1500));
+      }
+
       // Move to next question
-      await Future.delayed(const Duration(milliseconds: 800));
       if (provider.isLastQuestion) {
         await _submitQuiz(provider);
       } else {
@@ -786,12 +1015,50 @@ class _ReadingContentScreenState extends State<ReadingContentScreen> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      barrierColor: Colors.black.withOpacity(0.7),
+      barrierColor: Colors.black.withAlpha(179),
       builder: (context) => const LifeLostAnimationDialog(),
     );
 
     await Future.delayed(const Duration(milliseconds: 1500));
     if (mounted) Navigator.of(context).pop();
+  }
+
+  /// Shows a feedback animation for correct or incorrect answers
+  void _showFeedbackAnimation(bool isCorrect) {
+    final overlay = OverlayEntry(
+      builder: (context) => Positioned.fill(
+        child: Material(
+          color: Colors.transparent,
+          child: Center(
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeOut,
+              width: 120,
+              height: 120,
+              decoration: BoxDecoration(
+                color: isCorrect
+                    ? Colors.green.withAlpha(204)
+                    : Colors.red.withAlpha(204),
+                shape: BoxShape.circle,
+              ),
+              child: Center(
+                child: Icon(
+                  isCorrect ? Icons.check : Icons.close,
+                  color: Colors.white,
+                  size: 80,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    Overlay.of(context).insert(overlay);
+
+    Future.delayed(const Duration(milliseconds: 800), () {
+      overlay.remove();
+    });
   }
 
   /// Handle no lives remaining - save progress and go back
@@ -808,18 +1075,13 @@ class _ReadingContentScreenState extends State<ReadingContentScreen> {
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Row(
           children: [
             const Icon(Icons.heart_broken, color: Colors.red, size: 32),
             const SizedBox(width: 12),
             const Expanded(
-              child: Text(
-                'No Lives Remaining',
-                style: TextStyle(fontSize: 20),
-              ),
+              child: Text('No Lives Remaining', style: TextStyle(fontSize: 20)),
             ),
           ],
         ),
@@ -835,10 +1097,7 @@ class _ReadingContentScreenState extends State<ReadingContentScreen> {
             Text(
               'Come back tomorrow to continue!',
               textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey,
-              ),
+              style: TextStyle(fontSize: 14, color: Colors.grey),
             ),
           ],
         ),
@@ -862,6 +1121,112 @@ class _ReadingContentScreenState extends State<ReadingContentScreen> {
     );
   }
 
+  /// Build quiz result view with improved UI and feedback
+  Widget _buildQuizResultView(ReadingContentProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
+    final score = provider.score;
+    final total = provider.totalQuestions;
+    final percentage = (score / total) * 100;
+
+    // Determine result message and color based on score
+    String resultMessage;
+    Color resultColor;
+    IconData resultIcon;
+
+    if (percentage >= 80) {
+      resultMessage = "¡Excelente!";
+      resultColor = Colors.green;
+      resultIcon = Icons.emoji_events;
+    } else if (percentage >= 60) {
+      resultMessage = "¡Buen trabajo!";
+      resultColor = Colors.blue;
+      resultIcon = Icons.thumb_up;
+    } else {
+      resultMessage = "¡Sigue practicando!";
+      resultColor = Colors.orange;
+      resultIcon = Icons.refresh;
+    }
+
+    return Center(
+      child: Container(
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 10,
+              spreadRadius: 1,
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(resultIcon, size: 80, color: resultColor),
+            const SizedBox(height: 20),
+            Text(
+              resultMessage,
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                color: resultColor,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              '${l10n.score}: $score/$total',
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+            Text(
+              '${percentage.toStringAsFixed(0)}%',
+              style: Theme.of(context).textTheme.displayMedium?.copyWith(
+                color: resultColor,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 40),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ElevatedButton.icon(
+                  onPressed: () {
+                    provider.resetQuiz();
+                  },
+                  icon: const Icon(Icons.book),
+                  label: Text("Volver a la lectura"),
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 12,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                if (percentage < 80)
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      provider.resetQuizAndRetry();
+                    },
+                    icon: const Icon(Icons.replay),
+                    label: Text(l10n.tryAgain),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: resultColor,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 12,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Future<void> _submitQuiz(ReadingContentProvider provider) async {
     final l10n = AppLocalizations.of(context)!;
 
@@ -869,24 +1234,31 @@ class _ReadingContentScreenState extends State<ReadingContentScreen> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => const Center(
-        child: CircularProgressIndicator(),
-      ),
+      builder: (context) => const Center(child: CircularProgressIndicator()),
     );
 
     final result = await provider.submitQuiz();
+
+    // Log integration test result
+    debugPrint(
+      'INTEGRATION TEST: submitQuiz - ${result['success'] ? 'SUCCESS' : 'FAILURE'}',
+    );
+    if (!result['success'] && result['error'] != null) {
+      debugPrint('INTEGRATION TEST ERROR: ${result['error']}');
+    }
 
     // Close loading dialog
     if (mounted) Navigator.pop(context);
 
     if (!result['success']) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(result['error'] ?? l10n.unknownError),
-            backgroundColor: Colors.red,
-          ),
+        final errorMessage = result['error'] ?? l10n.unknownError;
+        final snackBar = SnackBar(
+          content: Text(errorMessage),
+          backgroundColor: Colors.red,
         );
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        SemanticsService.announce(errorMessage, TextDirection.ltr);
       }
       return;
     }
@@ -895,8 +1267,13 @@ class _ReadingContentScreenState extends State<ReadingContentScreen> {
     final passed = result['passed'] as bool;
 
     if (passed) {
+      // Capture provider before async gap
+      final chaptersProvider = Provider.of<ReadingChaptersProvider>(
+        context,
+        listen: false,
+      );
+
       // Mark chapter as completed
-      final chaptersProvider = Provider.of<ReadingChaptersProvider>(context, listen: false);
       await chaptersProvider.completeChapter(widget.chapter.id, score);
 
       // Show success dialog
@@ -904,8 +1281,10 @@ class _ReadingContentScreenState extends State<ReadingContentScreen> {
         _showSuccessDialog(score);
       }
     } else {
-      // Consume a life and show retry dialog
+      // Capture provider before async gap
       final livesProvider = Provider.of<LivesProvider>(context, listen: false);
+
+      // Consume a life and show retry dialog
       await livesProvider.consumeLife();
 
       if (mounted) {
@@ -1002,7 +1381,10 @@ class _ReadingContentScreenState extends State<ReadingContentScreen> {
           if (livesProvider.currentLives > 0)
             ElevatedButton(
               onPressed: () {
-                final contentProvider = Provider.of<ReadingContentProvider>(context, listen: false);
+                final contentProvider = Provider.of<ReadingContentProvider>(
+                  context,
+                  listen: false,
+                );
                 contentProvider.resetQuiz();
                 Navigator.pop(context); // Close dialog
               },
@@ -1028,9 +1410,7 @@ class _ReadingContentScreenState extends State<ReadingContentScreen> {
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-            ),
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             child: Text(l10n.exit),
           ),
         ],
@@ -1050,7 +1430,8 @@ class LifeLostAnimationDialog extends StatefulWidget {
   const LifeLostAnimationDialog({super.key});
 
   @override
-  State<LifeLostAnimationDialog> createState() => _LifeLostAnimationDialogState();
+  State<LifeLostAnimationDialog> createState() =>
+      _LifeLostAnimationDialogState();
 }
 
 class _LifeLostAnimationDialogState extends State<LifeLostAnimationDialog>

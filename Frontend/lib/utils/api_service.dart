@@ -25,7 +25,7 @@ class ApiService {
     if (withCredentials) {
       headers['X-Requested-With'] = 'XMLHttpRequest';
       // Backend requires Origin header - use mobile app compatible origin
-      headers['Origin'] = 'http://localhost:3000'; // Same origin as API for dev
+      headers['Origin'] = 'http://10.0.2.2:3000'; // Dirección especial para emulador Android
     }
     return headers;
   }

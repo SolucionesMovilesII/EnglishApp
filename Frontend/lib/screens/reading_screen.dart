@@ -207,7 +207,7 @@ class _ReadingScreenContentState extends State<_ReadingScreenContent> {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!.reading),
+        title: Text(AppLocalizations.of(context)?.reading ?? 'Reading'),
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Theme.of(context).colorScheme.onPrimary,
         actions: [

@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/user_model.dart';
 import '../l10n/app_localizations.dart';
@@ -454,5 +456,88 @@ class AuthProvider with ChangeNotifier {
     await prefs.remove(_refreshTokenKey);
     _accessToken = null;
     _refreshToken = null;
+  }
+  
+  /// Intenta renovar el token de acceso
+  /// Retorna true si la renovación fue exitosa, false en caso contrario
+  Future<bool> refreshToken() async {
+    if (_authState != AuthState.authenticated) {
+      return false;
+    }
+    
+    try {
+      // Si no hay un token de acceso actual, intentar auto-login
+      if (_accessToken == null) {
+        return await autoLogin();
+      }
+      
+      // Intentar renovar el token usando el endpoint de refresh
+      final response = await http.post(
+        Uri.parse(EnvironmentConfig.refreshTokenEndpoint),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $_accessToken',
+        },
+      );
+      
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        _accessToken = responseData['accessToken'] as String?;
+        
+        if (_accessToken != null) {
+          await _saveTokens();
+          return true;
+        }
+      }
+      
+      // Si la renovación falla, intentar auto-login como fallback
+      return await autoLogin();
+    } catch (e) {
+      debugPrint('Error al renovar token: $e');
+      return false;
+    }
+  }
+  
+  /// Intenta iniciar sesión automáticamente usando los datos guardados
+  /// Retorna true si el auto-login fue exitoso, false en caso contrario
+  Future<bool> autoLogin() async {
+    try {
+      // Cargar tokens guardados
+      await _loadTokens();
+      
+      // Si no hay token de acceso, no podemos hacer auto-login
+      if (_accessToken == null) {
+        return false;
+      }
+      
+      // Verificar si el token es válido haciendo una petición al endpoint de verificación
+      final response = await http.get(
+        Uri.parse('${EnvironmentConfig.authEndpoint}/verify'),
+        headers: {
+          'Authorization': 'Bearer $_accessToken',
+        },
+      );
+      
+      if (response.statusCode == 200) {
+        // Token válido, cargar datos del usuario
+        final userData = await SharedPreferences.getInstance().then(
+          (prefs) => prefs.getString(_userKey),
+        );
+        
+        if (userData != null) {
+          _user = UserModel.fromJson(userData);
+          _authState = AuthState.authenticated;
+          notifyListeners();
+          return true;
+        }
+      }
+      
+      // Si el token no es válido o no hay datos de usuario, limpiar tokens
+      await _clearTokens();
+      return false;
+    } catch (e) {
+      debugPrint('Error en auto-login: $e');
+      return false;
+    }
   }
 }
