@@ -14,8 +14,10 @@ export interface EvaluateApprovalRequest {
   userId: string;
   chapterId: string;
   score: number;
+  errors?: number;
   timeSpent?: number;
   additionalData?: Record<string, unknown>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface EvaluateApprovalResponse {

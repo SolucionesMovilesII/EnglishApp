@@ -1,6 +1,12 @@
+import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../models/quiz_question.dart';
 import '../services/quiz_practice_service.dart';
+
+import 'approval_provider.dart';
 import 'progress_provider.dart';
 
 class QuizProvider with ChangeNotifier {
@@ -69,8 +75,40 @@ class QuizProvider with ChangeNotifier {
       // Auto-save progress when moving to next question
       _progressProvider?.onQuizAnswered(_chapterId, _score.toDouble(), _currentQuestionIndex);
     } else {
-      // Quiz completed - save final progress
-      _progressProvider?.onChapterCompleted(_chapterId, _score.toDouble());
+      // Quiz completed - save final progress with additional metadata
+      Map<String, dynamic> quizData = {
+        'quiz_completed': true,
+        'final_score': _score,
+        'questions_total': _questions.length,
+        'completed_at': DateTime.now().toIso8601String(),
+      };
+      
+      _progressProvider?.onChapterCompleted(_chapterId, _score.toDouble(), extraData: quizData);
+      
+      // Also persist score in local storage for offline access
+      _persistQuizScore(_chapterId, _score, quizData);
+    }
+  }
+  
+  // Persist quiz score locally for offline access
+  Future<void> _persistQuizScore(String chapterId, int score, Map<String, dynamic> quizData) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      
+      // Store quiz scores by chapter
+      final key = 'quiz_score_$chapterId';
+      await prefs.setDouble(key, score.toDouble());
+      
+      // Store quiz completion data
+      final completionKey = 'quiz_completion_$chapterId';
+      await prefs.setString(completionKey, jsonEncode(quizData));
+      
+      // Store last completed quiz timestamp
+      await prefs.setString('last_completed_quiz', DateTime.now().toIso8601String());
+      
+      print('✅ Quiz score persisted locally: $score for chapter $chapterId');
+    } catch (e) {
+      print('❌ Error persisting quiz score: $e');
     }
   }
 
