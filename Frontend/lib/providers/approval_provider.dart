@@ -75,6 +75,7 @@ class ApprovalProvider with ChangeNotifier {
     required double score,
     required int errors,
     required int timeSpent,
+    Map<String, dynamic>? quizData,
   }) async {
     try {
       _setApprovalState(ApprovalState.evaluating);
@@ -94,6 +95,7 @@ class ApprovalProvider with ChangeNotifier {
         errors: errors,
         timeSpent: timeSpent,
         token: token,
+        metadata: quizData,
       );
       
       if (response.success) {
