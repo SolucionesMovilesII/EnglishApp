@@ -453,10 +453,12 @@ class InterviewPracticeService extends BasePracticeService {
     String? difficultyLevel,
   }) async {
     final additionalFilters = <String, dynamic>{};
-    if (interviewType != null)
+    if (interviewType != null) {
       additionalFilters['interviewType'] = interviewType;
-    if (difficultyLevel != null)
+    }
+    if (difficultyLevel != null) {
       additionalFilters['difficultyLevel'] = difficultyLevel;
+    }
 
     final response = await getUserPracticeStats(
       userId,

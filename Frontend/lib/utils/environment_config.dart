@@ -2,18 +2,21 @@ class EnvironmentConfig {
   // =========================
   // Flags de compilación
   // =========================
-  // Usa el túnel (loca.lt) por defecto. Para usar localhost:
+  // Usa el túnel (ngrok) por defecto. Para usar localhost:
   // --dart-define=USE_TUNNEL=false
   static const bool _useTunnel = bool.fromEnvironment(
     'USE_TUNNEL',
-    defaultValue: false, // Cambiado a false para usar localhost
+    defaultValue: true, // Cambiado a true para usar ngrok por defecto
   );
 
   // =========================
   // URLs base por defecto (ambas ramas)
   // =========================
-  static const String _tunnelApiUrl   = 'https://115b1724cb70.ngrok-free.app/'; // <<<< HU-007-4
-  static const String _localApiUrl    = 'http://10.0.2.2:3000';               // Dirección especial para emulador Android
+  static const String _tunnelApiUrl   = 'https://d1151c2af665.ngrok-free.app'; // <<<< ACTUALIZAR CON TU URL DE NGROK
+  static const String _localApiUrl    = 'http://10.0.2.2:3000';               // <<<< Para emulador Android
+
+  // Elige por defecto según el flag _useTunnel (se puede sobreescribir con API_BASE_URL)
+  static const String _defaultApiUrl  = _useTunnel ? _tunnelApiUrl : _localApiUrl;
 
   // Versión de API (se puede sobreescribir con API_VERSION)
   static const String _defaultApiVersion = 'api/v1';
@@ -21,8 +24,12 @@ class EnvironmentConfig {
   // =========================
   // Lectura de variables de entorno (con fallback)
   // =========================
-  // Forzar el uso de 10.0.2.2 para el emulador Android
-  static String get apiBaseUrl => 'http://10.0.2.2:3000';
+  static String get apiBaseUrl {
+    return const String.fromEnvironment(
+      'API_BASE_URL',
+      defaultValue: _defaultApiUrl,
+    );
+  }
 
   static String get apiVersion {
     return const String.fromEnvironment(
@@ -34,7 +41,7 @@ class EnvironmentConfig {
   // =========================
   // URL completa
   // =========================
-  static String get fullApiUrl => 'http://10.0.2.2:3000/$apiVersion';
+  static String get fullApiUrl => '$apiBaseUrl/$apiVersion';
 
   // =========================
   // Endpoints comunes
@@ -86,11 +93,11 @@ class EnvironmentConfig {
       // ignore: avoid_print
       print('USE_TUNNEL: $_useTunnel');
       // ignore: avoid_print
-      print('API Base URL: http://10.0.2.2:3000');
+      print('API Base URL: $apiBaseUrl');
       // ignore: avoid_print
       print('API Version: $apiVersion');
       // ignore: avoid_print
-      print('Full API URL: http://10.0.2.2:3000/$apiVersion');
+      print('Full API URL: $fullApiUrl');
       // ignore: avoid_print
       print('Development Mode: $isDevelopment');
       // ignore: avoid_print

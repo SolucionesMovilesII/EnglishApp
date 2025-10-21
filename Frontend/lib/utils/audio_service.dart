@@ -18,9 +18,10 @@ class AudioService {
 
   // Config TTS
   double _volume = 0.8;
-  double _rate = 0.5;
+  double _rate = 0.3;
   double _pitch = 1.0;
   String _currentLanguage = 'en-US';
+  Map<String, String>? _currentVoice;
 
   // Cache de idiomas y voces
   List<dynamic> _availableLanguages = [];
@@ -34,6 +35,7 @@ class AudioService {
   double get rate => _rate;
   double get pitch => _pitch;
   String get currentLanguage => _currentLanguage;
+  Map<String, String>? get currentVoice => _currentVoice;
   List<dynamic> get availableLanguages => _availableLanguages;
   List<dynamic> get availableVoices => _availableVoices;
 
@@ -78,6 +80,9 @@ class AudioService {
     await _flutterTts.setPitch(_pitch);
     await _flutterTts.setLanguage(_currentLanguage);
 
+    // Intentar configurar una voz masculina por defecto
+    await _setMaleVoiceIfAvailable();
+
     _flutterTts.setStartHandler(() {
       _isSpeaking = true;
     });
@@ -108,10 +113,114 @@ class AudioService {
   Future<void> _loadAvailableVoices() async {
     try {
       _availableVoices = await _flutterTts.getVoices ?? [];
+      if (kDebugMode) {
+        print('📢 Available voices: ${_availableVoices.length}');
+        for (var voice in _availableVoices) {
+          print('  - ${voice['name']} (${voice['locale']})');
+        }
+      }
     } catch (e) {
       if (kDebugMode) print('Error loading voices: $e');
       _availableVoices = [];
     }
+  }
+
+  /// Configurar voz masculina automáticamente
+  Future<void> _setMaleVoiceIfAvailable() async {
+    try {
+      if (_availableVoices.isEmpty) return;
+
+      // Nombres comunes de voces masculinas en diferentes plataformas
+      final maleVoicePatterns = [
+        // Android
+        'en-us-x-tpf-local',      // Android male voice
+        'en-us-x-tpd-local',      // Android male voice
+        'en-gb-x-gba-local',      // UK male voice
+        // iOS
+        'Aaron',                   // US English male
+        'Alex',                    // US English male
+        'Daniel',                  // UK English male
+        'Fred',                    // US English male
+        'Jorge',                   // Spanish male
+        'Juan',                    // Spanish male
+        // Otros patrones
+        'male',
+        'man',
+        'masculino',
+      ];
+
+      // Buscar una voz masculina para el idioma actual
+      for (var voice in _availableVoices) {
+        final voiceMap = voice as Map<String, dynamic>;
+        final name = voiceMap['name']?.toString().toLowerCase() ?? '';
+        final locale = voiceMap['locale']?.toString().toLowerCase() ?? '';
+
+        // Verificar si el locale coincide con el idioma actual
+        if (!locale.contains(_currentLanguage.toLowerCase().split('-').first)) {
+          continue;
+        }
+
+        // Verificar si el nombre contiene algún patrón masculino
+        for (var pattern in maleVoicePatterns) {
+          if (name.contains(pattern.toLowerCase())) {
+            await setVoice(voiceMap.map((key, value) => MapEntry(key.toString(), value.toString())));
+            if (kDebugMode) print('✅ Male voice set: ${voiceMap['name']}');
+            return;
+          }
+        }
+      }
+
+      if (kDebugMode) print('⚠️ No male voice found, using default');
+    } catch (e) {
+      if (kDebugMode) print('Error setting male voice: $e');
+    }
+  }
+
+  /// Configurar una voz específica
+  Future<bool> setVoice(Map<String, String> voice) async {
+    try {
+      if (!_isInitialized) await initialize();
+
+      await _flutterTts.setVoice(voice);
+      _currentVoice = voice;
+
+      if (kDebugMode) print('Voice set to: ${voice['name']}');
+      return true;
+    } catch (e) {
+      if (kDebugMode) print('Error setting voice: $e');
+      return false;
+    }
+  }
+
+  /// Obtener voces disponibles filtradas por idioma y género
+  List<Map<String, String>> getVoicesByLanguageAndGender({
+    String? language,
+    bool maleOnly = false,
+  }) {
+    final voices = <Map<String, String>>[];
+
+    for (var voice in _availableVoices) {
+      final voiceMap = voice as Map<String, dynamic>;
+      final locale = voiceMap['locale']?.toString().toLowerCase() ?? '';
+      final name = voiceMap['name']?.toString().toLowerCase() ?? '';
+
+      // Filtrar por idioma si se especifica
+      if (language != null && !locale.contains(language.toLowerCase())) {
+        continue;
+      }
+
+      // Filtrar por género si se especifica
+      if (maleOnly) {
+        final malePatterns = ['male', 'man', 'aaron', 'alex', 'daniel', 'fred', 'jorge', 'juan', 'tpf', 'tpd', 'gba'];
+        if (!malePatterns.any((pattern) => name.contains(pattern))) {
+          continue;
+        }
+      }
+
+      voices.add(voiceMap.map((key, value) => MapEntry(key.toString(), value.toString())));
+    }
+
+    return voices;
   }
 
   /// Hablar texto
@@ -307,6 +416,7 @@ class AudioService {
       'rate': _rate,
       'pitch': _pitch,
       'currentLanguage': _currentLanguage,
+      'currentVoice': _currentVoice,
       'availableLanguagesCount': _availableLanguages.length,
       'availableVoicesCount': _availableVoices.length,
     };

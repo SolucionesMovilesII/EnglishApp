@@ -324,11 +324,13 @@ class ReadingPracticeService extends BasePracticeService {
   }) async {
     final updateData = <String, dynamic>{};
 
-    if (currentParagraph != null)
+    if (currentParagraph != null) {
       updateData['currentParagraph'] = currentParagraph;
+    }
     if (wordsRead != null) updateData['wordsRead'] = wordsRead;
-    if (readingTimeSeconds != null)
+    if (readingTimeSeconds != null) {
       updateData['readingTimeSeconds'] = readingTimeSeconds;
+    }
     if (progress != null) updateData['progress'] = progress;
 
     final response = await updatePracticeSession(sessionId, updateData, token);
@@ -427,8 +429,9 @@ class ReadingPracticeService extends BasePracticeService {
     final filters = <String, dynamic>{};
     if (level != null) filters['level'] = level;
     if (completed != null) filters['completed'] = completed;
-    if (minComprehensionScore != null)
+    if (minComprehensionScore != null) {
       filters['minComprehensionScore'] = minComprehensionScore;
+    }
 
     final response = await getUserPracticeSessions(
       userId,

@@ -207,8 +207,9 @@ class VocabularyPracticeService extends BasePracticeService {
     if (wordsStudied != null) updateData['wordsStudied'] = wordsStudied;
     if (wordsLearned != null) updateData['wordsLearned'] = wordsLearned;
     if (correctAnswers != null) updateData['correctAnswers'] = correctAnswers;
-    if (incorrectAnswers != null)
+    if (incorrectAnswers != null) {
       updateData['incorrectAnswers'] = incorrectAnswers;
+    }
     if (studiedWords != null) {
       updateData['studiedWords'] = studiedWords
           .map((word) => word.toJson())
@@ -298,8 +299,9 @@ class VocabularyPracticeService extends BasePracticeService {
     String? difficultyLevel,
   }) async {
     final additionalFilters = <String, dynamic>{};
-    if (difficultyLevel != null)
+    if (difficultyLevel != null) {
       additionalFilters['difficultyLevel'] = difficultyLevel;
+    }
 
     final response = await getUserPracticeStats(
       userId,

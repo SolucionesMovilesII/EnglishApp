@@ -230,13 +230,16 @@ class QuizPracticeService extends BasePracticeService {
     if (progress != null) updateData['progress'] = progress;
     if (score != null) updateData['score'] = score;
     if (status != null) updateData['status'] = status;
-    if (answeredQuestions != null)
+    if (answeredQuestions != null) {
       updateData['answeredQuestions'] = answeredQuestions;
+    }
     if (correctAnswers != null) updateData['correctAnswers'] = correctAnswers;
-    if (incorrectAnswers != null)
+    if (incorrectAnswers != null) {
       updateData['incorrectAnswers'] = incorrectAnswers;
-    if (timeSpentSeconds != null)
+    }
+    if (timeSpentSeconds != null) {
       updateData['timeSpentSeconds'] = timeSpentSeconds;
+    }
     if (questionResults != null) {
       updateData['questionResults'] = questionResults
           .map((result) => result.toJson())
@@ -334,8 +337,9 @@ class QuizPracticeService extends BasePracticeService {
   }) async {
     final additionalFilters = <String, dynamic>{};
     if (category != null) additionalFilters['category'] = category;
-    if (difficultyLevel != null)
+    if (difficultyLevel != null) {
       additionalFilters['difficultyLevel'] = difficultyLevel;
+    }
 
     final response = await getUserPracticeStats(
       userId,

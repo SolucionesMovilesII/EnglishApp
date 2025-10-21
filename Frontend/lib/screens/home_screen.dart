@@ -9,14 +9,11 @@ import '../widgets/bottom_navigation.dart';
 import '../widgets/app_banner.dart';
 import '../l10n/app_localizations.dart';
 import 'settings_screen.dart';
-import 'quiz_screen.dart';
 import 'chapter_episodes_screen.dart';
 import 'chapter_results_screen.dart';
-import 'favorites_screen.dart';
 import 'vocabulary_chapters_screen.dart';
-import 'reading_screen.dart';
 import 'reading_chapters_screen.dart';
-import 'interview_screen.dart';
+import 'interview_topics_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -133,7 +130,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       case 2:
         return const ReadingChaptersScreen();
       case 3:
-        return const QuizScreen();
+        return const InterviewTopicsScreen();
       default:
         return _buildHomeContent();
     }
@@ -218,24 +215,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                               ),
                             ),
                           ),
-                          
+
                           const SizedBox(height: 8),
-                          
-                          // Interview Card
-                          CustomCard(
-                            title: AppLocalizations.of(context)!.databases,
-                            subtitle: AppLocalizations.of(context)!.continueText,
-                            description: AppLocalizations.of(context)!.interview,
-                            icon: CustomIcons.interviewIcon(),
-                            onTap: () => Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) => const InterviewScreen(),
-                              ),
-                            ),
-                          ),
-                          
-                          const SizedBox(height: 8),
-                          
+
                           // Chapter Results Card
                           CustomCard(
                             title: AppLocalizations.of(context)!.chapterResults,
