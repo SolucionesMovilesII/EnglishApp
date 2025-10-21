@@ -52,7 +52,7 @@ class LivesProvider with ChangeNotifier {
     if (_dailyLives?.nextReset == null) return 24;
 
     try {
-      final resetTime = DateTime.parse(_dailyLives!.nextReset!);
+      final resetTime = DateTime.parse(_dailyLives!.nextReset);
       final now = DateTime.now();
       final difference = resetTime.difference(now);
 
