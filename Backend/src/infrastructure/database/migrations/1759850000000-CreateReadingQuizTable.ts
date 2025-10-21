@@ -40,7 +40,7 @@ export class CreateReadingQuizTable1759850000000 implements MigrationInterface {
           {
             name: 'questions',
             type: 'jsonb',
-            default: '[]',
+            default: "'[]'",
           },
           {
             name: 'is_active',
